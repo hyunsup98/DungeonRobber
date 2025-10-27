@@ -21,11 +21,8 @@ public class Player : MonoBehaviour
         transform.Translate(new Vector3(moveX, 0, moveZ));
 
         //Debug.Log("Player Position: " + transform.position);
-    }
 
-    // 아이템 사용: 숫자 1~9키
-    private void FixedUpdate()
-    {
+        // 아이템 사용: 숫자 1~9키
 
         //TODO: 옵저버 패턴 추가
         TextMeshProUGUI goldText = GameObject.FindGameObjectWithTag("GoldText")?.GetComponent<TextMeshProUGUI>();
@@ -35,8 +32,8 @@ public class Player : MonoBehaviour
         }
 
         if (Input.anyKeyDown == false)
-        { 
-            return; 
+        {
+            return;
         }
 
         ItemTest itemTest = gameObject.GetComponent<ItemTest>();
