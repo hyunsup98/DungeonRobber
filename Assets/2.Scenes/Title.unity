@@ -163,21 +163,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 479039591}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cd3e9a6aef3b4242b1b80008ae9fa50, type: 3}
+  m_Script: {fileID: 11500000, guid: 0baffefd4f0f916428b2c9c790bfba55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spawnItemPrefabList:
-  - mapItemPrefab: {fileID: 1775927895860311147, guid: 613c272ec8d53fc41a829f5fcdfa595f, type: 3}
-    _spawnProbability: 0.307
-  - mapItemPrefab: {fileID: 5355940391723549367, guid: d5fefb85a5979cb4690276ec8cdd489c, type: 3}
-    _spawnProbability: 0.243
+  _spawnDataList:
+  - mapPrefab: {fileID: 1775927895860311147, guid: 613c272ec8d53fc41a829f5fcdfa595f, type: 3}
+    _spawnProbability: 0.079
   _groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  _CreateItemCount: 10
+  _CreateCount: 10
   _mapSwpanSize: {x: 40, y: 40}
-  _minItemDistance: 2
-  _spawnCountChance: 0.39
+  _minSpawnDistance: 2
+  _spawnCountChance: 0.372
+  enableRespawn: 1
+  respawnDelay: 5
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -378,6 +378,62 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 742181441}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &794534961
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 794534963}
+  - component: {fileID: 794534962}
+  m_Layer: 0
+  m_Name: MonsterSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &794534962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 794534961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bea416bdc6734479ede6498823a0c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _spawnDataList:
+  - mapPrefab: {fileID: 5355940391723549367, guid: d5fefb85a5979cb4690276ec8cdd489c, type: 3}
+    _spawnProbability: 0.205
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  _CreateCount: 4
+  _mapSwpanSize: {x: 40, y: 40}
+  _minSpawnDistance: 10
+  _spawnCountChance: 0.133
+  enableRespawn: 1
+  respawnDelay: 5
+--- !u!4 &794534963
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 794534961}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &927960815
 GameObject:
   m_ObjectHideFlags: 0
@@ -2361,3 +2417,4 @@ SceneRoots:
   - {fileID: 1187116173}
   - {fileID: 1160384359}
   - {fileID: 479039592}
+  - {fileID: 794534963}
