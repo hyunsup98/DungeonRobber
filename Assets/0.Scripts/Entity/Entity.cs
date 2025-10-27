@@ -5,12 +5,12 @@ using UnityEngine;
 /// </summary>
 public abstract class Entity : MonoBehaviour
 {
-    protected float attackDamage;
-    protected float maxHP;
-    protected float currentHP;
-    protected float moveSpeed;
-    protected float attackRange;
-    protected float attackDelay;
+   [SerializeField] protected float attackDamage;
+   [SerializeField] protected float maxHP;
+   [SerializeField] protected float currentHP;
+   [SerializeField] protected float moveSpeed;
+   [SerializeField] protected float attackRange;
+   [SerializeField] protected float attackDelay;
 
     //초기화 메서드
     protected abstract void Init();
