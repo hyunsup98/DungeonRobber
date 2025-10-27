@@ -122,6 +122,62 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &479039591
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 479039592}
+  - component: {fileID: 479039593}
+  m_Layer: 0
+  m_Name: ItemSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &479039592
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 479039591}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &479039593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 479039591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cd3e9a6aef3b4242b1b80008ae9fa50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _spawnItemPrefabList:
+  - mapItemPrefab: {fileID: 1775927895860311147, guid: 613c272ec8d53fc41a829f5fcdfa595f, type: 3}
+    _spawnProbability: 0.307
+  - mapItemPrefab: {fileID: 5355940391723549367, guid: d5fefb85a5979cb4690276ec8cdd489c, type: 3}
+    _spawnProbability: 0.243
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  _CreateItemCount: 10
+  _mapSwpanSize: {x: 40, y: 40}
+  _minItemDistance: 2
+  _spawnCountChance: 0.39
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -716,7 +772,7 @@ GameObject:
   - component: {fileID: 1555796303}
   - component: {fileID: 1555796302}
   - component: {fileID: 1555796301}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2304,3 +2360,4 @@ SceneRoots:
   - {fileID: 1555796304}
   - {fileID: 1187116173}
   - {fileID: 1160384359}
+  - {fileID: 479039592}
