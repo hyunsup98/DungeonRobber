@@ -1,28 +1,86 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.AI;
-
 
 public class SkeletonWarrior : Monster
 {
-    private void OnEnable()
+    [SerializeField] WaitForSeconds detectDelay = new WaitForSeconds(1f);//감지 딜레이 
+    Coroutine detectCoroutine; //감지 코루틴  변수
+
+    private void OnEnable() //활성화 시점에서 초기화 
     {
         Init();
+    }
+    
+    private void FixedUpdate()
+    {
+        if (isDetective) //감지했을 때
+        {
+            DetectAction();
+        }
+        else
+        {
+            OverlookAction();
+        }
+    }
+    private void OnDisable() //비활성화시 코루틴 정지 
+    {
+        if (detectCoroutine != null)
+            StopCoroutine(detectCoroutine);
+    }
+
+    protected override void Init()
+    {
+        maxHP = 50f;
+        base.Init();
+        attackRange = 2f;
+        attackDamage = 10f;
+        attackDelay = 1.5f;
+        moveSpeed = 3f;
+        detectedRangeRadius = 10f;
+        
+        detectCoroutine = StartCoroutine(nameof(DetectTarget));
+        targetWaypoint = Waypoints[Random.Range(0, Waypoints.Length)];              
     }
 
     protected override void Attack()
     {
-        
+        //todo 공격 구현
+        Debug.Log("Attack");
     }
 
+    /// <summary>
+    /// 감지했을 때 취하는 행동 메서드
+    /// </summary>
     protected override void DetectAction()
     {
-        if(isDetective)
+        monsterrib.velocity = Vector3.zero;
+
+        Vector3 tempVector = target.transform.position - transform.position;
+        targetDistance = Vector3.SqrMagnitude(tempVector); // 단순 비교이므로 sqrMagnitude 사용
+
+        if (targetDistance <= attackRange * attackRange) //공격 사거리안에 들어오면 공격 
         {
-            agent.SetDestination(target.transform.position);
-        }        
+            if (Physics.Raycast(transform.position + (Vector3.up * 1.5f), transform.forward, out rayhit, attackRange, detectlayer) && rayhit.collider.CompareTag("Player")) //플레이어가 장애물 뒤에 숨어있지 않고 공격범위 내라면 
+            {                               
+                agent.isStopped = true; //이동 멈추고
+                Attack();
+                agent.isStopped = false; //다시 이동 시작
+            }
+            else
+            {
+                agent.SetDestination(target.transform.position); //타겟의 위치로 이동
+            }
+        }
+        else
+        {
+            agent.SetDestination(target.transform.position); //타겟의 위치로 이동
+        }
     }
 
+    /// <summary>
+    /// 데미지 피격 메서드 
+    /// </summary>
+    /// <param name="damage"> 해당 몬스터가 입을 피해 </param>
     protected override void GetDamage(float damage)
     {
         currentHP -= damage;
@@ -33,43 +91,68 @@ public class SkeletonWarrior : Monster
         }
     }
 
+    /// <summary>
+    /// 감지하지 못했을 때 취하는 행동 메서드
+    /// </summary>
     protected override void OverlookAction()
     {
-        Direction rndDirection = (Direction)Random.Range(0, 4); //랜덤 방향 선언 
+        agent.SetDestination(targetWaypoint.position);//목적지로 이동
 
-        switch(rndDirection)
+        if (Vector3.SqrMagnitude(transform.position - targetWaypoint.position) < 0.1f * 0.1f) //a목적지에 도달했을 때
         {
-            case Direction.North:
-                transform.LookAt(Vector3.forward);
-                break;
-            
-            case Direction.South:
-                transform.LookAt(Vector3.back);
-                break;
-            
-            case Direction.East:
-                transform.LookAt(Vector3.right);
-                break;
-            
-            case Direction.West:
-                transform.LookAt(Vector3.left);
-                break;                 
-        }
+            previousWaypoint = targetWaypoint; //이전 목적지에 현재 목적지 저장
 
+            while (true)
+            {
+                if (Waypoints.Length <= 1) //목적지가 하나밖에 없으면
+                    break;
+
+                targetWaypoint = Waypoints[Random.Range(0, Waypoints.Length)]; //새 목적지 설정
+
+                if (targetWaypoint != previousWaypoint) //이전 목적지와 다르면
+                    break;
+            }
+        }
     }
 
+    // 벽 감지 시 회전 후 이동 
+    // protected override void OverlookAction()
+    // {
+    //     Vector3 nextPos = transform.position + transform.forward * 2f;
+
+    //     if (Physics.Raycast(transform.position + (Vector3.up * 1.5f), transform.forward, out rayhit, 5f, detectlayer))
+    //     {           
+    //         agent.isStopped = true;
+    //         Debug.Log("뭔가 있음");
+
+    //         agent.isStopped = false;
+    //         nextPos = transform.position + transform.forward * 2f;
+    //     }  
+    //     agent.SetDestination(nextPos);//다음 위치로 전진                  
+    // }
+
+    /// <summary>
+    /// 감지를 위한 코루틴 함수
+    /// 감지 범위 내에서 감지 레이어에 해당하는 오브젝트가 있으면 colliders 배열에 저장
+    /// </summary>
+    /// <returns></returns>
     protected override IEnumerator DetectTarget()
     {
-        WaitForSeconds detectDelay = new WaitForSeconds(0.1f);//감지 딜레이 
-
         while (true)
         {
             colliders = Physics.OverlapSphere(transform.position, detectedRangeRadius, detectlayer); 
 
-            if (colliders.Length > 0) //collider가 하나라도 있다면 
+            if (colliders.Length > 0) 
             {
-                isDetective = true;
-                target = colliders[0].gameObject;
+                foreach (var collider in colliders)
+                {
+                    if (collider.gameObject.CompareTag("Player")) //태그가 player이면
+                    {
+                        target = collider.gameObject; //타겟 설정
+                        isDetective = true;
+                        break;
+                    }
+                }
             }
             else
             {
