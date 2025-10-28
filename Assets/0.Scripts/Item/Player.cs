@@ -1,9 +1,10 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using TMPro;
+using static UnityEditor.Progress;
 
 public class Player : MonoBehaviour
 {
@@ -12,6 +13,14 @@ public class Player : MonoBehaviour
     private int gold = 0;
 
     public int Gold { get => gold; set => gold = value; }
+
+    GameObject inventory;
+
+    void Awake()
+    {
+        inventory = GameObject.FindGameObjectWithTag("Inventory");
+        inventory.SetActive(false);
+    }
 
     void Update()
     {
@@ -22,9 +31,9 @@ public class Player : MonoBehaviour
 
         //Debug.Log("Player Position: " + transform.position);
 
-        // ¾ÆÀÌÅÛ »ç¿ë: ¼ıÀÚ 1~9Å°
+        // ì•„ì´í…œ ì‚¬ìš©: ìˆ«ì 1~9í‚¤
 
-        //TODO: ¿ÉÀú¹ö ÆĞÅÏ Ãß°¡
+        //TODO: ì˜µì €ë²„ íŒ¨í„´ ì¶”ê°€
         TextMeshProUGUI goldText = GameObject.FindGameObjectWithTag("GoldText")?.GetComponent<TextMeshProUGUI>();
         if (goldText != null)
         {
@@ -41,21 +50,24 @@ public class Player : MonoBehaviour
         {
             itemTest.UseItem("speedRune");
         }
-        // ÀÓ½Ã·Î 2¹ø Å°¸¦ ´­·¯ ÆÇ¸ÅÇÑ´Ù°í °¡Á¤
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        // ì„ì‹œë¡œ 2ë²ˆ í‚¤ë¥¼ ëˆŒëŸ¬ íŒë§¤í•œë‹¤ê³  ê°€ì •
+        if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             itemTest.SellItem();
         }
+
+        ToggleInventory();
+        AddItemToInventory();
     }
 
-    // moveSpeed¸¦ power ¹è·Î Áõ°¡½ÃÅ°°í duration ÃÊ ÈÄ¿¡ ¿ø·¡ ¼Óµµ·Î µÇµ¹¸®´Â ¸Ş¼Òµå
+    // moveSpeedë¥¼ power ë°°ë¡œ ì¦ê°€ì‹œí‚¤ê³  duration ì´ˆ í›„ì— ì›ë˜ ì†ë„ë¡œ ë˜ëŒë¦¬ëŠ” ë©”ì†Œë“œ
     internal void ApplySpeedEffect(float power, int duration)
     {
-        // ÀÌµ¿ ¼Óµµ Áõ°¡
+        // ì´ë™ ì†ë„ ì¦ê°€
         moveSpeedOriginal = moveSpeed;
         moveSpeed *= power;
-        Debug.Log($"{duration}ÃÊ°£ ¼Óµµ {power}¹è Áõ°¡!!!");
-        // duration ÃÊ ÈÄ¿¡ ¿ø·¡ ¼Óµµ·Î µÇµ¹¸®±â
+        Debug.Log($"{duration}ì´ˆê°„ ì†ë„ {power}ë°° ì¦ê°€!!!");
+        // duration ì´ˆ í›„ì— ì›ë˜ ì†ë„ë¡œ ë˜ëŒë¦¬ê¸°
         StartCoroutine(ResetSpeedAfterDuration(duration));
     }
 
@@ -63,12 +75,36 @@ public class Player : MonoBehaviour
     {
         yield return new WaitForSeconds(duration);
         moveSpeed = moveSpeedOriginal;
-        Debug.Log($"¼Óµµ ¸®¼Â");
+        Debug.Log($"ì†ë„ ë¦¬ì…‹");
     }
 
     internal void AddGold(int amount)
     {
         Gold += amount;
-        Debug.Log($"°ñµå {amount} È¹µæ! ÇöÀç °ñµå: {Gold}");
+        Debug.Log($"ê³¨ë“œ {amount} íšë“! í˜„ì¬ ê³¨ë“œ: {Gold}");
+    }
+
+    void ToggleInventory()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            inventory.SetActive(!inventory.activeSelf);
+        }
+    }
+
+    // ì„ì‹œë¡œ ì¸ë²¤í† ë¦¬ì— ì•„ì´í…œ ì¶”ê°€í•˜ëŠ” ë©”ì„œë“œ
+    internal void AddItemToInventory()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Inventory inven = inventory.GetComponent<Inventory>();
+
+            if (inven != null)
+            {
+                Item item = inven.GetRandomItem();
+                inven.AddItem(item);
+            }
+        }
+        
     }
 }
