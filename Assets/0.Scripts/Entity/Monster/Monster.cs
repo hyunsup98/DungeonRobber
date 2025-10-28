@@ -11,9 +11,13 @@ public abstract class Monster : Entity
     [SerializeField] protected float targetDistance; // 타겟 간의 거리
     [SerializeField] protected float detectedRangeRadius; // 감지 거리 반지름 
     [SerializeField] protected Collider[] colliders; // 감지된 물체 넣어놓는 배열
-    [SerializeField] protected LayerMask detectlayer; //물체를 감지할 레이어
+    [SerializeField] protected LayerMask detectlayer; //감지할 물체 레이어    
     [SerializeField] protected NavMeshAgent agent; //ai navigation 사용을 위한 변수
+    [SerializeField] protected Rigidbody monsterrib; //몬스터 리지드바디 변수
 
+   
+    protected RaycastHit rayhit; //레이캐스트 히트 정보 저장용 변수
+ 
     protected bool isDetective = false; //감지했는가를 나타내는 변수      
     protected abstract override void Attack();
     protected abstract override void GetDamage(float damage);
