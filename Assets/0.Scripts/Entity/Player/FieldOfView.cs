@@ -3,17 +3,22 @@ using UnityEngine;
 public class FieldOfView : MonoBehaviour
 {
     [Header("시야각 적 탐지 변수")]
-    [SerializeField] private float viewAngle = 90f;
-    [SerializeField] private float viewInnerRadius = 3f;
-    [SerializeField] private float viewDistance = 22f;
-    [SerializeField] private LayerMask targetMask;
-    [SerializeField] private LayerMask obstacleMask;
+    [SerializeField] private float viewAngle = 90f;         //시야각
+    [SerializeField] private float viewInnerRadius = 3f;    //플레이어 주변 시야 범위
+    [SerializeField] private float viewDistance = 22f;      //부채꼴 시야각의 최대 시야 거리
+    [SerializeField] private LayerMask targetMask;          //적(Enemy) 레이어마스크
+    [SerializeField] private LayerMask obstacleMask;        //장애물, 벽 레이어마스크
 
     [Header("시야각 쉐이더 변수")]
-    [SerializeField] private Transform player;
-    [SerializeField] private Material maskMaterial;
+    [SerializeField] private Transform player;              //플레이어 위치 정보
+    [SerializeField] private Material maskMaterial;         //시야 메테리얼
+    [Range(1f, 15f)]
+    [SerializeField] private float fovRotateSpeed = 10f;    //마우스 포인터를 돌릴 때 보간 수치
 
-    [SerializeField] private Transform fovQuad;
+    [Header("Quad(Panel 트랜스폼)")]
+    [SerializeField] private Transform fovQuad;             //카메라에 붙어있는 쿼드(판넬) 위치 정보
+
+    Vector3 lookDir = Vector3.zero;                         //시야각이 바라보고 있는 방향 벡터
 
     private void Start()
     {
@@ -76,13 +81,9 @@ public class FieldOfView : MonoBehaviour
     {
         if (player == null || maskMaterial == null) return;
 
-        maskMaterial.SetVector("_PlayerPos", player.position);
-        maskMaterial.SetVector("_PlayerForward", player.forward);
-    }
+        lookDir = Vector3.Slerp(lookDir, (CameraController.Instance.GetMousePos() - transform.position).normalized, fovRotateSpeed * Time.deltaTime);
 
-    //public void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.green;
-    //    Gizmos.DrawSphere(transform.position, viewInnerRadius);
-    //}
+        maskMaterial.SetVector("_PlayerPos", player.position);
+        maskMaterial.SetVector("_PlayerForward", lookDir);
+    }
 }

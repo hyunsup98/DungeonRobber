@@ -1,4 +1,16 @@
+using System;
 using UnityEngine;
+
+[System.Flags]
+public enum PlayerBehaviorState : int
+{
+    None        = 0,
+    Alive       = 1 << 0,       //플레이어가 살아있는 상태 = 체력이 0보다 큼
+    Dead        = 1 << 1,       //플레이어가 죽은 상태 = 체력이 0 이하
+    IsCanMove   = 1 << 2,       //플레이어가 움직일 수 있는 상태
+    IsWalk      = 1 << 3,       //플레이어가 걷고 있는 상태
+    IsSprint    = 1 << 4        //플레이어가 달리고 있는 상태
+}
 
 /// <summary>
 /// 플레이어에 관련된 기능들을 담당하는 클래스
@@ -17,6 +29,33 @@ public sealed partial class Player_Controller : Entity
 
     [Header("공격 관련 변수")]
     [SerializeField] private LayerMask attackMask;      //공격할 대상 레이어
+    public event Action playerDeadAction;               //플레이어가 죽었을 때 발생할 이벤트
+
+    private PlayerBehaviorState playerBehaviorState;    //플레이어 행동에 관련된 상태 플래그
+
+    public float CurrentHP                              //현재 체력 프로퍼티
+    {
+        get { return currentHP; }
+        set
+        {
+            if(value > maxHP)
+            {
+                value = maxHP;
+            }
+            else if(value < 0)
+            {
+                value = 0;
+            }
+
+            currentHP = value;
+
+            //플레이어의 체력이 0 이하면 PlayerDeadAction 호출
+            if(currentHP <= 0)
+            {
+                playerDeadAction?.Invoke();
+            }
+        }
+    }
 
     private void Awake()
     {
@@ -29,34 +68,38 @@ public sealed partial class Player_Controller : Entity
         Init();
     }
 
-    public float CurrentHP      //현재 체력 프로퍼티
+    private void Start()
     {
-        get { return currentHP; }
-        set
-        {
-            if (value < 0)
-            {
-                value = 0;
-            }
-            else if(value > maxHP)
-            {
-                value = maxHP;
-            }
-        }
+        playerDeadAction += Dead;
     }
 
     private void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (!CheckPlayerBehaviorState(PlayerBehaviorState.Alive)) return;
+
+        //공격
+        if (Input.GetMouseButtonDown(0))
         {
             Attack();
         }
 
-        LookAtMousePoint();
+        //마우스 커서 바라보기
+        if(!CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint))
+        {
+            LookAtMousePoint();
+        }
+
+        if(Input.GetKeyDown(KeyCode.F))
+        {
+            GetDamage(5f);
+        }
     }
 
     private void FixedUpdate()
     {
+        if (!CheckPlayerBehaviorState(PlayerBehaviorState.Alive)) return;
+
+        //이동
         Move();
     }
 
@@ -70,5 +113,50 @@ public sealed partial class Player_Controller : Entity
 
         if (runSpeed < moveSpeed)
             runSpeed = moveSpeed * 1.5f;
+
+        playerBehaviorState = PlayerBehaviorState.Alive | PlayerBehaviorState.IsCanMove;
+    }
+
+    #region 플레이어의 행동 상태 제어
+    /// <summary>
+    /// 플레이어 행동 상태 플래그에 새로운 상태 추가
+    /// </summary>
+    /// <param name="state"> 추가할 상태 </param>
+    private void AddPlayerBehaviorState(PlayerBehaviorState state)
+    {
+        playerBehaviorState |= state;
+    }
+
+    /// <summary>
+    /// 플레이어 행동 상태 플래그에 있는 상태 제거
+    /// </summary>
+    /// <param name="state"> 삭제할 상태 </param>
+    private void RemovePlayerBehaviorState(PlayerBehaviorState state)
+    {
+        playerBehaviorState &= ~state;
+    }
+
+    /// <summary>
+    /// 플레이어 행동 상태 플래그에 상태가 활성화되어 있는지 체크
+    /// </summary>
+    /// <param name="states"> 체크할 상태 목록 </param>
+    /// <returns></returns>
+    private bool CheckPlayerBehaviorState(params PlayerBehaviorState[] states)
+    {
+        foreach(var state in states)
+        {
+            if((playerBehaviorState & state) == 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    #endregion
+
+    private void OnDestroy()
+    {
+        playerDeadAction -= Dead;
     }
 }
