@@ -4,6 +4,8 @@ public sealed partial class Player_Controller
 {
     protected override void Attack()
     {
+        playerAnimator.SetTrigger("attack");
+
         Vector3 dir = transform.forward;
         Vector3 atkPos = attackPos.position + (transform.forward * (attackRange * 0.5f));
 
@@ -26,12 +28,20 @@ public sealed partial class Player_Controller
         CurrentHP -= damage;
     }
 
-    private void OnDrawGizmos()
+    private void Dead()
     {
-        Vector3 dir = transform.forward;
-        Vector3 atkPos = attackPos.position + (transform.forward * (attackRange * 0.5f));
-
-        Gizmos.color = Color.green;
-        Gizmos.DrawCube(atkPos, new Vector3(1f, 0.8f, attackRange));
+        playerAnimator.SetBool("alive", false);
+        playerRigid.velocity = new Vector3(0, playerRigid.velocity.y, 0);
+        RemovePlayerBehaviorState(PlayerBehaviorState.Alive);
+        AddPlayerBehaviorState(PlayerBehaviorState.Dead);
     }
+
+    //private void OnDrawGizmos()
+    //{
+    //    Vector3 dir = transform.forward;
+    //    Vector3 atkPos = attackPos.position + (transform.forward * (attackRange * 0.5f));
+
+    //    Gizmos.color = Color.green;
+    //    Gizmos.DrawCube(atkPos, new Vector3(1f, 0.8f, attackRange));
+    //}
 }
