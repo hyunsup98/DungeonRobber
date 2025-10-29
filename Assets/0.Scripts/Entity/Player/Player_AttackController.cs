@@ -4,6 +4,9 @@ public sealed partial class Player_Controller
 {
     protected override void Attack()
     {
+        if (CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint)
+            || CheckPlayerBehaviorState(PlayerBehaviorState.IsDoingUpperBody)) return;
+
         playerAnimator.SetTrigger("attack");
 
         Vector3 dir = transform.forward;
@@ -14,7 +17,6 @@ public sealed partial class Player_Controller
         foreach(var hit in hits)
         {
             //todo 공격 로직 넣기
-            Debug.Log("공격!");
         }
     }
 
