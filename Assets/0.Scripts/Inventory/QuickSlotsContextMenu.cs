@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InventoryContextMenu : MonoBehaviour
+public class QuickSlotsContextMenu : MonoBehaviour
 {
-    public static InventoryContextMenu Instance { get; private set; }
+    public static QuickSlotsContextMenu Instance { get; private set; }
 
     [Header("UI")]
     [SerializeField] private RectTransform menuRoot; // 메뉴 루트(RectTransform)
-    [SerializeField] private Button addToQuickButton;
+    [SerializeField] private Button removeFromQuickButton;
     [SerializeField] private Button discardButton;
 
     [Tooltip("옵션: 에디터에서 할당하면 자동으로 사용됩니다. 비어있으면 런타임에 Find합니다.")]
@@ -31,21 +31,21 @@ public class InventoryContextMenu : MonoBehaviour
         parentCanvas = GetComponentInParent<Canvas>();
         if (parentCanvas != null) canvasRect = parentCanvas.GetComponent<RectTransform>();
 
-        if (addToQuickButton != null) addToQuickButton.onClick.AddListener(OnAddToQuick);
+        if (removeFromQuickButton != null) removeFromQuickButton.onClick.AddListener(RemoveFromQuick);
         if (discardButton != null) discardButton.onClick.AddListener(OnDiscard);
     }
 
     void OnDestroy()
     {
         if (Instance == this) Instance = null;
-        if (addToQuickButton != null) addToQuickButton.onClick.RemoveListener(OnAddToQuick);
+        if (removeFromQuickButton != null) removeFromQuickButton.onClick.RemoveListener(RemoveFromQuick);
         if (discardButton != null) discardButton.onClick.RemoveListener(OnDiscard);
     }
 
-    public static InventoryContextMenu GetOrFind()
+    public static QuickSlotsContextMenu GetOrFind()
     {
         if (Instance == null)
-            Instance = FindObjectOfType<InventoryContextMenu>();
+            Instance = FindObjectOfType<QuickSlotsContextMenu>();
         return Instance;
     }
 
@@ -106,20 +106,20 @@ public class InventoryContextMenu : MonoBehaviour
         menuRoot.position += delta;
     }
 
-    private void OnAddToQuick()
+    private void RemoveFromQuick()
     {
         if (currentItem == null) return;
         if (quickSlots == null) quickSlots = FindObjectOfType<QuickSlots>();
 
-        quickSlots?.AddItem(currentItem);
-        //currentInventory?.RemoveItem(currentItem);
+        //currentInventory?.AddItem(currentItem);
+        quickSlots?.RemoveItem(currentItem);
         Hide();
     }
 
     private void OnDiscard()
     {
         if (currentItem == null) return;
-        currentInventory?.RemoveItem(currentItem);
+        quickSlots?.RemoveItem(currentItem);
         Hide();
     }
 

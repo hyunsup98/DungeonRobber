@@ -76,13 +76,13 @@ public class Inventory : MonoBehaviour
             // 슬롯에 owner / index 할당
             slots[i].ownerInventory = this;
             slots[i].slotIndex = i;
-            slots[i].item = items[i];
+            slots[i].Item = items[i];
         }
         for (; i < slots.Length; i++)
         {
             slots[i].ownerInventory = this;
             slots[i].slotIndex = i;
-            slots[i].item = null;
+            slots[i].Item = null;
         }
     }
 
@@ -109,7 +109,7 @@ public class Inventory : MonoBehaviour
     /// <returns></returns>
     public Item GetItem(int idx)
     {
-        return slots[idx].item;
+        return slots[idx].Item;
     }
 
     // 기존 인덱스 기반 제거 (유지)
@@ -123,7 +123,11 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    // Item 기반 제거 (퀵슬롯 등에서 호출됨)
+    /// <summary>
+    /// Item 기반 제거 (퀵슬롯 등에서 호출됨)
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     internal void RemoveItem(Item item)
     {
         if (item == null) return;

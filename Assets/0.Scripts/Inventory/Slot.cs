@@ -4,7 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
+/// <summary>
+/// 개별 슬롯 UI를 담당합니다.
+/// private 필드: _item
+/// public 프로퍼티: Item (UI 갱신)
+/// </summary>
+public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [SerializeField] Image image;
 
@@ -13,8 +18,13 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     public QuickSlots ownerQuickSlots;
     public int slotIndex = -1;
 
+    // 내부 필드
     private Item _item;
-    public Item item
+
+    /// <summary>
+    /// 슬롯에 세팅된 아이템. set에서 UI 이미지 갱신 처리.
+    /// </summary>
+    public Item Item
     {
         get { return _item; }
         set
@@ -47,31 +57,45 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
             ItemTooltip.Instance.Hide();
     }
 
-    // 우클릭 처리: 인벤토리 슬롯이면 컨텍스트 메뉴 표시
+    // 우클릭 처리: 인벤토리에서 컨텍스트 메뉴 표시
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("Slot OnPointerClick");
         if (eventData.button == PointerEventData.InputButton.Right)
         {
             Debug.Log($"_item: {_item}");
             if (_item == null) return;
 
-            var menu = InventoryContextMenu.GetOrFind();
-            if (menu != null)
+
+            // 퀵슬롯일 경우
+            if (ownerQuickSlots != null)
             {
-                menu.Show(this, eventData.position);
+                var menu = QuickSlotsContextMenu.GetOrFind();
+                if (menu != null)
+                {
+                    menu.Show(this, eventData.position);
+                }
             }
+            else
+            {
+                var menu = InventoryContextMenu.GetOrFind();
+                if (menu != null)
+                {
+                    menu.Show(this, eventData.position);
+                }
+            }
+
+
         }
     }
 
     // 디버그용 포인터 다운/업 이벤트
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        Debug.Log($"OnPointerDown on {gameObject.name}  pressObject: {eventData.pointerPress?.name}");
-    }
+    //public void OnPointerDown(PointerEventData eventData)
+    //{
+    //    Debug.Log($"OnPointerDown on {gameObject.name}  pressObject: {eventData.pointerPress?.name}");
+    //}
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        Debug.Log($"OnPointerUp on {gameObject.name}  currentRaycast: {eventData.pointerCurrentRaycast.gameObject?.name}");
-    }
+    //public void OnPointerUp(PointerEventData eventData)
+    //{
+    //    Debug.Log($"OnPointerUp on {gameObject.name}  currentRaycast: {eventData.pointerCurrentRaycast.gameObject?.name}");
+    //}
 }

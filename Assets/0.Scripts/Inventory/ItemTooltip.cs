@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// 화면 상의 아이템 툴팁을 제어합니다.
+/// </summary>
 public class ItemTooltip : MonoBehaviour
 {
     public static ItemTooltip Instance { get; private set; }
@@ -50,7 +53,7 @@ public class ItemTooltip : MonoBehaviour
     public static ItemTooltip GetOrFind()
     {
         if (Instance == null)
-            Instance = FindObjectOfType<ItemTooltip>(true); // 비활성객체도 찾게 하고 싶으면 true (Unity 2020+)
+            Instance = FindObjectOfType<ItemTooltip>(true);
         return Instance;
     }
 
@@ -86,6 +89,8 @@ public class ItemTooltip : MonoBehaviour
         Vector2 localPoint;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPosition, cam, out localPoint);
         tooltipRoot.localPosition = localPoint + pivotOffset;
+        
+        // 화면 밖으로 나가지 않게 클램프
         ClampToCanvas();
     }
 

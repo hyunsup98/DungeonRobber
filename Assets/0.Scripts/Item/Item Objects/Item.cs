@@ -3,8 +3,15 @@ using UnityEngine;
 [CreateAssetMenu]
 public class Item : ScriptableObject
 {
+    [Header("이름")]
     public string itemName;
+    
+    [TextArea]
     public string description;
+
+    [Header("이미지")]
     public Sprite itemImage;
-    public ItemAction useAction; // NULL이면 사용 불가
+    
+    [Header("아이템 사용 액션")]
+    public ItemAction useAction;
 }

@@ -40,13 +40,13 @@ public class QuickSlots : MonoBehaviour
             // 퀵슬롯 소유자/인덱스 설정
             slots[i].ownerQuickSlots = this;
             slots[i].slotIndex = i;
-            slots[i].item = items[i];
+            slots[i].Item = items[i];
         }
         for (; i < slots.Length; i++)
         {
             slots[i].ownerQuickSlots = this;
             slots[i].slotIndex = i;
-            slots[i].item = null;
+            slots[i].Item = null;
         }
     }
 
@@ -65,7 +65,7 @@ public class QuickSlots : MonoBehaviour
 
     public Item GetItem(int idx)
     {
-        return slots[idx].item;
+        return slots[idx].Item;
     }
 
     internal void RemoveItem(int idx)
@@ -75,5 +75,12 @@ public class QuickSlots : MonoBehaviour
         items.RemoveAt(idx);
         FreshSlot();
         Debug.Log($"퀵슬롯 {idx + 1}번째 아이템이 제거되었습니다.");
+    }
+
+    internal void RemoveItem(Item item)
+    {
+        items.Remove(item);
+        FreshSlot();
+        Debug.Log($"퀵슬롯에서 {item.name}이 제거되었습니다.");
     }
 }
