@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2127518387696836825}
-  - component: {fileID: 6566718572433163708}
+  - component: {fileID: -7429601798154906738}
   m_Layer: 0
   m_Name: Spawner
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6566718572433163708
+--- !u!114 &-7429601798154906738
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -51,4 +51,9 @@ MonoBehaviour:
   _spawnCountChance: 1
   enableRespawn: 0
   respawnDelay: 0
-  _tagGroups: []
+  _tagGroups:
+  - enable: 0
+    spawnPrefabs: []
+    tag: 0
+    createCount: 0
+    minSpawnDistance: 0

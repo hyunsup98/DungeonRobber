@@ -1,3 +1,4 @@
+
 using System.Collections;
 using UnityEngine;
 
@@ -8,7 +9,30 @@ public class SkeletonWarrior : Monster
 
     private void OnEnable() //활성화 시점에서 초기화 
     {
-        Init();
+        if (isDetective) //감지됐을 때
+        {
+            DetectAction();
+        }
+        else
+        {
+            OverlookAction();
+        }
+    }
+
+    private void OnDisable() //비활성화시 코루틴 정지 
+    {
+        if (detectCoroutine != null)
+            StopCoroutine(detectCoroutine);
+
+        if (changeDirection != null)
+            StopCoroutine(changeDirection);
+    }
+
+    protected override void Init()
+    {
+        base.Init();
+        detectCoroutine = StartCoroutine(nameof(DetectTarget));
+        changeDirection = StartCoroutine(nameof(ChangeDirection));
     }
     
     private void FixedUpdate()
@@ -140,7 +164,7 @@ public class SkeletonWarrior : Monster
     {
         while (true)
         {
-            colliders = Physics.OverlapSphere(transform.position, detectedRangeRadius, detectlayer); 
+            colliders = Physics.OverlapSphere(transform.position, detectedRangeRadius, detectlayer);
 
             if (colliders.Length > 0) 
             {
@@ -161,4 +185,14 @@ public class SkeletonWarrior : Monster
             yield return detectDelay;
         }
     }
+
+    protected IEnumerator ChangeDirection()
+    {
+        while (true)
+        {
+            direction = (Direction)Random.Range(0, 4); //랜덤 방향 지정 
+            yield return changeDirectionDelay;
+        }
+    }
+
 }
