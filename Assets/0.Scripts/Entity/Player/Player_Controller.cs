@@ -59,11 +59,14 @@ public sealed partial class Player_Controller : Entity
 
     private void Awake()
     {
+        if (mainCamera == null)
+            mainCamera = Camera.main;
+
         if (playerRigid == null && TryGetComponent<Rigidbody>(out var rigid))
             playerRigid = rigid;
 
-        if (mainCamera == null)
-            mainCamera = Camera.main;
+        if(playerAnimator == null && TryGetComponent<Animator>(out var anim))
+            playerAnimator = anim;
 
         Init();
     }
@@ -75,7 +78,7 @@ public sealed partial class Player_Controller : Entity
 
     private void Update()
     {
-        if (!CheckPlayerBehaviorState(PlayerBehaviorState.Alive)) return;
+        if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
         //공격
         if (Input.GetMouseButtonDown(0))
@@ -97,7 +100,7 @@ public sealed partial class Player_Controller : Entity
 
     private void FixedUpdate()
     {
-        if (!CheckPlayerBehaviorState(PlayerBehaviorState.Alive)) return;
+        if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
         //이동
         Move();
