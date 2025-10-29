@@ -18,22 +18,6 @@ public class SkeletonWarrior : Monster
             OverlookAction();
         }
     }
-
-    private void OnDisable() //비활성화시 코루틴 정지 
-    {
-        if (detectCoroutine != null)
-            StopCoroutine(detectCoroutine);
-
-        if (changeDirection != null)
-            StopCoroutine(changeDirection);
-    }
-
-    protected override void Init()
-    {
-        base.Init();
-        detectCoroutine = StartCoroutine(nameof(DetectTarget));
-        changeDirection = StartCoroutine(nameof(ChangeDirection));
-    }
     
     private void FixedUpdate()
     {
@@ -185,14 +169,4 @@ public class SkeletonWarrior : Monster
             yield return detectDelay;
         }
     }
-
-    protected IEnumerator ChangeDirection()
-    {
-        while (true)
-        {
-            direction = (Direction)Random.Range(0, 4); //랜덤 방향 지정 
-            yield return changeDirectionDelay;
-        }
-    }
-
 }
