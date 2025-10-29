@@ -68,19 +68,21 @@ public class QuickSlots : MonoBehaviour
         return slots[idx].Item;
     }
 
+    // 퀵슬롯 아이템 사용 후 제거
     internal void RemoveItem(int idx)
     {
         if (idx < 0 || idx >= items.Count) return;
-        inventory?.RemoveItem(items[idx]);
         items.RemoveAt(idx);
+        inventory?.RemoveItem(items[idx]);
+        Debug.Log($"{items[idx]}이 제거되었습니다.");
         FreshSlot();
-        Debug.Log($"퀵슬롯 {idx + 1}번째 아이템이 제거되었습니다.");
     }
 
+    // 퀵슬롯 등록 해제
     internal void RemoveItem(Item item)
     {
         items.Remove(item);
-        FreshSlot();
         Debug.Log($"퀵슬롯에서 {item.name}이 제거되었습니다.");
+        FreshSlot();
     }
 }

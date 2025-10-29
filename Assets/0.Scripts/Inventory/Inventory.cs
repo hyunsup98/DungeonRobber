@@ -31,35 +31,39 @@ public class Inventory : MonoBehaviour
         HideInventory();
     }
 
-    public bool IsOpen => inventoryRoot != null ? inventoryRoot.activeSelf : gameObject.activeSelf;
+    public bool IsOpen => inventoryRoot != null && inventoryRoot.activeSelf;
 
     public void ToggleInventory()
     {
-        if (inventoryRoot != null)
+        if (IsOpen)
         {
-            bool open = !inventoryRoot.activeSelf;
-            inventoryRoot.SetActive(open);
-            if (open) FreshSlot();
+            HideInventory();
         }
         else
         {
-            bool open = !gameObject.activeSelf;
-            gameObject.SetActive(open);
-            if (open) FreshSlot();
+            ShowInventory();
         }
     }
 
     public void ShowInventory()
     {
         if (inventoryRoot != null) inventoryRoot.SetActive(true);
-        else gameObject.SetActive(true);
         FreshSlot();
     }
 
     public void HideInventory()
     {
+        // 컨텍스트 메뉴 숨김
+        InventoryContextMenu inventoryContextMenu = InventoryContextMenu.GetOrFind();
+        if (inventoryContextMenu != null)
+            inventoryContextMenu.Hide();
+
+        // 툴팁 숨김 (툴팁이 인벤토리 슬롯에 있을 때만 숨기는 게 나을 수도 있음)
+        ItemTooltip itemTooltip = ItemTooltip.GetOrFind();
+        if (itemTooltip != null)
+            itemTooltip.Hide();
+
         if (inventoryRoot != null) inventoryRoot.SetActive(false);
-        else gameObject.SetActive(false);
     }
 
     public void FreshSlot()
@@ -86,7 +90,7 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public void AddItem(Item _item)
+    public bool AddItem(Item _item)
     {
         if (slots == null || items == null)
             FreshSlot();
@@ -95,10 +99,13 @@ public class Inventory : MonoBehaviour
         {
             items.Add(_item);
             FreshSlot();
+            Debug.Log($"인벤토리에 '{_item.itemName}' 아이템이 추가되었습니다.");
+            return true;
         }
         else
         {
             Debug.Log("슬롯이 가득 차 있습니다.");
+            return false;
         }
     }
 

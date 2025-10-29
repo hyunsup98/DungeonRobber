@@ -36,7 +36,7 @@ public class TestPlayer : MonoBehaviour
                     if (item != null && item.useAction != null)
                     {
                         item.useAction.Use(item, gameObject);
-                        // 아이템 사용 후 인벤토리에서 제거
+                        // 아이템 사용 후 퀵슬롯, 인벤토리에서 제거
                         quickSlots.RemoveItem(i);
                     }
                 }
@@ -58,14 +58,15 @@ public class TestPlayer : MonoBehaviour
         if (clickInterface != null)
         {
             Item item = clickInterface.ClickItem();
-            Debug.Log($"{item.itemName}");
-            inventory.AddItem(item);
-            // 여기서 아이템 획득 효과음 재생 가능
-            // 예: AudioSource.PlayClipAtPoint(pickupSound, transform.position);
+            bool isAdded = inventory.AddItem(item);
+            
+            // 아이템 획득 효과음
+            // AudioSource.PlayClipAtPoint(pickupSound, transform.position);
 
             // 아이템 오브젝트 삭제
+            // Destroy 하지 않고 비활성화 할지 고민 중
             //Destroy(hit3D.transform.gameObject);
-            hit3D.transform.gameObject.SetActive(false);
+            if(isAdded) hit3D.transform.gameObject.SetActive(false);
         }
     }
 }

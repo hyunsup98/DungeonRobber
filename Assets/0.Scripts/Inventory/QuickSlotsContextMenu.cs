@@ -111,7 +111,6 @@ public class QuickSlotsContextMenu : MonoBehaviour
         if (currentItem == null) return;
         if (quickSlots == null) quickSlots = FindObjectOfType<QuickSlots>();
 
-        //currentInventory?.AddItem(currentItem);
         quickSlots?.RemoveItem(currentItem);
         Hide();
     }
