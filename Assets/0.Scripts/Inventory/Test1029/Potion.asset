@@ -13,4 +13,7 @@ MonoBehaviour:
   m_Name: Potion
   m_EditorClassIdentifier: 
   itemName: Health Potion
+  description: "\uBD89\uC740 \uC561\uCCB4\uAC00 \uB2F4\uAE34 \uD3EC\uC158. \uC0AC\uC6A9\uD558\uBA74
+    \uCCB4\uB825\uC774 nn \uC99D\uAC00\uD55C\uB2E4."
   itemImage: {fileID: 21300000, guid: b7d19ec039fa7b141bd165aa95496c75, type: 3}
+  useAction: {fileID: 11400000, guid: db4f30681f8fd724a92fbf6fdf233d09, type: 2}

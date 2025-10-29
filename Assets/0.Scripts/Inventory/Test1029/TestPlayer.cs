@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TestPlayer : MonoBehaviour
@@ -9,6 +10,7 @@ public class TestPlayer : MonoBehaviour
 
     void Update()
     {
+        // 마우스 우클릭 (상호작용)
         if (Input.GetMouseButtonDown(1))
         {
             Debug.Log("Right Click");
@@ -16,6 +18,20 @@ public class TestPlayer : MonoBehaviour
             RaycastHit hit3D;
             if (Physics.Raycast(ray, out hit3D))
                 HitCheckObject(hit3D);
+        }
+
+        // 숫자 1 (퀵슬롯)
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            // 인벤토리 1번째 칸 아이템 정보 불러옴
+            ItemModel item = inventory.GetItem(0);
+            Debug.Log($"Using item: {(item != null ? item.itemName : "None")}");
+            if (item != null && item.useAction != null)
+            {
+                item.useAction.Use(item, gameObject);
+                // 아이템 사용 후 인벤토리에서 제거
+                inventory.RemoveItem(0);
+            }
         }
     }
 
@@ -32,7 +48,8 @@ public class TestPlayer : MonoBehaviour
             // 예: AudioSource.PlayClipAtPoint(pickupSound, transform.position);
 
             // 아이템 오브젝트 삭제
-            Destroy(hit3D.transform.gameObject);
+            //Destroy(hit3D.transform.gameObject);
+            hit3D.transform.gameObject.SetActive(false);
         }
     }
 }

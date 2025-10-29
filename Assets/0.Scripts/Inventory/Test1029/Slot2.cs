@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class Slot2 : MonoBehaviour
+public class Slot2 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] Image image;
 
@@ -16,7 +17,7 @@ public class Slot2 : MonoBehaviour
             _item = value;
             if (_item != null)
             {
-                image.sprite = item.itemImage;
+                image.sprite = _item.itemImage;
                 image.color = new Color(1, 1, 1, 1);
             }
             else
@@ -24,5 +25,20 @@ public class Slot2 : MonoBehaviour
                 image.color = new Color(1, 1, 1, 0);
             }
         }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (_item != null && ItemTooltip.Instance != null)
+        {
+            ItemTooltip.Instance.Show(_item);
+            ItemTooltip.Instance.SetPosition(eventData.position);
+        }
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (ItemTooltip.Instance != null)
+            ItemTooltip.Instance.Hide();
     }
 }

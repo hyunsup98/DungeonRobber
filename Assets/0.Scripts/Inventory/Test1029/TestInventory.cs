@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class TestInventory : MonoBehaviour
 {
@@ -47,5 +49,22 @@ public class TestInventory : MonoBehaviour
         {
             Debug.Log("슬롯이 가득 차 있습니다.");
         }
+    }
+
+    /// <summary>
+    /// idx번째 슬롯의 아이템을 반환합니다.
+    /// </summary>
+    /// <param name="idx"></param>
+    /// <returns></returns>
+    public ItemModel GetItem(int idx)
+    {
+        return slots[idx].item;
+    }
+
+    internal void RemoveItem(int idx)
+    {
+        items.RemoveAt(idx);
+        FreshSlot();
+        Debug.Log($"인벤토리 {idx+1}번째 아이템이 제거되었습니다.");
     }
 }
