@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum ItemType
 {
@@ -43,11 +44,15 @@ public class Item : MonoBehaviour
     ItemType _type;
     ItemGrade _grade;
     string _description;
+    int _count;
+    Sprite _image;
 
     public string Name { get => _name; set => _name = value; }
     public ItemType Type { get => _type; set => _type = value; }
     public ItemGrade Grade { get => _grade; set => _grade = value; }
     public string Description { get => _description; set => _description = value; }
+    public int Count { get => _count; set => _count = value; }
+    public Sprite IconImage { get => _image; set => _image = value; }
 }
 
 public class ConsumableItem : Item, IConsumable

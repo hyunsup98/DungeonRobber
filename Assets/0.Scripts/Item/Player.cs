@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 using static UnityEditor.Progress;
 
 public class Player : MonoBehaviour
@@ -14,51 +15,72 @@ public class Player : MonoBehaviour
 
     public int Gold { get => gold; set => gold = value; }
 
-    GameObject inventory;
+    private GameObject InvenManager;
+    private InventoryController inventory;
+    private SellableItem necklace;
 
     void Awake()
     {
-        inventory = GameObject.FindGameObjectWithTag("Inventory");
-        inventory.SetActive(false);
+        InvenManager = GameObject.FindGameObjectWithTag("InvenManager");
+        InvenManager.SetActive(false);
+
+        
     }
 
     void Update()
     {
-        // wasd move
-        float moveX = Input.GetAxis("Horizontal") * Time.deltaTime * moveSpeed;
-        float moveZ = Input.GetAxis("Vertical") * Time.deltaTime * moveSpeed;
-        transform.Translate(new Vector3(moveX, 0, moveZ));
-
-        //Debug.Log("Player Position: " + transform.position);
-
-        // 아이템 사용: 숫자 1~9키
-
         //TODO: 옵저버 패턴 추가
-        TextMeshProUGUI goldText = GameObject.FindGameObjectWithTag("GoldText")?.GetComponent<TextMeshProUGUI>();
-        if (goldText != null)
-        {
-            goldText.text = $"Gold: {Gold}";
-        }
+        //TextMeshProUGUI goldText = GameObject.FindGameObjectWithTag("GoldText")?.GetComponent<TextMeshProUGUI>();
+        //if (goldText != null)
+        //{
+        //    goldText.text = $"Gold: {Gold}";
+        //}
 
         if (Input.anyKeyDown == false)
         {
             return;
         }
 
-        ItemTest itemTest = gameObject.GetComponent<ItemTest>();
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            itemTest.UseItem("speedRune");
-        }
-        // 임시로 2번 키를 눌러 판매한다고 가정
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            itemTest.SellItem();
-        }
+        
+        // 인벤토리 슬롯 4칸 = 퀵슬롯
+        
+
+
+        //if (Input.GetKeyDown(KeyCode.Alpha1))
+        //{
+        //    itemTest.UseItem("speedRune");
+        //}
+        //// 임시로 2번 키를 눌러 판매한다고 가정
+        //if (Input.GetKeyDown(KeyCode.Alpha2))
+        //{
+        //    itemTest.SellItem();
+        //}
 
         ToggleInventory();
         AddItemToInventory();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // moveSpeed를 power 배로 증가시키고 duration 초 후에 원래 속도로 되돌리는 메소드
     internal void ApplySpeedEffect(float power, int duration)
@@ -88,7 +110,7 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            inventory.SetActive(!inventory.activeSelf);
+            InvenManager.SetActive(!InvenManager.activeSelf);
         }
     }
 
@@ -97,13 +119,21 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Inventory inven = inventory.GetComponent<Inventory>();
+            Debug.Log("스페이스바 감지");
 
-            if (inven != null)
-            {
-                Item item = inven.GetRandomItem();
-                inven.AddItem(item);
-            }
+            necklace = gameObject.AddComponent<SellableItem>();
+            necklace.Name = "저주받은 해골";
+            necklace.Type = ItemType.Sellable;
+            necklace.Grade = ItemGrade.Unique;
+            necklace.Description = "으스스한 기운을 풍기는 저주받은 해골. 상당한 가치가 있어 보인다.";
+            necklace.Price = 150;
+            necklace.IconImage = Resources.Load("Assets/7.AssetStores/GUI_Parts/Icons/skill_icon_03.png") as Sprite;
+
+            inventory = InvenManager.GetComponent<InventoryController>();
+            inventory.AddItem(necklace);
+
+            //inventory.GetRandomItem();
+            //inventory.AddItem(item);
         }
         
     }
