@@ -1183,7 +1183,7 @@ MonoBehaviour:
   maxHP: 15
   currentHP: 15
   mainCamera: {fileID: 1405820079}
-  playerRigid: {fileID: 0}
+  playerRigid: {fileID: 1107888529}
   playerAnimator: {fileID: 1300545629}
   attackPos: {fileID: 2091618762}
   runSpeed: 7.5
