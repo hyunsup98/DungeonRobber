@@ -168,6 +168,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   image: {fileID: 7737543082528514583}
+  ownerInventory: {fileID: 0}
+  ownerQuickSlots: {fileID: 0}
+  slotIndex: -1
 --- !u!1 &9043468317711819097
 GameObject:
   m_ObjectHideFlags: 0

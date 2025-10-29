@@ -1,186 +1,77 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using TMPro;
 using UnityEngine.UI;
-using System.Runtime.CompilerServices;
+using UnityEngine.EventSystems;
 
-public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
-    IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
+public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
 {
-    [SerializeField] private Image slotItemImage;
-    [SerializeField] private Image EventImage;
-    [SerializeField] private TMP_Text slotItemCountText;
-    private Item item;
-    private bool isIn = false;
+    [SerializeField] Image image;
 
-    public Item Item { get => item; set => item = value; }
-    public bool IsIn { get => isIn; set => isIn = value; }
+    // 슬롯 소유자(인벤토리 / 퀵슬롯)와 인덱스 정보
+    public Inventory ownerInventory;
+    public QuickSlots ownerQuickSlots;
+    public int slotIndex = -1;
 
-    void Awake()
+    private Item _item;
+    public Item item
     {
-        Canvas[] canvases = GameObject.FindObjectsOfType<Canvas>();
-        foreach (var cvs in canvases)
+        get { return _item; }
+        set
         {
-            if (cvs.CompareTag("Inventory"))
+            _item = value;
+            if (_item != null)
             {
-                canvas = cvs;
-                break;
+                image.sprite = _item.itemImage;
+                image.color = new Color(1, 1, 1, 1);
+            }
+            else
+            {
+                image.color = new Color(1, 1, 1, 0);
             }
         }
-        draggingPlane = canvas.transform as RectTransform;
-        slotItemCountText.text = "";
-    }
-
-    public void SetSlot(Item setItem, bool isNewItem)
-    {
-        if (setItem != null)
-        {
-            GetItem(setItem);
-            if (isNewItem)
-            {
-                setItem.Count = 1;
-            }
-            SlotUpdate(setItem);
-        }
-        UpdateCountText();
-    }
-
-    private void GetItem(Item getItem)
-    {
-        // 아이템 획득 처리
-    }
-
-    private void SlotUpdate(Item updateItem)
-    {
-        Debug.Log($"Slot Update Called: {updateItem}");
-        Debug.Log($"Slot Update Called: {updateItem.Name}");
-        SetColor(1f, slotItemImage);
-        this.slotItemImage.sprite = updateItem.GetComponent<Image>().sprite;
-        this.IsIn = true;
-        this.Item = updateItem;
-        Debug.Log($"Slot Update: {Item.Name}");
-    }
-
-    private void ClearSlot()
-    {
-        SetColor(0f, slotItemImage);
-        this.slotItemImage.sprite = null;
-        this.IsIn = false;
-        this.Item = null;
-        UpdateCountText();
-    }
-
-    public void UpdateCountText()
-    {
-        if (Item != null && Item.Count > 0)
-        {
-            slotItemCountText.text = Item.Count.ToString();
-        }
-        else
-        {
-            slotItemCountText.text = "";
-        }
-    }
-
-    public void AddCount(int count)
-    {
-        if (Item != null)
-        {
-            Item.Count += count;
-            UpdateCountText();
-        }
-    }
-
-    private void SetColor(float alpha, Image setImage)
-    {
-        Color color = setImage.color;
-        color.a = alpha;
-        setImage.color = color;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        SetColor(1f, EventImage);
+        if (_item != null && ItemTooltip.Instance != null)
+        {
+            ItemTooltip.Instance.Show(_item);
+            ItemTooltip.Instance.SetPosition(eventData.position);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        SetColor(0f, EventImage);
+        if (ItemTooltip.Instance != null)
+            ItemTooltip.Instance.Hide();
     }
 
-
-
-    private Canvas canvas;
-    private GameObject draggingIcon;
-    private RectTransform draggingPlane;
-
-
-    public void OnBeginDrag(PointerEventData eventData)
+    // 우클릭 처리: 인벤토리 슬롯이면 컨텍스트 메뉴 표시
+    public void OnPointerClick(PointerEventData eventData)
     {
-        if (Item == null)
-            return;
-        canvas = GetComponentInParent<Canvas>();
-        if (canvas == null)
-            return;
-        // 드래그 아이콘 생성
-        draggingIcon = new GameObject("Dragging Icon");
-        draggingIcon.transform.SetParent(canvas.transform, false);
-        draggingIcon.transform.SetAsLastSibling();
-        Image image = draggingIcon.AddComponent<Image>();
-        image.sprite = slotItemImage.sprite;
-        image.SetNativeSize();
-        image.raycastTarget = false;
-        SetColor(0.6f, image);
-        draggingPlane = canvas.transform as RectTransform;
-        SetDraggedPosition(eventData);
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (draggingIcon != null)
+        Debug.Log("Slot OnPointerClick");
+        if (eventData.button == PointerEventData.InputButton.Right)
         {
-            SetDraggedPosition(eventData);
+            Debug.Log($"_item: {_item}");
+            if (_item == null) return;
+
+            var menu = InventoryContextMenu.GetOrFind();
+            if (menu != null)
+            {
+                menu.Show(this, eventData.position);
+            }
         }
     }
 
-    private void SetDraggedPosition(PointerEventData eventData)
+    // 디버그용 포인터 다운/업 이벤트
+    public void OnPointerDown(PointerEventData eventData)
     {
-        RectTransform rt = draggingIcon.GetComponent<RectTransform>();
-        Vector3 globalMousePos;
-        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(draggingPlane, eventData.position, eventData.pressEventCamera, out globalMousePos))
-        {
-            rt.position = globalMousePos;
-            rt.rotation = draggingPlane.rotation;
-        }
+        Debug.Log($"OnPointerDown on {gameObject.name}  pressObject: {eventData.pointerPress?.name}");
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    public void OnPointerUp(PointerEventData eventData)
     {
-        if (draggingIcon != null)
-        {
-            Destroy(draggingIcon);
-        }
+        Debug.Log($"OnPointerUp on {gameObject.name}  currentRaycast: {eventData.pointerCurrentRaycast.gameObject?.name}");
     }
-
-    public void OnDrop(PointerEventData eventData)
-    {
-        Slot droppedSlot = eventData.pointerDrag.GetComponent<Slot>();
-        if (droppedSlot != null)
-        {
-            Item droppedItem = droppedSlot.Item;
-            Item thisItem = this.Item;
-            // 아이템 교환
-            this.SlotUpdate(droppedItem);
-            droppedSlot.SlotUpdate(thisItem);
-        }
-    }
-
-    public void SetSlotItem(Item setItem) { Item = setItem; }
-    public void SetSlotImage(Image slotImage) { slotItemImage = slotImage; }
-    public void SetCountText(int count) { slotItemCountText.text = count.ToString(); }
-    
-    public Item GetItem() { return Item; }
 }
-
