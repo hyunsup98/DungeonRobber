@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Flags]
@@ -9,7 +11,8 @@ public enum PlayerBehaviorState : int
     Dead        = 1 << 1,       //플레이어가 죽은 상태 = 체력이 0 이하
     IsCanMove   = 1 << 2,       //플레이어가 움직일 수 있는 상태
     IsWalk      = 1 << 3,       //플레이어가 걷고 있는 상태
-    IsSprint    = 1 << 4        //플레이어가 달리고 있는 상태
+    IsSprint    = 1 << 4,       //플레이어가 달리고 있는 상태
+    IsDoingUpperBody = 1 << 5,  //플레이어가 상체가 하는 동작을 하고 있는지에 대한 상태 - 공격, 먹기, 마시기, 상자 열기 등의 모션
 }
 
 /// <summary>
@@ -80,19 +83,17 @@ public sealed partial class Player_Controller : Entity
     {
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
+        //마우스 커서 바라보기
+        LookAtMousePoint();
+
         //공격
         if (Input.GetMouseButtonDown(0))
         {
             Attack();
         }
 
-        //마우스 커서 바라보기
-        if(!CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint))
-        {
-            LookAtMousePoint();
-        }
-
-        if(Input.GetKeyDown(KeyCode.F))
+        //Test
+        if (Input.GetKeyDown(KeyCode.F))
         {
             GetDamage(5f);
         }
@@ -118,6 +119,28 @@ public sealed partial class Player_Controller : Entity
             runSpeed = moveSpeed * 1.5f;
 
         playerBehaviorState = PlayerBehaviorState.Alive | PlayerBehaviorState.IsCanMove;
+    }
+
+    private IEnumerator PlayOtherAnimatorLayer(string motionName)
+    {
+        playerAnimator.SetTrigger(motionName);
+        playerAnimator.SetLayerWeight(1, 1);
+        AddPlayerBehaviorState(PlayerBehaviorState.IsDoingUpperBody);
+
+        while (true)
+        {
+            if(playerAnimator.GetCurrentAnimatorStateInfo(1).normalizedTime < 1f)
+            {
+                playerAnimator.SetLayerWeight(1, 1 - playerAnimator.GetCurrentAnimatorStateInfo(1).normalizedTime);
+            }
+            else
+            {
+                RemovePlayerBehaviorState(PlayerBehaviorState.IsDoingUpperBody);
+                break;
+            }
+
+            yield return null;
+        }
     }
 
     #region 플레이어의 행동 상태 제어

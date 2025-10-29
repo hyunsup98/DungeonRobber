@@ -9,7 +9,7 @@ public sealed partial class Player_Controller
     private void Move()
     {
         //이동이 가능한 상태라면
-        if(CheckPlayerBehaviorState(PlayerBehaviorState.IsCanMove))
+        if (CheckPlayerBehaviorState(PlayerBehaviorState.IsCanMove))
         {
             float horizontal = Input.GetAxisRaw("Horizontal");
             float vertical = Input.GetAxisRaw("Vertical");
@@ -25,7 +25,7 @@ public sealed partial class Player_Controller
                 AddPlayerBehaviorState(PlayerBehaviorState.IsWalk);
             }
 
-            if(CheckPlayerBehaviorState(PlayerBehaviorState.IsWalk))
+            if (CheckPlayerBehaviorState(PlayerBehaviorState.IsWalk))
             {
                 if (Input.GetKey(KeyCode.LeftShift))
                 {
@@ -53,12 +53,13 @@ public sealed partial class Player_Controller
     /// </summary>
     private void LookAtMousePoint()
     {
-        Vector3 worldPos = CameraController.Instance.GetMousePos();
+        if (CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint)) return;
 
+        Vector3 worldPos = Camera.main.GetMouseWorldPos();
+        worldPos.y = transform.position.y;
         Vector3 direction = worldPos - transform.position;
-        direction.y = transform.position.y;
 
-        if(direction.sqrMagnitude > 0.001f)
+        if (direction.sqrMagnitude > 0.001f)
         {
             Quaternion targetRot = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 10f);
@@ -74,7 +75,7 @@ public sealed partial class Player_Controller
         float smoothX = 0;
         float smoothZ = 0;
 
-        if(CheckPlayerBehaviorState(PlayerBehaviorState.IsWalk))
+        if (CheckPlayerBehaviorState(PlayerBehaviorState.IsWalk))
         {
             smoothX = Mathf.Lerp(playerAnimator.GetFloat("moveX"), dir.x, 10 * Time.deltaTime);
             smoothZ = Mathf.Lerp(playerAnimator.GetFloat("speed"), CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint) ? dir.z * 2 : dir.z, 10 * Time.deltaTime);

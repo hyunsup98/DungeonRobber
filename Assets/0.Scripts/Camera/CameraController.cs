@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CameraController : Singleton<CameraController>
+public class CameraController : MonoBehaviour
 {
     //바라볼 타겟
     [SerializeField] private Transform target;
@@ -10,11 +10,6 @@ public class CameraController : Singleton<CameraController>
 
     //쿼터뷰를 위해 플레이어 위치에서 z좌표가 얼마나 아래에 있을지에 대한 값
     [SerializeField] private float zOffset = -10f;
-
-    private void Awake()
-    {
-        SingletonInit();
-    }
 
     private void LateUpdate()
     {
@@ -37,16 +32,5 @@ public class CameraController : Singleton<CameraController>
         if (target == null) return;
 
         transform.LookAt(target);
-    }
-
-    /// <summary>
-    /// 게임 화면의 마우스 포인터 좌표를 월드좌표로 변환 후 반환하는 메서드
-    /// </summary>
-    /// <returns> 마우스 좌표의 월드좌표 벡터 </returns>
-    public Vector3 GetMousePos()
-    {
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = transform.position.y;
-        return Camera.main.ScreenToWorldPoint(mousePos);
     }
 }
