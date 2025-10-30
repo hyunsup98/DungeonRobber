@@ -207,7 +207,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 356fe0841767854438f6e74930a40b03, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -229,7 +229,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 109172321315190402, guid: 50c549939b9529d49b9eae59fc1d0fd3, type: 3}
       propertyPath: m_Name
-      value: Ninja_Demo@T-Pose
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 109172321315190402, guid: 50c549939b9529d49b9eae59fc1d0fd3, type: 3}
       propertyPath: m_Layer
@@ -249,7 +249,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 776883070312361016, guid: 50c549939b9529d49b9eae59fc1d0fd3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 17.61
+      value: 5.51
       objectReference: {fileID: 0}
     - target: {fileID: 776883070312361016, guid: 50c549939b9529d49b9eae59fc1d0fd3, type: 3}
       propertyPath: m_LocalPosition.y
@@ -710,6 +710,32 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1998719677}
   m_SourcePrefab: {fileID: 100100000, guid: 5c090aac760a8d846aa9e10a55e7087e, type: 3}
+--- !u!1 &987021220 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1320586924919428289, guid: e128e6bc51c95304ab8b1147db7457c8, type: 3}
+  m_PrefabInstance: {fileID: 2006253885297048080}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &987021222
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987021220}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 78deed9e3962351458fbbe1b2be072c9, type: 2}
+  m_Controller: {fileID: 9100000, guid: 356fe0841767854438f6e74930a40b03, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1557583600
 GameObject:
   m_ObjectHideFlags: 0
@@ -977,13 +1003,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -3117642547060124320, guid: e128e6bc51c95304ab8b1147db7457c8, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1320586924919428289, guid: e128e6bc51c95304ab8b1147db7457c8, type: 3}
       propertyPath: m_Name
       value: Skeleton_Warrior_Model
       objectReference: {fileID: 0}
     - target: {fileID: 1808329816553377403, guid: e128e6bc51c95304ab8b1147db7457c8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.59
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2153847135603497240, guid: e128e6bc51c95304ab8b1147db7457c8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1044,7 +1074,7 @@ PrefabInstance:
     - target: {fileID: 4835899557752365805, guid: e128e6bc51c95304ab8b1147db7457c8, type: 3}
       propertyPath: monsterAnimator
       value: 
-      objectReference: {fileID: 168536637}
+      objectReference: {fileID: 987021222}
     - target: {fileID: 4835899557752365805, guid: e128e6bc51c95304ab8b1147db7457c8, type: 3}
       propertyPath: detectlayer.m_Bits
       value: 384
@@ -1072,6 +1102,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7553524762178184995, guid: e128e6bc51c95304ab8b1147db7457c8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 168536637}
+    - targetCorrespondingSourceObject: {fileID: 1320586924919428289, guid: e128e6bc51c95304ab8b1147db7457c8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 987021222}
   m_SourcePrefab: {fileID: 100100000, guid: e128e6bc51c95304ab8b1147db7457c8, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
