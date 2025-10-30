@@ -14,7 +14,6 @@ public class SkeletonWarrior : Monster
         StartCoroutine(WaitAnimationEnd("Spawn")); //스폰 애니메이션 종료까지 대기 
        
     }
-    
     private void FixedUpdate()
     {
         
@@ -27,6 +26,7 @@ public class SkeletonWarrior : Monster
             OverlookAction();
         }
     }
+
     private void OnDisable() //비활성화시 코루틴 정지 
     {
         if (detectCoroutine != null)
@@ -115,6 +115,9 @@ public class SkeletonWarrior : Monster
             
             while (true && isDetective == false)
             {
+                monsterAnimator.SetTrigger("Arrive"); //도착 애니메이션 재생
+                StartCoroutine(WaitAnimationEnd("LookAround")); //주변 살피기 애니메이션 재생 대기
+
                 if (Waypoints.Length <= 1) //목적지가 하나밖에 없으면
                     break;
 
@@ -136,6 +139,17 @@ public class SkeletonWarrior : Monster
         agent.isStopped = !toSetBool;
         monsterAnimator.SetBool("isWalk", toSetBool);
     }
+
+    /// <summary>
+    /// 이동 관련 부울 변수 제어 메서드
+    /// </summary>
+    /// <param name="toSetBool">"움직일 때  true 움직이지 않을때 false"</param>
+    void SetMoveBool(bool toSetBool)
+    {
+        agent.isStopped = !toSetBool;
+        monsterAnimator.SetBool("isWalk", toSetBool);
+    }
+
 
     /// <summary>
     /// 감지를 위한 코루틴 함수
