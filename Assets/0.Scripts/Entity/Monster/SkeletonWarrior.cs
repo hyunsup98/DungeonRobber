@@ -5,22 +5,17 @@ using UnityEngine;
 public class SkeletonWarrior : Monster
 {
     [SerializeField] WaitForSeconds detectDelay = new WaitForSeconds(1f);//감지 딜레이 
-    Coroutine detectCoroutine; //감지 코루틴  변수
+    Coroutine detectCoroutine; //감지 코루틴 변수
 
     private void OnEnable() //활성화 시점에서 초기화 
     {
-        if (isDetective) //감지됐을 때
-        {
-            DetectAction();
-        }
-        else
-        {
-            OverlookAction();
-        }
+        Init();
     }
     
     private void FixedUpdate()
     {
+        StartCoroutine(WaitAnimationEnd("Spawn")); //스폰 애니메이션 끝날때까지 대기
+       
         if (isDetective) //감지했을 때
         {
             DetectAction();
@@ -53,7 +48,10 @@ public class SkeletonWarrior : Monster
     protected override void Attack()
     {
         //todo 공격 구현
+        SetMoveBool(false); //이동 정지
         Debug.Log("Attack");
+        monsterAnimator.SetTrigger("Attack");
+        StartCoroutine(WaitAnimationEnd("Attack"));
     }
 
     /// <summary>
@@ -61,26 +59,25 @@ public class SkeletonWarrior : Monster
     /// </summary>
     protected override void DetectAction()
     {
-        monsterrib.velocity = Vector3.zero;
-
+        SetMoveBool(false);//이동 정지
         Vector3 tempVector = target.transform.position - transform.position;
         targetDistance = Vector3.SqrMagnitude(tempVector); // 단순 비교이므로 sqrMagnitude 사용
 
         if (targetDistance <= attackRange * attackRange) //공격 사거리안에 들어오면 공격 
         {
             if (Physics.Raycast(transform.position + (Vector3.up * 1.5f), transform.forward, out rayhit, attackRange, detectlayer) && rayhit.collider.CompareTag("Player")) //플레이어가 장애물 뒤에 숨어있지 않고 공격범위 내라면 
-            {                               
-                agent.isStopped = true; //이동 멈추고
-                Attack();
-                agent.isStopped = false; //다시 이동 시작
+            {                                              
+                Attack();               
             }
             else
             {
+                SetMoveBool(true);//이동 가능
                 agent.SetDestination(target.transform.position); //타겟의 위치로 이동
             }
         }
         else
-        {
+        {     
+            SetMoveBool(true);//이동 가능
             agent.SetDestination(target.transform.position); //타겟의 위치로 이동
         }
     }
@@ -104,14 +101,19 @@ public class SkeletonWarrior : Monster
     /// </summary>
     protected override void OverlookAction()
     {
+        SetMoveBool(true);//??? ????
         agent.SetDestination(targetWaypoint.position);//목적지로 이동
 
         if (Vector3.SqrMagnitude(transform.position - targetWaypoint.position) < 0.1f * 0.1f) //a목적지에 도달했을 때
         {
+            SetMoveBool(false);//??? ?????
             previousWaypoint = targetWaypoint; //이전 목적지에 현재 목적지 저장
 
             while (true)
             {
+                monsterAnimator.SetTrigger("Arrive"); //도착 애니메이션 재생
+                StartCoroutine(WaitAnimationEnd("LookAround")); //주변 살피기 애니메이션 재생 대기
+
                 if (Waypoints.Length <= 1) //목적지가 하나밖에 없으면
                     break;
 
@@ -140,6 +142,17 @@ public class SkeletonWarrior : Monster
     // }
 
     /// <summary>
+    /// 이동 관련 부울 변수 제어 메서드
+    /// </summary>
+    /// <param name="toSetBool">"움직일 때  true 움직이지 않을때 false"</param>
+    void SetMoveBool(bool toSetBool)
+    {
+        agent.isStopped = !toSetBool;
+        monsterAnimator.SetBool("isWalk", toSetBool);
+    }
+
+
+    /// <summary>
     /// 감지를 위한 코루틴 함수
     /// 감지 범위 내에서 감지 레이어에 해당하는 오브젝트가 있으면 colliders 배열에 저장
     /// </summary>
@@ -150,7 +163,7 @@ public class SkeletonWarrior : Monster
         {
             colliders = Physics.OverlapSphere(transform.position, detectedRangeRadius, detectlayer);
 
-            if (colliders.Length > 0) 
+            if (colliders.Length > 0)
             {
                 foreach (var collider in colliders)
                 {
@@ -167,6 +180,23 @@ public class SkeletonWarrior : Monster
                 isDetective = false;
             }
             yield return detectDelay;
+        }
+    }
+    
+    /// <summary>
+    /// 애니메이션 종료 대기 코루틴
+    /// </summary>
+    /// <param name="animName">에니메이션이름</param>
+    /// <returns></returns>
+    IEnumerator WaitAnimationEnd(string animName)
+    {   
+        while (!monsterAnimator.GetCurrentAnimatorStateInfo(0).IsName(animName))
+        {
+            yield return null;
+        }
+        while(monsterAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
+        {
+            yield return null;
         }
     }
 }
