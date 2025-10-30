@@ -11,7 +11,6 @@ public class SpawnData
     [Range(0f, 1f)] public float _spawnProbability = 1f;
 }
 
-
 //사용할 태그 열거형
 public enum TagType
 {
@@ -20,33 +19,28 @@ public enum TagType
     ItemBox
 }
 
-
 //태그별 스폰 설정 구조체
 [System.Serializable]
 public class TagSpawnSetting
 {
     public bool enable = true;
-    public bool useRandomSpawn = true;
-
     public List<SpawnData> spawnPrefabs = new List<SpawnData>();
     public TagType tag;
     public int createCount;
     public float minSpawnDistance;
-    public float spawnHeight = 0f;
 
-    //랜덤 OFF일 때 사용할 고정 스폰 포인트
-    public List<Transform> fixedSpawnPoints = new List<Transform>();
+    public float spawnHeight = 0f;  // 추가: 스폰 높이
 }
 
 
-// 리스폰 알림 인터페이스
+//리스폰 알림 인터페이스
 public interface IRespawnNotifier
 {
     void NotifyObjectDestroyed(GameObject obj);
 }
 
 
-// 오브젝트 파괴 감지 트래커
+//오브젝트 파괴 감지 트래커
 public class DestructionTracker : MonoBehaviour
 {
     private IRespawnNotifier spawner;
@@ -67,56 +61,48 @@ public class DestructionTracker : MonoBehaviour
 }
 
 
-// 통합 스포너
+//통합 스포너
 public class Spawner : MonoBehaviour, IRespawnNotifier
 {
 
     [Header("스폰 설정")]
     [SerializeField] private LayerMask _groundLayer;
-    [SerializeField] private LayerMask _wallLayer;
-
-    [SerializeField] private float _wallCheckRadius = 2f;
-    [SerializeField] private Vector2 _mapSpawnSize = new Vector2(50, 50);
+    [SerializeField] private Vector2 _mapSpawnSize;
     [Range(0f, 1f)][SerializeField] private float _spawnCountChance = 1f;
 
 
     [Header("리스폰 설정")]
-    [SerializeField] private bool enableRespawn = true;
-    [SerializeField] private float respawnDelay = 3f;
+    [SerializeField] private bool enableRespawn;
+    [SerializeField] private float respawnDelay;
 
 
     [Header("태그별 스폰 설정")]
     [SerializeField] private List<TagSpawnSetting> _tagGroups = new List<TagSpawnSetting>();
 
-
     private float _raycastHeight = 100;
-
-
-    //생성된 오브젝트와 관련 데이터 저장
-    private Dictionary<GameObject, (TagSpawnSetting group, Transform spawnPoint)> _spawnedObjects
-    = new Dictionary<GameObject, (TagSpawnSetting, Transform)>();
-
 
     //스폰 위치 겹침 방지용
     private List<Vector3> _spawnedPositions = new List<Vector3>();
 
+    //생성된 오브젝트와 관련 데이터 저장
+    private Dictionary<GameObject, TagSpawnSetting> _spawnedObjects = new Dictionary<GameObject, TagSpawnSetting>();
 
     private void Start()
     {
         SpawnAllTags();
     }
 
-
     //모든 태그 그룹 스폰
     private void SpawnAllTags()
     {
         foreach (var tagGroup in _tagGroups)
         {
-            if (tagGroup.enable)
+            if (tagGroup.enable == true)
+            {
                 SpawnTagGroup(tagGroup);
+            }
         }
     }
-
 
     //태그 그룹별 스폰
     private void SpawnTagGroup(TagSpawnSetting group)
@@ -125,47 +111,25 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
         {
             return;
         }
-            
-        //랜덤 OFF 시 고정 포인트 위치 기준
-        if (!group.useRandomSpawn)
-        {
-            int count = Mathf.Min(group.fixedSpawnPoints.Count, group.createCount);
 
-            for (int i = 0; i < count; i++)
-            {
-                Transform point = group.fixedSpawnPoints[i];
-                if (point != null)
-                {
-                    SpawnObjectByTag(group, point.position, point);
-                }
-            }
-            return;
-        }
-
-        //랜덤 ON 시 기존 랜덤 로직
         int spawnCount = group.createCount;
-        if (group.useRandomSpawn && Random.value > _spawnCountChance)
+
+        //일부만 생성될 확률 적용
+        if (Random.value > _spawnCountChance)
         {
             spawnCount = Random.Range((int)(group.createCount * 0.5f), group.createCount);
         }
 
         for (int i = 0; i < spawnCount; i++)
         {
-            Vector3 pos = GetRandomSpawnPosition(group);
-            SpawnObjectByTag(group, pos, null);
+            SpawnObjectByTag(group);
         }
     }
 
 
     //확률에 따라 스폰 데이터 선택
-    private SpawnData GetRandomData(TagSpawnSetting group)
+    private SpawnData GetRandomData(List<SpawnData> list)
     {
-        var list = group.spawnPrefabs;
-        if (group.useRandomSpawn == false)
-        {
-            return list[0];
-        }
-
         float totalWeight = 0f;
         foreach (var data in list)
         {
@@ -186,41 +150,8 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
         return list[0];
     }
 
-
-    //오브젝트 생성
-    private void SpawnObjectByTag(TagSpawnSetting group, Vector3 spawnPos, Transform originPoint)
+    private void SpawnObjectByTag(TagSpawnSetting group, bool useTag = true)
     {
-
-        if (spawnPos == Vector3.zero)
-        {
-            return;
-        }
-
-        spawnPos.y = group.spawnHeight;
-        var spawnData = GetRandomData(group);
-
-        if (spawnData == null || spawnData.mapPrefab == null)
-        {
-            return;
-        }
-            
-        GameObject instance = Instantiate(spawnData.mapPrefab, spawnPos, Quaternion.identity);
-        _spawnedPositions.Add(spawnPos);
-        _spawnedObjects[instance] = (group, originPoint);
-
-
-        if (enableRespawn)
-        {
-            var tracker = instance.AddComponent<DestructionTracker>();
-            tracker.Initialize(this);
-        }
-    }
-
-
-    //랜덤 위치 계산
-    private Vector3 GetRandomSpawnPosition(TagSpawnSetting group)
-    {
-
         // 유효한 스폰 위치 후보 리스트
         List<Vector3> candidatePositions = new List<Vector3>();
         int maxAttempts = 100;
@@ -229,20 +160,19 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
         // 랜덤 위치 후보 탐색
         for (int i = 0; i < maxAttempts; i++)
         {
-
             float x = Random.Range(-_mapSpawnSize.x / 2, _mapSpawnSize.x / 2);
             float z = Random.Range(-_mapSpawnSize.y / 2, _mapSpawnSize.y / 2);
-            Vector3 spawnPos = transform.position + new Vector3(x, _raycastHeight, z);
+            Vector3 spawnPos = new Vector3(x, _raycastHeight, z);
 
 
-            //지면 탐지
+            // 지면 탐지
             if (Physics.Raycast(spawnPos, Vector3.down, out RaycastHit hit, _raycastHeight * 2f, _groundLayer))
             {
-
                 Vector3 groundPos = hit.point;
                 bool tooClose = false;
 
-                //기존 스폰 위치와 최소 거리 체크
+
+                // 기존 스폰 위치와 최소 거리 체크
                 foreach (var pos in _spawnedPositions)
                 {
                     if (Vector3.Distance(groundPos, pos) < group.minSpawnDistance)
@@ -250,13 +180,6 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
                         tooClose = true;
                         break;
                     }
-                }
-
-                //벽 레이어 감지
-                bool nearWall = Physics.CheckSphere(groundPos, _wallCheckRadius, _wallLayer);
-                if (nearWall)
-                {
-                    continue;
                 }
 
                 if (tooClose == false)
@@ -270,46 +193,43 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
         // 유효 위치가 없으면 스폰 실패
         if (candidatePositions.Count == 0)
         {
-            return Vector3.zero;
+            return;
         }
-        return candidatePositions[Random.Range(0, candidatePositions.Count)];
-    }
 
 
-    //오브젝트 파괴 시 리스폰 처리
-    public void NotifyObjectDestroyed(GameObject obj)
-    {
-        if (enableRespawn == false || _spawnedObjects.ContainsKey(obj) == false)
+        // 최종 스폰 위치 랜덤 선택
+        Vector3 finalPos = candidatePositions[Random.Range(0, candidatePositions.Count)];
+
+
+        // 스폰 높이 적용
+        finalPos.y = group.spawnHeight;
+
+
+        // 확률 기반으로 스폰 데이터 선택
+        var spawnData = GetRandomData(group.spawnPrefabs);
+        if (spawnData == null || spawnData.mapPrefab == null)
         {
             return;
         }
 
-        var (group, originPoint) = _spawnedObjects[obj];
-        _spawnedObjects.Remove(obj);
-        StartCoroutine(RespawnAfterDelay(group, originPoint, respawnDelay));
-    }
+
+        // 오브젝트 생성
+        GameObject instance = Instantiate(spawnData.mapPrefab, finalPos, Quaternion.identity);
 
 
-    //딜레이 후 리스폰
-    private IEnumerator RespawnAfterDelay(TagSpawnSetting group, Transform originPoint, float delay)
-    {
-        yield return new WaitForSeconds(delay);
+        // 위치와 객체 데이터 저장
+        _spawnedPositions.Add(finalPos);
+        _spawnedObjects.Add(instance, group);
 
-        //랜덤 ON 시 새로운 랜덤 위치에서 리스폰
-        if (group.useRandomSpawn)
+
+        // 파괴 감시 트래커 추가 (리스폰 기능용)
+        if (enableRespawn == true)
         {
-            Vector3 pos = GetRandomSpawnPosition(group);
-            SpawnObjectByTag(group, pos, null);
-        }
-        else
-        {
-            //랜덤 OFF 시 원래 고정 포인트에서 리스폰
-            if (originPoint != null)
-            {
-                SpawnObjectByTag(group, originPoint.position, originPoint);
-            }
+            var tracker = instance.AddComponent<DestructionTracker>();
+            tracker.Initialize(this);
         }
     }
+
 
 
     //오브젝트와 자식들까지 태그 지정
@@ -320,5 +240,30 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
         {
             SetTagRecursively(child.gameObject, tag);
         }
+    }
+
+
+
+    //오브젝트 파괴 시 리스폰 처리
+    public void NotifyObjectDestroyed(GameObject obj)
+    {
+        if (enableRespawn == false || _spawnedObjects.ContainsKey(obj) == false)
+        {
+            return;
+        }
+
+        var group = _spawnedObjects[obj];
+        _spawnedObjects.Remove(obj);
+
+        StartCoroutine(RespawnAfterDelay(group, respawnDelay));
+    }
+
+
+
+    //딜레이 후 리스폰
+    private IEnumerator RespawnAfterDelay(TagSpawnSetting group, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SpawnObjectByTag(group);
     }
 }

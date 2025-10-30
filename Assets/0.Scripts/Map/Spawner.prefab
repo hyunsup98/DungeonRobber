@@ -53,16 +53,7 @@ MonoBehaviour:
   respawnDelay: 0
   _tagGroups:
   - enable: 0
-    useRandomSpawn: 1
     spawnPrefabs: []
     tag: 0
     createCount: 0
     minSpawnDistance: 0
-    spawnHeight: 0
-  - enable: 0
-    useRandomSpawn: 1
-    spawnPrefabs: []
-    tag: 0
-    createCount: 0
-    minSpawnDistance: 0
-    spawnHeight: 0
