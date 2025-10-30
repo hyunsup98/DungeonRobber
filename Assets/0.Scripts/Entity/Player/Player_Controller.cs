@@ -21,6 +21,8 @@ public enum PlayerBehaviorState : int
 /// </summary>
 public sealed partial class Player_Controller : Entity
 {
+    [SerializeField] private BaseStat stats = new BaseStat();
+
     [Header("컴포넌트 변수")]
     [SerializeField] private Camera mainCamera;         //메인 카메라
     [SerializeField] private Rigidbody playerRigid;     //플레이어 Rigidbody

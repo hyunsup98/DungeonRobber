@@ -1,20 +1,22 @@
-using System.Collections.Generic;
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum StatType
 {
-    MaxHp,
+    Health,
     CurrentHP,
     MoveSpeed,
     RunSpeed,
 }
 
-public class BaseStat : MonoBehaviour
+[System.Serializable]
+public class BaseStat
 {
-    [field : SerializeField]
-    public Dictionary<StatType, float> stats = new()
+    [SerializeField]
+    private SerializeDicStats stats = new SerializeDicStats()
     {
-        {StatType.MaxHp, 0 },
+        {StatType.Health, 0 },
         {StatType.CurrentHP, 0 },
         {StatType.MoveSpeed, 0 },
         {StatType.RunSpeed, 0 }
