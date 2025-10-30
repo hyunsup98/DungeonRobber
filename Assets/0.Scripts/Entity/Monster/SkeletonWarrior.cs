@@ -140,17 +140,7 @@ public class SkeletonWarrior : Monster
         monsterAnimator.SetBool("isWalk", toSetBool);
     }
 
-    /// <summary>
-    /// 이동 관련 부울 변수 제어 메서드
-    /// </summary>
-    /// <param name="toSetBool">"움직일 때  true 움직이지 않을때 false"</param>
-    void SetMoveBool(bool toSetBool)
-    {
-        agent.isStopped = !toSetBool;
-        monsterAnimator.SetBool("isWalk", toSetBool);
-    }
-
-
+    
     /// <summary>
     /// 감지를 위한 코루틴 함수
     /// 감지 범위 내에서 감지 레이어에 해당하는 오브젝트가 있으면 colliders 배열에 저장
