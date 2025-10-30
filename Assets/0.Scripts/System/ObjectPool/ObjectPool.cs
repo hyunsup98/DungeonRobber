@@ -30,6 +30,7 @@ public abstract class ObjectPool<T> : Singleton<ObjectPool<T>> where T : MonoBeh
         else
         {
             obj = Instantiate(type, pos);
+            obj.name = type.name;
         }
 
         return obj;
@@ -56,11 +57,12 @@ public abstract class ObjectPool<T> : Singleton<ObjectPool<T>> where T : MonoBeh
         {
             obj = Instantiate(type, pos);
             obj.name = name;
-            queue.Enqueue(obj);
         }
-
-        obj = queue.Dequeue();
-        obj.gameObject.SetActive(true);
+        else
+        {
+            obj = queue.Dequeue();
+            obj.gameObject.SetActive(true);
+        }
 
         return obj;
     }
