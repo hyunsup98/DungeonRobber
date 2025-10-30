@@ -17,7 +17,7 @@ public class MiniMapFollow : MonoBehaviour
     {
         //≈´ πÃ¥œ∏ ¿∫ Ω√¿€ Ω√ ≤®µ–¥Ÿ
         _minimapCamera = GetComponent<Camera>();
-        if (_largeMapUI != null )
+        if (_largeMapUI != null)
         {
             _largeMapUI.SetActive(false);
         }
@@ -86,8 +86,4 @@ public class MiniMapFollow : MonoBehaviour
                 _minimapCamera.orthographicSize = 30f;
         }
     }
-
-
-
-
 }
