@@ -5,12 +5,8 @@ using UnityEngine;
 /// </summary>
 public abstract class Entity : MonoBehaviour
 {
-    [SerializeField] protected float attackDamage;
-    [SerializeField] protected float attackRange;
-    [SerializeField] protected float attackDelay;
-    [SerializeField] protected float moveSpeed;
-    [SerializeField] protected float maxHP;
-    [SerializeField] protected float currentHP;
+    [SerializeField] protected BaseStat stats = new BaseStat();
+    protected BuffManager buffManager = new BuffManager();
 
     /// <summary>
     /// 초기화 메서드
@@ -20,10 +16,7 @@ public abstract class Entity : MonoBehaviour
     /// </summary>
     protected virtual void Init()
     {
-        if (currentHP != maxHP)
-        {
-            currentHP = maxHP;
-        }
+        stats.Init();
     }
 
     //공격 메서드
@@ -31,4 +24,13 @@ public abstract class Entity : MonoBehaviour
 
     //피격 메서드
     protected abstract void GetDamage(float damage);
+
+    //버프 적용 메서드
+    protected void ApplyBuffToEntity(BaseStat stat, params BaseBuff[] buffs)
+    {
+        foreach (var buff in buffs)
+        {
+            buffManager.ApplyBuff(buff, stat);
+        }
+    }
 }

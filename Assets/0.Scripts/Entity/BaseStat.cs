@@ -1,14 +1,15 @@
-using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 #region 스탯의 타입
 //스탯의 타입
 public enum StatType
 {
-    HP,
-    MoveSpeed
+    HP,             //체력, baseStats에선 maxHP역할 / stats에선 currentHP 역할
+    MoveSpeed,      //이동 속도
+    AttackDamage,   //공격력
+    AttackRange,    //공격 사거리
+    AttackDelay     //공격 속도
 }
 #endregion
 
@@ -61,7 +62,9 @@ public class BaseStat
     //엔티티 생성 시 초기 세팅 메서드
     public void Init()
     {
-        foreach(var stat in baseStats)
+        if (baseStats == null) return;
+
+        foreach (var stat in baseStats)
         {
             stats.Add(stat);
         }

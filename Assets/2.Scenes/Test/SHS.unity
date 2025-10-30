@@ -1253,18 +1253,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e875877ab34ae48a97c48b3d9229b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackDamage: 0
-  attackRange: 2
-  attackDelay: 0
-  moveSpeed: 5
-  maxHP: 15
-  currentHP: 15
   stats:
     baseStats:
     - type: 0
       <Value>k__BackingField: 30
     - type: 1
       <Value>k__BackingField: 5
+    - type: 2
+      <Value>k__BackingField: 5
+    - type: 3
+      <Value>k__BackingField: 1.5
+    - type: 4
+      <Value>k__BackingField: 1.5
   freeze: {fileID: 2956473564646443432, guid: 4799fe0a563ccbf4c8af0412cbcfccf6, type: 3}
   mainCamera: {fileID: 1405820079}
   playerRigid: {fileID: 1107888529}

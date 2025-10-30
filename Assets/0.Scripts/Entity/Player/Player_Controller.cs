@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 [System.Flags]
@@ -20,9 +21,6 @@ public enum PlayerBehaviorState : int
 /// </summary>
 public sealed partial class Player_Controller : Entity
 {
-    [SerializeField] private BaseStat stats;
-    private BuffManager buffManager;
-
     [SerializeField] private BaseBuff freeze;
 
     [Header("컴포넌트 변수")]
@@ -40,30 +38,6 @@ public sealed partial class Player_Controller : Entity
 
     private PlayerBehaviorState playerBehaviorState;    //플레이어 행동에 관련된 상태 플래그
 
-    public float CurrentHP                              //현재 체력 프로퍼티
-    {
-        get { return currentHP; }
-        set
-        {
-            if(value > maxHP)
-            {
-                value = maxHP;
-            }
-            else if(value < 0)
-            {
-                value = 0;
-            }
-
-            currentHP = value;
-
-            //플레이어의 체력이 0 이하면 PlayerDeadAction 호출
-            if(currentHP <= 0)
-            {
-                playerDeadAction?.Invoke();
-            }
-        }
-    }
-
     private void Awake()
     {
         if (mainCamera == null)
@@ -75,14 +49,7 @@ public sealed partial class Player_Controller : Entity
         if(playerAnimator == null && TryGetComponent<Animator>(out var anim))
             playerAnimator = anim;
 
-        if (stats == null)
-            stats = new BaseStat();
-
-        if (buffManager == null)
-            buffManager = new BuffManager();
-
         Init();
-        stats.Init();
     }
 
     private void Start()
@@ -108,13 +75,8 @@ public sealed partial class Player_Controller : Entity
 
         if(Input.GetKeyDown(KeyCode.F))
         {
-            Debug.Log(stats.GetStat(StatType.HP));
-            Debug.Log(stats.GetStat(StatType.MoveSpeed));
-        }
-
-        if(Input.GetKeyDown(KeyCode.G))
-        {
-            ApplyBuffToEntity(stats, freeze);
+            var buff = BuffPool.Instance.GetObjects(freeze, BuffPool.Instance.transform);
+            buffManager.ApplyBuff(buff, stats);
         }
     }
 
@@ -134,8 +96,8 @@ public sealed partial class Player_Controller : Entity
     {
         base.Init();
 
-        if (runSpeed < moveSpeed)
-            runSpeed = moveSpeed * 1.5f;
+        if (runSpeed < stats.GetStat(StatType.MoveSpeed))
+            runSpeed = stats.GetStat(StatType.MoveSpeed) * 1.5f;
 
         playerBehaviorState = PlayerBehaviorState.Alive | PlayerBehaviorState.IsCanMove;
     }
@@ -204,14 +166,5 @@ public sealed partial class Player_Controller : Entity
     private void OnDestroy()
     {
         playerDeadAction -= Dead;
-    }
-
-    //버프 테스트
-    private void ApplyBuffToEntity(BaseStat stat, params BaseBuff[] buffs)
-    {
-        foreach(var buff in buffs)
-        {
-            buffManager.ApplyBuff(buff, stat);
-        }
     }
 }

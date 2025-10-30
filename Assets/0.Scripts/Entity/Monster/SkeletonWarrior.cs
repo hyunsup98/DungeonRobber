@@ -35,12 +35,9 @@ public class SkeletonWarrior : Monster
 
     protected override void Init()
     {
-        maxHP = 50f;
         base.Init();
-        attackRange = 2f;
-        attackDamage = 10f;
-        attackDelay = 1.5f;
-        moveSpeed = 3f;
+        //attackRange = 2f;
+        //attackDelay = 1.5f;
         detectedRangeRadius = 30f;
         
         detectCoroutine = StartCoroutine(nameof(DetectTarget));
@@ -65,9 +62,9 @@ public class SkeletonWarrior : Monster
         Vector3 tempVector = target.transform.position - transform.position;
         targetDistance = Vector3.SqrMagnitude(tempVector); // 단순 비교이므로 sqrMagnitude 사용
 
-        if (targetDistance <= attackRange * attackRange) //공격 사거리안에 들어오면 공격 
+        if (targetDistance <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange)) //공격 사거리안에 들어오면 공격 
         {
-            if (Physics.Raycast(transform.position + (Vector3.up * 1.5f), transform.forward, out rayhit, attackRange, detectlayer) && rayhit.collider.CompareTag("Player")) //플레이어가 장애물 뒤에 숨어있지 않고 공격범위 내라면 
+            if (Physics.Raycast(transform.position + (Vector3.up * 1.5f), transform.forward, out rayhit, stats.GetStat(StatType.AttackRange), detectlayer) && rayhit.collider.CompareTag("Player")) //플레이어가 장애물 뒤에 숨어있지 않고 공격범위 내라면 
             {                                               
                 Attack();               
             }
@@ -91,9 +88,9 @@ public class SkeletonWarrior : Monster
     protected override void GetDamage(float damage)
     {
         monsterAnimator.SetTrigger("GetDamage");
-        currentHP -= damage;
+        stats.ModifyStat(StatType.HP, -damage);
 
-        if (currentHP <= 0)
+        if (stats.GetStat(StatType.HP) <= 0)
         {
             monsterAnimator.SetTrigger("Die");
             Destroy(this);

@@ -44,7 +44,7 @@ public sealed partial class Player_Controller
             Vector3 localMoveDir = transform.InverseTransformDirection(moveDir).normalized;
             SetMoveAnimationBlend(localMoveDir);
 
-            playerRigid.velocity = CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint) ? moveDir * runSpeed : moveDir * moveSpeed;
+            playerRigid.velocity = CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint) ? moveDir * runSpeed : moveDir * stats.GetStat(StatType.MoveSpeed);
         }
     }
 
@@ -53,7 +53,7 @@ public sealed partial class Player_Controller
     /// </summary>
     private void LookAtMousePoint()
     {
-        Vector3 worldPos = CameraController.Instance.GetMousePos();
+        Vector3 worldPos = Camera.main.GetWorldPosToMouse();
 
         Vector3 direction = worldPos - transform.position;
         direction.y = transform.position.y;
