@@ -7,6 +7,7 @@ TagManager:
   - GoldText
   - InvenText
   - Inventory
+  - InvenManager
   layers:
   - Default
   - TransparentFX
