@@ -16,7 +16,7 @@ public abstract class Monster : Entity
     [SerializeField] protected Animator monsterAnimator; //에니메이션 관리 
     [SerializeField] protected Collider[] colliders; // 감지된 물체 넣어놓는 배열
     [SerializeField] protected Transform[] Waypoints; //순찰 지점들 저장용 배열  
-
+    
     protected RaycastHit rayhit; //레이캐스트 히트 정보 저장용 변수   
     public bool isDetective = false; //감지했는가를 나타내는 변수 
 
