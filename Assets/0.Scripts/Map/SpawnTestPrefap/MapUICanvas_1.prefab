@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 9127014940312994613}
   - component: {fileID: 6887259290765613642}
   m_Layer: 5
-  m_Name: MiniMapUICanvas_1
+  m_Name: MapUICanvas_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
