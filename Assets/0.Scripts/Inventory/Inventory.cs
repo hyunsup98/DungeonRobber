@@ -1,152 +1,98 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
+using static UnityEditor.Progress;
 
 public class Inventory : MonoBehaviour
 {
-    public List<Item> items;
+    // 보유 중인 아이템 리스트를 불러와서 UI로 표시
+    // E키를 누르면 인벤토리 창이 열리고 닫히는 기능 < Item/Player.cs에서 처리 >
 
-    [SerializeField]
-    private Transform slotParent;
-    [SerializeField] private Transform inventoryParent;
-    private Slot[] slots;
+    [SerializeField] int invenCapacity = 10;
 
-    [Header("UI")]
-    [Tooltip("인벤토리 전체 UI 루트(활성/비활성 토글)")]
-    [SerializeField] private GameObject inventoryRoot;
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        if (slotParent != null)
-            slots = slotParent.GetComponentsInChildren<Slot>();
-    }
-#endif
+    private GameObject player;
+    private Item[] invenArray;
 
     void Awake()
     {
-        FreshSlot();
-        HideInventory();
+        player = GameObject.FindGameObjectWithTag("Player");
+        invenArray = new Item[invenCapacity];
     }
 
-    public bool IsOpen => inventoryRoot != null && inventoryRoot.activeSelf;
-
-    public void ToggleInventory()
+    void Update()
     {
-        if (IsOpen)
+        TextMeshProUGUI invenText = GameObject.FindGameObjectWithTag("InvenText")?.GetComponent<TextMeshProUGUI>();
+        invenText.text = $"Inventory: {String.Join(" / ", Array.ConvertAll(invenArray, item => item != null ? item.Name : " "))}";
+    }
+
+    /// <summary>
+    /// 아이템 보유 확인
+    /// </summary>
+    /// <param name="itemName"></param>
+    /// <returns>보유여부 bool</returns>
+    public bool HasItem(string itemName)
+    {
+        foreach (var invItem in invenArray)
         {
-            HideInventory();
+            if (invItem != null && invItem.Name == itemName)
+            {
+                return true;
+            }
         }
-        else
+        return false;
+    }
+
+    public void AddItem(Item newItem)
+    {
+        if (HasItem(newItem.Name))
         {
-            ShowInventory();
-        }
-    }
-
-    public void ShowInventory()
-    {
-        if (inventoryRoot != null) inventoryRoot.SetActive(true);
-        FreshSlot();
-    }
-
-    public void HideInventory()
-    {
-        // 컨텍스트 메뉴 숨김
-        InventoryContextMenu inventoryContextMenu = InventoryContextMenu.GetOrFind();
-        if (inventoryContextMenu != null)
-            inventoryContextMenu.Hide();
-
-        // 툴팁 숨김 (툴팁이 인벤토리 슬롯에 있을 때만 숨기는 게 나을 수도 있음)
-        ItemTooltip itemTooltip = ItemTooltip.GetOrFind();
-        if (itemTooltip != null)
-            itemTooltip.Hide();
-
-        if (inventoryRoot != null) inventoryRoot.SetActive(false);
-    }
-
-    public void FreshSlot()
-    {
-        if (slotParent == null)
+            Debug.Log($"이미 '{newItem.Name}' 아이템을 보유 중입니다.");
             return;
-
-        if (slots == null || slots.Length == 0)
-            slots = slotParent.GetComponentsInChildren<Slot>();
-
-        int i = 0;
-        for (; i < items.Count && i < slots.Length; i++)
-        {
-            // 슬롯에 owner / index 할당
-            slots[i].ownerInventory = this;
-            slots[i].slotIndex = i;
-            slots[i].Item = items[i];
         }
-        for (; i < slots.Length; i++)
+        // 이미 보유중인 경우 수량 증가????
+
+        for (int i = 0; i < invenArray.Length; i++)
         {
-            slots[i].ownerInventory = this;
-            slots[i].slotIndex = i;
-            slots[i].Item = null;
+            if (invenArray[i] == null)
+            {
+                invenArray[i] = newItem;
+                Debug.Log($"아이템 '{newItem.Name}'(이)가 인벤토리에 추가되었습니다.");
+                // 퀵슬롯에 자동 할당하는 기능 추가 예정
+                return;
+            }
         }
+        Debug.Log("인벤토리가 가득 찼습니다. 아이템을 추가할 수 없습니다.");
     }
 
-    public bool AddItem(Item _item)
+    ///////////////////////////////////////////////// 테스트용 메서드 /////////////////////////////////////////////////
+
+    private WeaponItem defaultWeapon;
+    private ConsumableItem speedRune;
+    private SellableItem necklace;
+
+    public Item GetRandomItem()
     {
-        if (slots == null || items == null)
-            FreshSlot();
+        speedRune = gameObject.AddComponent<ConsumableItem>();
+        speedRune.Name = "Speed Rune";
+        speedRune.Type = ItemType.Consumable;
+        speedRune.Grade = ItemGrade.Rare;
+        speedRune.Description = "사용하면 일정 시간 동안 이동 속도가 빨라지는 룬. 던전 탐험이나 적을 피할 때에 유용하다.";
+        speedRune.ConsumeType = ConsumableType.Effect;
+        speedRune.Power = 2f;
+        speedRune.Duration = 5;
 
-        if (items.Count < slots.Length)
-        {
-            items.Add(_item);
-            FreshSlot();
-            Debug.Log($"인벤토리에 '{_item.itemName}' 아이템이 추가되었습니다.");
-            return true;
-        }
-        else
-        {
-            Debug.Log("슬롯이 가득 차 있습니다.");
-            return false;
-        }
-    }
+        necklace = gameObject.AddComponent<SellableItem>();
+        necklace.Name = "Cursed Skul";
+        necklace.Type = ItemType.Sellable;
+        necklace.Grade = ItemGrade.Unique;
+        necklace.Description = "으스스한 기운을 풍기는 저주받은 해골. 상당한 가치가 있어 보인다.";
+        necklace.Price = 150;
 
-    /// <summary>
-    /// idx번째 슬롯의 아이템을 반환합니다.
-    /// </summary>
-    /// <param name="idx"></param>
-    /// <returns></returns>
-    public Item GetItem(int idx)
-    {
-        return slots[idx].Item;
-    }
+        Item[] randomItems = new Item[] { speedRune, necklace };
 
-    // 기존 인덱스 기반 제거 (유지)
-    internal void RemoveItem(int idx)
-    {
-        if (idx >= 0 && idx < items.Count)
-        {
-            items.RemoveAt(idx);
-            FreshSlot();
-            Debug.Log($"인벤토리 {idx + 1}번째 아이템이 제거되었습니다.");
-        }
-    }
-
-    /// <summary>
-    /// Item 기반 제거 (퀵슬롯 등에서 호출됨)
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    internal void RemoveItem(Item item)
-    {
-        if (item == null) return;
-
-        if (items.Remove(item))
-        {
-            FreshSlot();
-            Debug.Log($"인벤토리 '{item.itemName}' 아이템이 제거되었습니다.");
-        }
-        else
-        {
-            Debug.LogWarning("RemoveItem: 해당 아이템이 인벤토리에 없습니다.");
-        }
+        return randomItems[UnityEngine.Random.Range(0, randomItems.Length)];
     }
 }
