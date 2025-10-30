@@ -21,7 +21,10 @@ public enum PlayerBehaviorState : int
 /// </summary>
 public sealed partial class Player_Controller : Entity
 {
-    [SerializeField] private BaseStat stats = new BaseStat();
+    [SerializeField] private BaseStat stats;
+    private BuffManager buffManager;
+
+    [SerializeField] private BaseBuff freeze;
 
     [Header("컴포넌트 변수")]
     [SerializeField] private Camera mainCamera;         //메인 카메라
@@ -73,7 +76,14 @@ public sealed partial class Player_Controller : Entity
         if(playerAnimator == null && TryGetComponent<Animator>(out var anim))
             playerAnimator = anim;
 
+        if (stats == null)
+            stats = new BaseStat();
+
+        if (buffManager == null)
+            buffManager = new BuffManager();
+
         Init();
+        stats.Init();
     }
 
     private void Start()
@@ -97,7 +107,13 @@ public sealed partial class Player_Controller : Entity
         //Test
         if (Input.GetKeyDown(KeyCode.F))
         {
-            GetDamage(5f);
+            Debug.Log(stats.GetStat(StatType.HP));
+            Debug.Log(stats.GetStat(StatType.MoveSpeed));
+        }
+
+        if(Input.GetKeyDown(KeyCode.G))
+        {
+            ApplyBuffToEntity(stats, freeze);
         }
     }
 
@@ -123,6 +139,7 @@ public sealed partial class Player_Controller : Entity
         playerBehaviorState = PlayerBehaviorState.Alive | PlayerBehaviorState.IsCanMove;
     }
 
+    //todo, 상체 행동 애니메이션 레이어 보간 작업인데 원하는 방향으로 안나와서 잠시 보류
     private IEnumerator PlayOtherAnimatorLayer(string motionName)
     {
         playerAnimator.SetTrigger(motionName);
@@ -186,5 +203,14 @@ public sealed partial class Player_Controller : Entity
     private void OnDestroy()
     {
         playerDeadAction -= Dead;
+    }
+
+    //버프 테스트
+    private void ApplyBuffToEntity(BaseStat stat, params BaseBuff[] buffs)
+    {
+        foreach(var buff in buffs)
+        {
+            buffManager.ApplyBuff(buff, stat);
+        }
     }
 }
