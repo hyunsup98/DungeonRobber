@@ -10,7 +10,8 @@ public enum PlayerBehaviorState : int
     Dead        = 1 << 1,       //플레이어가 죽은 상태 = 체력이 0 이하
     IsCanMove   = 1 << 2,       //플레이어가 움직일 수 있는 상태
     IsWalk      = 1 << 3,       //플레이어가 걷고 있는 상태
-    IsSprint    = 1 << 4        //플레이어가 달리고 있는 상태
+    IsSprint    = 1 << 4,       //플레이어가 달리고 있는 상태
+    IsDoingUpperBody = 1 << 5,  //플레이어가 상체가 하는 동작을 하고 있는지에 대한 상태 - 공격, 먹기, 마시기, 상자 열기 등의 모션
 }
 
 /// <summary>
