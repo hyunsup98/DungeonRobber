@@ -5,44 +5,44 @@ using UnityEngine;
 
 public class TestPlayer : MonoBehaviour
 {
-    [Header("ÀÎº¥Åä¸®")]
+    [Header("ï¿½Îºï¿½ï¿½ä¸®")]
     public Inventory inventory;
 
-    [Header("Äü½½·Ô")]
+    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")]
     public QuickSlot_Controller quickSlots;
 
     void Update()
     {
-        // ¸¶¿ì½º ¿ìÅ¬¸¯ (»óÈ£ÀÛ¿ë)
+        // ï¿½ï¿½ï¿½ì½º ï¿½ï¿½Å¬ï¿½ï¿½ (ï¿½ï¿½È£ï¿½Û¿ï¿½)
         if (Input.GetMouseButtonDown(1))
         {
             Debug.Log("Right Click");
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit3D;
-            if (Physics.Raycast(ray, out hit3D))
-                HitCheckObject(hit3D);
+            //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            //RaycastHit hit3D;
+            //if (Physics.Raycast(ray, out hit3D))
+            //    HitCheckObject(hit3D);
         }
 
         if (Input.anyKeyDown)
         {
-            // ¼ýÀÚ 1~6¹ø (Äü½½·Ô)
-            for (int i = 0; i < 6; i++)
-            {
-                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
-                {
-                    // Äü½½·Ô i¹øÂ° Ä­ ¾ÆÀÌÅÛ Á¤º¸ ºÒ·¯¿È
-                    Item item = quickSlots.GetItem(i);
-                    Debug.Log($"Using item: {(item != null ? item.itemName : "None")}");
-                    if (item != null && item.useAction != null)
-                    {
-                        item.useAction.Use(item, gameObject);
-                        // ¾ÆÀÌÅÛ »ç¿ë ÈÄ Äü½½·Ô, ÀÎº¥Åä¸®¿¡¼­ Á¦°Å
-                        quickSlots.RemoveItem(i);
-                    }
-                }
-            }
+            // ï¿½ï¿½ï¿½ï¿½ 1~6ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+            //for (int i = 0; i < 6; i++)
+            //{
+            //    if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+            //    {
+            //        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ iï¿½ï¿½Â° Ä­ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ò·ï¿½ï¿½ï¿½
+            //        Item item = quickSlots.GetItem(i);
+            //        Debug.Log($"Using item: {(item != null ? item.itemName : "None")}");
+            //        if (item != null && item.useAction != null)
+            //        {
+            //            item.useAction.Use(item, gameObject);
+            //            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            //            quickSlots.RemoveItem(i);
+            //        }
+            //    }
+            //}
 
-            // Tab Å° (ÀÎº¥Åä¸® ¿­±â/´Ý±â)
+            // Tab Å° (ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½/ï¿½Ý±ï¿½)
             if (Input.GetKeyDown(KeyCode.Tab))
             {
                 if (inventory != null)
@@ -51,22 +51,22 @@ public class TestPlayer : MonoBehaviour
         }
     }
 
-    void HitCheckObject(RaycastHit hit3D)
-    {
-        IObjectItem clickInterface = hit3D.transform.gameObject.GetComponent<IObjectItem>();
+    //void HitCheckObject(RaycastHit hit3D)
+    //{
+    //    IObjectItem clickInterface = hit3D.transform.gameObject.GetComponent<IObjectItem>();
 
-        if (clickInterface != null)
-        {
-            Item item = clickInterface.ClickItem();
-            bool isAdded = inventory.AddItem(item);
+    //    if (clickInterface != null)
+    //    {
+    //        Item item = clickInterface.ClickItem();
+    //        bool isAdded = inventory.AddItem(item);
             
-            // ¾ÆÀÌÅÛ È¹µæ È¿°úÀ½
-            // AudioSource.PlayClipAtPoint(pickupSound, transform.position);
+    //        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È¹ï¿½ï¿½ È¿ï¿½ï¿½ï¿½ï¿½
+    //        // AudioSource.PlayClipAtPoint(pickupSound, transform.position);
 
-            // ¾ÆÀÌÅÛ ¿ÀºêÁ§Æ® »èÁ¦
-            // Destroy ÇÏÁö ¾Ê°í ºñÈ°¼ºÈ­ ÇÒÁö °í¹Î Áß
-            //Destroy(hit3D.transform.gameObject);
-            if(isAdded) hit3D.transform.gameObject.SetActive(false);
-        }
-    }
+    //        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
+    //        // Destroy ï¿½ï¿½ï¿½ï¿½ ï¿½Ê°ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+    //        //Destroy(hit3D.transform.gameObject);
+    //        if(isAdded) hit3D.transform.gameObject.SetActive(false);
+    //    }
+    //}
 }

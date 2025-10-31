@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class Inventory_Controller
 {
-    // ÀÎº¥Åä¸® °ü·Ã ¸Þ¼­µå
-    // get, add, remove µî
+    // ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½
+    // get, add, remove ï¿½ï¿½
 
     
     
     
     
     
-    // public ¸Þ¼­µå
+    // public ï¿½Þ¼ï¿½ï¿½ï¿½
 
     /// <summary>
-    /// ÀÎº¥Åä¸®¿¡ ¾ÆÀÌÅÛÀÌ ÀÖ´ÂÁö È®ÀÎÇÕ´Ï´Ù.
+    /// ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     /// </summary>
     /// <param name="item"></param>
-    /// <returns>bool ¾ÆÀÌÅÛ Á¸Àç ¿©ºÎ</returns>
+    /// <returns>bool ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½</returns>
     //public bool HasItem(Item item) { return true; }
     //public void AddItem(Item item) { }
     //public void RemoveItem(Item item) { }

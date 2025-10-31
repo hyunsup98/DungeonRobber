@@ -12,22 +12,18 @@ public class Inventory : MonoBehaviour
     // ���� ���� ������ ����Ʈ�� �ҷ��ͼ� UI�� ǥ��
     // EŰ�� ������ �κ��丮 â�� ������ ������ ��� < Item/Player.cs���� ó�� >
 
-    [SerializeField] int invenCapacity = 10;
+    public List<Item> items;
 
     private GameObject player;
     private Item[] invenArray;
 
-    //private void Awake()
-    //{
-    //    if (slotParent != null)
-    //        slots = slotParent.GetComponentsInChildren<Slot>();
-    //}
+    [SerializeField] GameObject inventoryRoot;
 
     private void Awake()
     {
         // �κ��丮 9ĭ
         items = new List<Item>() { null, null, null, null, null, null, null, null, null };
-        FreshSlot();
+        //FreshSlot();
         HideInventory();
     }
 
@@ -41,8 +37,6 @@ public class Inventory : MonoBehaviour
     /// </summary>
     public void ToggleInventory()
     {
-        TextMeshProUGUI invenText = GameObject.FindGameObjectWithTag("InvenText")?.GetComponent<TextMeshProUGUI>();
-        invenText.text = $"Inventory: {String.Join(" / ", Array.ConvertAll(invenArray, item => item != null ? item.Name : " "))}";
     }
 
     /// <summary>
@@ -50,25 +44,25 @@ public class Inventory : MonoBehaviour
     /// </summary>
     /// <param name="itemName"></param>
     /// <returns>�������� bool</returns>
-    public bool HasItem(string itemName)
-    {
-        foreach (var invItem in invenArray)
-        {
-            if (invItem != null && invItem.Name == itemName)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    //public bool HasItem(string itemName)
+    //{
+    //    foreach (var invItem in invenArray)
+    //    {
+    //        if (invItem != null && invItem.Name == itemName)
+    //        {
+    //            return true;
+    //        }
+    //    }
+    //    return false;
+    //}
 
-    public void AddItem(Item newItem)
-    {
-        if (HasItem(newItem.Name))
-        {
-            ShowInventory();
-        }
-    }
+    //public void AddItem(Item newItem)
+    //{
+    //    if (HasItem(newItem.Name))
+    //    {
+    //        ShowInventory();
+    //    }
+    //}
 
     /// <summary>
     /// �κ��丮�� ǥ���մϴ�.
@@ -76,7 +70,7 @@ public class Inventory : MonoBehaviour
     public void ShowInventory()
     {
         if (inventoryRoot != null) inventoryRoot.SetActive(true);
-        FreshSlot();
+        //FreshSlot();
     }
 
     /// <summary>
@@ -90,9 +84,9 @@ public class Inventory : MonoBehaviour
             inventoryContextMenu.Hide();
 
         // ���� ���� (������ �κ��丮 ���Կ� ���� ���� ����� �� ���� ���� ����)
-        ItemTooltip itemTooltip = ItemTooltip.GetOrFind();
-        if (itemTooltip != null)
-            itemTooltip.Hide();
+        //ItemTooltip itemTooltip = ItemTooltip.GetOrFind();
+        //if (itemTooltip != null)
+        //    itemTooltip.Hide();
 
         if (inventoryRoot != null) inventoryRoot.SetActive(false);
     }
@@ -100,38 +94,38 @@ public class Inventory : MonoBehaviour
     /// <summary>
     /// �κ��丮 ���� UI�� �����մϴ�.
     /// </summary>
-    public void FreshSlot()
-    {
-        if (slotParent == null)
-            return;
+    //public void FreshSlot()
+    //{
+    //    if (slotParent == null)
+    //        return;
 
-        if (slots == null || slots.Length == 0)
-            slots = slotParent.GetComponentsInChildren<Slot>();
+    //    if (slots == null || slots.Length == 0)
+    //        slots = slotParent.GetComponentsInChildren<Slot>();
 
-        int i = 0;
-        for (; i < slots.Length; i++)
-        {
-            // ���Կ� owner / index �Ҵ�
-            slots[i].ownerInventory = this;
-            slots[i].Item = items[i];
-            // ���� �ؽ�Ʈ ����
-            if(slots[i].ItemQuantity > 0)
-                slots[i].GetComponentInChildren<Text>().text = slots[i].ItemQuantity.ToString();
-            else
-                slots[i].GetComponentInChildren<Text>().text = "";
-        }
-        //for (; i < slots.Length; i++)
-        //{
-        //    slots[i].ownerInventory = this;
-        //    slots[i].Item = null;
-        //}
+    //    int i = 0;
+    //    for (; i < slots.Length; i++)
+    //    {
+    //        // ���Կ� owner / index �Ҵ�
+    //        slots[i].ownerInventory = this;
+    //        slots[i].Item = items[i];
+    //        // ���� �ؽ�Ʈ ����
+    //        if(slots[i].ItemQuantity > 0)
+    //            slots[i].GetComponentInChildren<Text>().text = slots[i].ItemQuantity.ToString();
+    //        else
+    //            slots[i].GetComponentInChildren<Text>().text = "";
+    //    }
+    //    //for (; i < slots.Length; i++)
+    //    //{
+    //    //    slots[i].ownerInventory = this;
+    //    //    slots[i].Item = null;
+    //    //}
 
         
 
 
 
-        PrintItems();
-    }
+    //    PrintItems();
+    //}
 
     public enum SlotType
     {
@@ -146,15 +140,159 @@ public class Inventory : MonoBehaviour
     /// <param name="fromIdx"></param>
     /// <param name="to">�������� ���� ��</param>
     /// <param name="toIdx"></param>
-    public void SwapItem(SlotType from, int fromIdx, SlotType to, int toIdx)
-    {
-        Debug.Log($"SwapItem: �Ķ���� idx1: {fromIdx}, idx2: {toIdx}");
+    //public void SwapItem(SlotType from, int fromIdx, SlotType to, int toIdx)
+    //{
+    //    Debug.Log($"SwapItem: �Ķ���� idx1: {fromIdx}, idx2: {toIdx}");
         
-        // ��ȿ�� �˻�
-        if (slotParent == null) return;
-        if (fromIdx < 0 || fromIdx >= items.Count || toIdx < 0 || toIdx >= items.Count)
+    //    // ��ȿ�� �˻�
+    //    if (slotParent == null) return;
+    //    if (fromIdx < 0 || fromIdx >= items.Count || toIdx < 0 || toIdx >= items.Count)
+    //    {
+    //        Debug.LogWarning("SwapItem: �ε����� ��ȿ���� �ʽ��ϴ�.");
+    //        return;
+    //    }
+        
+    //    if (from == SlotType.Inventory && to == SlotType.Inventory)
+    //    {
+    //        // �κ��丮 �� ��ȯ
+    //        var tempSlot = slots[fromIdx];
+    //        slots[fromIdx] = slots[toIdx];
+    //        slots[toIdx] = tempSlot;
+
+    //        //var tempItem = items[fromIdx];
+    //        //items[fromIdx] = items[toIdx];
+    //        //items[toIdx] = tempItem;
+    //    }
+    //    else if (from == SlotType.Inventory && to == SlotType.QuickSlots)
+    //    {
+    //        // �κ��丮 -> �������� ���
+    //        QuickSlot_Controller quickSlots = FindObjectOfType<QuickSlot_Controller>();
+    //        if (quickSlots == null)
+    //        {
+    //            Debug.LogWarning("SwapItem: QuickSlots ������Ʈ�� ã�� �� �����ϴ�.");
+    //            return;
+    //        }
+    //        quickSlots.items[toIdx] = items[fromIdx];
+    //        quickSlots.FreshSlot();
+    //    }
+    //    else if (from == SlotType.QuickSlots && to == SlotType.Inventory)
+    //    {
+    //        // ������ -> �κ��丮�� ��� ����
+    //        QuickSlot_Controller quickSlots = FindObjectOfType<QuickSlot_Controller>();
+    //        if (quickSlots == null)
+    //        {
+    //            Debug.LogWarning("SwapItem: QuickSlots ������Ʈ�� ã�� �� �����ϴ�.");
+    //            return;
+    //        }
+    //        quickSlots.RemoveItem(quickSlots.items[fromIdx]);
+    //    }
+    //    else if (from == SlotType.Inventory && to == SlotType.Inventory)
+    //    {
+    //        // ������ �� ��ȯ
+    //        QuickSlot_Controller quickSlots = FindObjectOfType<QuickSlot_Controller>();
+    //        if (quickSlots == null)
+    //        {
+    //            Debug.LogWarning("SwapItem: QuickSlots ������Ʈ�� ã�� �� �����ϴ�.");
+    //            return;
+    //        }
+    //        var temp = quickSlots.items[fromIdx];
+    //        quickSlots.items[fromIdx] = quickSlots.items[toIdx];
+    //        quickSlots.items[toIdx] = temp;
+    //        quickSlots.FreshSlot();
+    //    }
+    //    else
+    //    {
+    //        Debug.LogWarning("SwapItem: �߸��� from/to �Ķ�����Դϴ�.");
+    //        return;
+    //    }
+
+    //    FreshSlot();
+    //}
+
+    //public bool AddItem(int idx, Item item)
+    //{
+    //    if (slots == null || items == null)
+    //        FreshSlot();
+
+    //    if (idx < 0 || idx >= items.Count)
+    //    {
+    //        Debug.Log("AddItem: �ε����� ��ȿ���� �ʽ��ϴ�.");
+    //        return false;
+    //    }
+
+    //    items[idx] = item;
+    //    FreshSlot();
+    //    Debug.Log($"�κ��丮�� '{item.itemName}' �������� �߰��Ǿ����ϴ�.");
+    //    return true;
+    //}
+
+    //public bool AddItem(Item item)
+    //{
+    //    speedRune = gameObject.AddComponent<ConsumableItem>();
+    //    speedRune.Name = "Speed Rune";
+    //    speedRune.Type = ItemType.Consumable;
+    //    speedRune.Grade = ItemGrade.Rare;
+    //    speedRune.Description = "����ϸ� ���� �ð� ���� �̵� �ӵ��� �������� ��. ���� Ž���̳� ���� ���� ���� �����ϴ�.";
+    //    speedRune.ConsumeType = ConsumableType.Effect;
+    //    speedRune.Power = 2f;
+    //    speedRune.Duration = 5;
+
+    //    // ������ �ش� �������� �ִ��� �˻�
+    //    if (items.Find(x => x == item) != null)
+    //    {
+    //        // ������ ���� ����
+    //        int itemIdx = items.FindIndex(x => x == item);
+    //        Debug.Log($"�κ��丮�� �̹� '{item.itemName}' �������� �ֽ��ϴ�. ������ ������ŵ�ϴ�.");
+    //        // ������ ���� ����
+    //        slots[itemIdx].ItemQuantity++;
+    //        FreshSlot();
+    //        return true;
+    //    }
+
+    //    // ������ ������ �� ĭ ã�Ƽ� �߰�
+    //    int idx = items.FindIndex(x => x == null);
+    //    if (idx != -1)
+    //    {
+    //        items[idx] = item;
+    //        Debug.Log($"�κ��丮�� '{item.itemName}' �������� �߰��Ǿ����ϴ�.");
+    //        slots[idx].ItemQuantity++;
+    //        FreshSlot();
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("������ ���� �� �ֽ��ϴ�.");
+    //        return false;
+    //    }
+    //}
+
+        //Item[] randomItems = new Item[] { speedRune, necklace };
+
+    // ���� �ε��� ��� ���� (����)
+    internal void RemoveItem(int idx)
+    {
+        if (idx >= 0 && idx < items.Count)
         {
-            Debug.LogWarning("SwapItem: �ε����� ��ȿ���� �ʽ��ϴ�.");
+            items[idx] = null;
+            //FreshSlot();
+            Debug.Log($"�κ��丮 {idx + 1}��° �������� ���ŵǾ����ϴ�.");
+        }
+    }
+
+    /// <summary>
+    /// Item ��� ���� (������ ��� ȣ���)
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    internal void RemoveItem(Item item)
+    {
+        if (item == null) return;
+
+        int idx = items.FindIndex(x => x == item);
+        if (idx != -1) {
+            items[idx] = null;
+            //FreshSlot();
+            Debug.Log($"�κ��丮 '{item.itemName}' �������� ���ŵǾ����ϴ�.");
             return;
         }
         

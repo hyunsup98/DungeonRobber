@@ -5,9 +5,9 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// °³º° ½½·Ô UI¸¦ ´ã´çÇÕ´Ï´Ù.
-/// private ÇÊµå: _item
-/// public ÇÁ·ÎÆÛÆ¼: Item (UI °»½Å)
+/// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ UIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+/// private ï¿½Êµï¿½: _item
+/// public ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¼: Item (UI ï¿½ï¿½ï¿½ï¿½)
 /// </summary>
 public abstract class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
@@ -20,22 +20,22 @@ public abstract class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     }
     [SerializeField] protected SlotType slotType;
 
-    // ½½·Ô ¼ÒÀ¯ÀÚ(ÀÎº¥Åä¸® / Äü½½·Ô)¿Í ÀÎµ¦½º Á¤º¸
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½Îºï¿½ï¿½ä¸® / ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     public Inventory ownerInventory;
 
     public Image defaultImage;
 
-    // ½½·Ô ÀÚÃ¼ ÀÎµ¦½º(ÀÐ±âÀü¿ë)
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ ï¿½Îµï¿½ï¿½ï¿½(ï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½)
     public int Index { get; private set; } = -1;
     public uint ItemQuantity { get => _itemQuantity; set => _itemQuantity = value; }
 
 
-    // ³»ºÎ ÇÊµå
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½Êµï¿½
     protected private Item _item;
     private uint _itemQuantity = 0;
 
     /// <summary>
-    /// ½½·Ô¿¡ ¼¼ÆÃµÈ ¾ÆÀÌÅÛ. set¿¡¼­ UI ÀÌ¹ÌÁö °»½Å Ã³¸®.
+    /// ï¿½ï¿½ï¿½Ô¿ï¿½ ï¿½ï¿½ï¿½Ãµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½. setï¿½ï¿½ï¿½ï¿½ UI ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½.
     /// </summary>
     public Item Item
     {
@@ -69,25 +69,25 @@ public abstract class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 #endif
 
     /// <summary>
-    /// ºÎ¸ð(¶Ç´Â ½½·Ô ÄÁÅ×ÀÌ³Ê)ÀÇ GetComponentsInChildren ¼ø¼­¿Í µ¿ÀÏÇÑ ÀÎµ¦½º¸¦ °è»êÇÏ¿© Index¿¡ ÀúÀåÇÕ´Ï´Ù.
+    /// ï¿½Î¸ï¿½(ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì³ï¿½)ï¿½ï¿½ GetComponentsInChildren ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ Indexï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     /// </summary>
     private void UpdateIndexFromHierarchy()
     {
-        // ºÎ¸ð°¡ ¾øÀ¸¸é -1
+        // ï¿½Î¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ -1
         if (transform.parent == null)
         {
             Index = -1;
             return;
         }
 
-        // ½½·Ô ÄÁÅ×ÀÌ³Ê(ºÎ¸ð)
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì³ï¿½(ï¿½Î¸ï¿½)
         var slotContainer = transform.parent;
 
-        // ½½·Ô ÄÁÅ×ÀÌ³ÊÀÇ ºÎ¸ð(=grandparent)°¡ ÀÖÀ¸¸é grandparent À§¿¡¼­ °Ë»ö,
-        // ¾øÀ¸¸é ºÎ¸ð(slotContainer) À§¿¡¼­ °Ë»ö
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì³ï¿½ï¿½ï¿½ ï¿½Î¸ï¿½(=grandparent)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ grandparent ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ë»ï¿½,
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Î¸ï¿½(slotContainer) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ë»ï¿½
         Transform searchRoot = slotContainer.parent != null ? slotContainer.parent : slotContainer;
 
-        // null Ã¼Å©(¾ÈÁ¤¼º)
+        // null Ã¼Å©(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
         if (searchRoot == null)
         {
             Index = -1;
@@ -104,35 +104,35 @@ public abstract class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             }
         }
 
-        // ¸ø Ã£¾ÒÀ» °æ¿ì
+        // ï¿½ï¿½ Ã£ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         Index = -1;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (_item != null && ItemTooltip.Instance != null)
-        {
-            ItemTooltip.Instance.Show(_item);
-            ItemTooltip.Instance.SetPosition(eventData.position);
-        }
+        //if (_item != null && ItemTooltip.Instance != null)
+        //{
+        //    ItemTooltip.Instance.Show(_item);
+        //    ItemTooltip.Instance.SetPosition(eventData.position);
+        //}
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (ItemTooltip.Instance != null)
-            ItemTooltip.Instance.Hide();
+        //if (ItemTooltip.Instance != null)
+        //    ItemTooltip.Instance.Hide();
     }
 
     public abstract void OnPointerClick(PointerEventData eventData);
     
-        // ¿ìÅ¬¸¯ Ã³¸®: ÀÎº¥Åä¸®¿¡¼­ ÄÁÅØ½ºÆ® ¸Þ´º Ç¥½Ã
+        // ï¿½ï¿½Å¬ï¿½ï¿½ Ã³ï¿½ï¿½: ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ø½ï¿½Æ® ï¿½Þ´ï¿½ Ç¥ï¿½ï¿½
         //if (eventData.button == PointerEventData.InputButton.Right)
         //{
         //    Debug.Log($"_item: {_item}");
         //    if (_item == null) return;
 
 
-        //    // Äü½½·ÔÀÏ °æ¿ì
+        //    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         //    if (ownerQuickSlots != null)
         //    {
         //        var menu = QuickSlotsContextMenu.GetOrFind();
@@ -152,7 +152,7 @@ public abstract class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         //}
     
 
-    // µð¹ö±×¿ë Æ÷ÀÎÅÍ ´Ù¿î/¾÷ ÀÌº¥Æ®
+    // ï¿½ï¿½ï¿½ï¿½×¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¿ï¿½/ï¿½ï¿½ ï¿½Ìºï¿½Æ®
     //public void OnPointerDown(PointerEventData eventData)
     //{
     //    Debug.Log($"OnPointerDown on {gameObject.name}  pressObject: {eventData.pointerPress?.name}");

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CameraController : Singleton<CameraController>
+public class CameraController : MonoBehaviour
 {
     //바라볼 타겟
     [SerializeField] private Transform target;
@@ -10,11 +10,6 @@ public class CameraController : Singleton<CameraController>
 
     //쿼터뷰를 위해 플레이어 위치에서 z좌표가 얼마나 아래에 있을지에 대한 값
     [SerializeField] private float zOffset = -10f;
-
-    private void Awake()
-    {
-        SingletonInit();
-    }
 
     private void LateUpdate()
     {

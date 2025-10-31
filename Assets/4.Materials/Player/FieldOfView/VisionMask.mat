@@ -65,7 +65,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FOV: 90
+    - _FOV: 384.1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -81,8 +81,8 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0, g: 0, b: 0, a: 0.47058824}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _PlayerForward: {r: 0.53402436, g: 0.2865808, b: 0.79541457, a: 0}
-    - _PlayerPos: {r: 5.5999293, g: -0.00000011920929, b: -1.3480567, a: 0}
+    - _PlayerForward: {r: 0.54931015, g: 0.37732926, b: 0.7455727, a: 0}
+    - _PlayerPos: {r: 9.845544, g: -2.0873, b: -22.163712, a: 0}
   m_BuildTextureStacks: []

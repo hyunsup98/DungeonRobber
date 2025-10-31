@@ -6,16 +6,16 @@ using UnityEngine;
 public class Inventory_UIController
 {
     [Header("UI")]
-    [Tooltip("ÀÎº¥Åä¸® ÀüÃ¼ UI ·çÆ®(È°¼º/ºñÈ°¼º Åä±Û)")]
+    [Tooltip("ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½Ã¼ UI ï¿½ï¿½Æ®(È°ï¿½ï¿½/ï¿½ï¿½È°ï¿½ï¿½ ï¿½ï¿½ï¿½)")]
     [SerializeField] private GameObject inventoryRoot;
 
     /// <summary>
-    /// ÀÎº¥Åä¸® ¿­¸² ¿©ºÎ¸¦ ¹ÝÈ¯ÇÕ´Ï´Ù.
+    /// ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Î¸ï¿½ ï¿½ï¿½È¯ï¿½Õ´Ï´ï¿½.
     /// </summary>
     public bool IsOpen => inventoryRoot != null && inventoryRoot.activeSelf;
 
     /// <summary>
-    /// ÀÎº¥Åä¸® ¿­¸²/´ÝÈûÀ» Åä±ÛÇÕ´Ï´Ù.
+    /// ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     /// </summary>
     public void ToggleInventory()
     {
@@ -30,7 +30,7 @@ public class Inventory_UIController
     }
 
     /// <summary>
-    /// ÀÎº¥Åä¸®¸¦ Ç¥½ÃÇÕ´Ï´Ù.
+    /// ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ Ç¥ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     /// </summary>
     public void ShowInventory()
     {
@@ -39,19 +39,19 @@ public class Inventory_UIController
     }
 
     /// <summary>
-    /// ÀÎº¥Åä¸®¸¦ ¼û±é´Ï´Ù.
+    /// ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.
     /// </summary>
     public void HideInventory()
     {
-        // ÄÁÅØ½ºÆ® ¸Þ´º ¼û±è
+        // ï¿½ï¿½ï¿½Ø½ï¿½Æ® ï¿½Þ´ï¿½ ï¿½ï¿½ï¿½ï¿½
         InventoryContextMenu inventoryContextMenu = InventoryContextMenu.GetOrFind();
         if (inventoryContextMenu != null)
             inventoryContextMenu.Hide();
 
-        // ÅøÆÁ ¼û±è (ÅøÆÁÀÌ ÀÎº¥Åä¸® ½½·Ô¿¡ ÀÖÀ» ¶§¸¸ ¼û±â´Â °Ô ³ªÀ» ¼öµµ ÀÖÀ½)
-        ItemTooltip itemTooltip = ItemTooltip.GetOrFind();
-        if (itemTooltip != null)
-            itemTooltip.Hide();
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½Ô¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+        //ItemTooltip itemTooltip = ItemTooltip.GetOrFind();
+        //if (itemTooltip != null)
+        //    itemTooltip.Hide();
 
         if (inventoryRoot != null) inventoryRoot.SetActive(false);
     }
@@ -68,10 +68,10 @@ public class Inventory_UIController
     //    int i = 0;
     //    for (; i < slots.Length; i++)
     //    {
-    //        // ½½·Ô¿¡ owner / index ÇÒ´ç
+    //        // ï¿½ï¿½ï¿½Ô¿ï¿½ owner / index ï¿½Ò´ï¿½
     //        slots[i].ownerInventory = this;
     //        slots[i].Item = items[i];
-    //        // ¼ö·® ÅØ½ºÆ® °»½Å
+    //        // ï¿½ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
     //        if (slots[i].ItemQuantity > 0)
     //            slots[i].GetComponentInChildren<Text>().text = slots[i].ItemQuantity.ToString();
     //        else
