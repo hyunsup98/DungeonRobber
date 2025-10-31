@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 [System.Flags]
@@ -9,7 +11,8 @@ public enum PlayerBehaviorState : int
     Dead        = 1 << 1,       //플레이어가 죽은 상태 = 체력이 0 이하
     IsCanMove   = 1 << 2,       //플레이어가 움직일 수 있는 상태
     IsWalk      = 1 << 3,       //플레이어가 걷고 있는 상태
-    IsSprint    = 1 << 4        //플레이어가 달리고 있는 상태
+    IsSprint    = 1 << 4,       //플레이어가 달리고 있는 상태
+    IsDoingUpperBody = 1 << 5,  //플레이어가 상체가 하는 동작을 하고 있는지에 대한 상태 - 공격, 먹기, 마시기, 상자 열기 등의 모션
 }
 
 /// <summary>
@@ -18,6 +21,8 @@ public enum PlayerBehaviorState : int
 /// </summary>
 public sealed partial class Player_Controller : Entity
 {
+    [SerializeField] private BaseBuff freeze;
+
     [Header("컴포넌트 변수")]
     [SerializeField] private Camera mainCamera;         //메인 카메라
     [SerializeField] private Rigidbody playerRigid;     //플레이어 Rigidbody
@@ -32,30 +37,6 @@ public sealed partial class Player_Controller : Entity
     public event Action playerDeadAction;               //플레이어가 죽었을 때 발생할 이벤트
 
     private PlayerBehaviorState playerBehaviorState;    //플레이어 행동에 관련된 상태 플래그
-
-    public float CurrentHP                              //현재 체력 프로퍼티
-    {
-        get { return currentHP; }
-        set
-        {
-            if(value > maxHP)
-            {
-                value = maxHP;
-            }
-            else if(value < 0)
-            {
-                value = 0;
-            }
-
-            currentHP = value;
-
-            //플레이어의 체력이 0 이하면 PlayerDeadAction 호출
-            if(currentHP <= 0)
-            {
-                playerDeadAction?.Invoke();
-            }
-        }
-    }
 
     private void Awake()
     {
@@ -94,7 +75,8 @@ public sealed partial class Player_Controller : Entity
 
         if(Input.GetKeyDown(KeyCode.F))
         {
-            GetDamage(5f);
+            var buff = BuffPool.Instance.GetObjects(freeze, BuffPool.Instance.transform);
+            buffManager.ApplyBuff(buff, stats);
         }
     }
 
@@ -114,10 +96,33 @@ public sealed partial class Player_Controller : Entity
     {
         base.Init();
 
-        if (runSpeed < moveSpeed)
-            runSpeed = moveSpeed * 1.5f;
+        if (runSpeed < stats.GetStat(StatType.MoveSpeed))
+            runSpeed = stats.GetStat(StatType.MoveSpeed) * 1.5f;
 
         playerBehaviorState = PlayerBehaviorState.Alive | PlayerBehaviorState.IsCanMove;
+    }
+
+    //todo, 상체 행동 애니메이션 레이어 보간 작업인데 원하는 방향으로 안나와서 잠시 보류
+    private IEnumerator PlayOtherAnimatorLayer(string motionName)
+    {
+        playerAnimator.SetTrigger(motionName);
+        playerAnimator.SetLayerWeight(1, 1);
+        AddPlayerBehaviorState(PlayerBehaviorState.IsDoingUpperBody);
+
+        while (true)
+        {
+            if(playerAnimator.GetCurrentAnimatorStateInfo(1).normalizedTime < 1f)
+            {
+                playerAnimator.SetLayerWeight(1, 1 - playerAnimator.GetCurrentAnimatorStateInfo(1).normalizedTime);
+            }
+            else
+            {
+                RemovePlayerBehaviorState(PlayerBehaviorState.IsDoingUpperBody);
+                break;
+            }
+
+            yield return null;
+        }
     }
 
     #region 플레이어의 행동 상태 제어
