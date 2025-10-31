@@ -19,6 +19,13 @@ public class Inventory : MonoBehaviour
 
     private void Awake()
     {
+        if (slotParent != null)
+            slots = slotParent.GetComponentsInChildren<Slot>();
+    }
+#endif
+
+    private void Awake()
+    {
         // �κ��丮 9ĭ
         items = new List<Item>() { null, null, null, null, null, null, null, null, null };
         FreshSlot();
@@ -228,14 +235,10 @@ public class Inventory : MonoBehaviour
 
     public bool AddItem(Item item)
     {
-        speedRune = gameObject.AddComponent<ConsumableItem>();
-        speedRune.Name = "Speed Rune";
-        speedRune.Type = ItemType.Consumable;
-        speedRune.Grade = ItemGrade.Rare;
-        speedRune.Description = "����ϸ� ���� �ð� ���� �̵� �ӵ��� �������� ��. ���� Ž���̳� ���� ���� ���� �����ϴ�.";
-        speedRune.ConsumeType = ConsumableType.Effect;
-        speedRune.Power = 2f;
-        speedRune.Duration = 5;
+        if (slots == null || items == null)
+            FreshSlot();
+            return true;
+        }
 
         // ������ �ش� �������� �ִ��� �˻�
         if (items.Find(x => x == item) != null)
