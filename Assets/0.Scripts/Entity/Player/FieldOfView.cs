@@ -2,23 +2,23 @@ using UnityEngine;
 
 public class FieldOfView : MonoBehaviour
 {
-    [Header("ï¿½Ã¾ß°ï¿½ ï¿½ï¿½ Å½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½")]
-    [SerializeField] private float viewAngle = 90f;         //ï¿½Ã¾ß°ï¿½
-    [SerializeField] private float viewInnerRadius = 3f;    //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Öºï¿½ ï¿½Ã¾ï¿½ ï¿½ï¿½ï¿½ï¿½
-    [SerializeField] private float viewDistance = 22f;      //ï¿½ï¿½Ã¤ï¿½ï¿½ ï¿½Ã¾ß°ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½Ã¾ï¿½ ï¿½Å¸ï¿½
-    [SerializeField] private LayerMask targetMask;          //ï¿½ï¿½(Enemy) ï¿½ï¿½ï¿½Ì¾î¸¶ï¿½ï¿½Å©
-    [SerializeField] private LayerMask obstacleMask;        //ï¿½ï¿½Ö¹ï¿½, ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¾î¸¶ï¿½ï¿½Å©
+    [Header("½Ã¾ß°¢ Àû Å½Áö º¯¼ö")]
+    [SerializeField] private float viewAngle = 90f;         //½Ã¾ß°¢
+    [SerializeField] private float viewInnerRadius = 3f;    //ÇÃ·¹ÀÌ¾î ÁÖº¯ ½Ã¾ß ¹üÀ§
+    [SerializeField] private float viewDistance = 22f;      //ºÎÃ¤²Ã ½Ã¾ß°¢ÀÇ ÃÖ´ë ½Ã¾ß °Å¸®
+    [SerializeField] private LayerMask targetMask;          //Àû(Enemy) ·¹ÀÌ¾î¸¶½ºÅ©
+    [SerializeField] private LayerMask obstacleMask;        //Àå¾Ö¹°, º® ·¹ÀÌ¾î¸¶½ºÅ©
 
-    [Header("ï¿½Ã¾ß°ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½ï¿½")]
-    [SerializeField] private Transform player;              //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
-    [SerializeField] private Material maskMaterial;         //ï¿½Ã¾ï¿½ ï¿½ï¿½ï¿½×¸ï¿½ï¿½ï¿½
+    [Header("½Ã¾ß°¢ ½¦ÀÌ´õ º¯¼ö")]
+    [SerializeField] private Transform player;              //ÇÃ·¹ÀÌ¾î À§Ä¡ Á¤º¸
+    [SerializeField] private Material maskMaterial;         //½Ã¾ß ¸ÞÅ×¸®¾ó
     [Range(1f, 15f)]
-    [SerializeField] private float fovRotateSpeed = 10f;    //ï¿½ï¿½ï¿½ì½º ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
+    [SerializeField] private float fovRotateSpeed = 10f;    //¸¶¿ì½º Æ÷ÀÎÅÍ¸¦ µ¹¸± ¶§ º¸°£ ¼öÄ¡
 
-    [Header("Quad(Panel Æ®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)")]
-    [SerializeField] private Transform fovQuad;             //Ä«ï¿½Þ¶ï¿½ ï¿½Ù¾ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½Ç³ï¿½) ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
+    [Header("Quad(Panel Æ®·£½ºÆû)")]
+    [SerializeField] private Transform fovQuad;             //Ä«¸Þ¶ó¿¡ ºÙ¾îÀÖ´Â Äõµå(ÆÇ³Ú) À§Ä¡ Á¤º¸
 
-    Vector3 lookDir = Vector3.zero;                         //ï¿½Ã¾ß°ï¿½ï¿½ï¿½ ï¿½Ù¶óº¸°ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    Vector3 lookDir = Vector3.zero;                         //½Ã¾ß°¢ÀÌ ¹Ù¶óº¸°í ÀÖ´Â ¹æÇâ º¤ÅÍ
 
     private void Start()
     {
@@ -42,8 +42,9 @@ public class FieldOfView : MonoBehaviour
 
         foreach (var target in targetCol)
         {
+            Vector3 dirToMousePoint = Camera.main.GetWorldPosToMouse() - transform.position;
             Vector3 dirToTarget = target.transform.position - transform.position;
-            float angleBetween = Vector3.Angle(transform.forward, dirToTarget.normalized);
+            float angleBetween = Vector3.Angle(dirToMousePoint.normalized, dirToTarget.normalized);
 
             if (angleBetween < viewAngle * 0.5f || dirToTarget.sqrMagnitude <= viewInnerRadius * viewInnerRadius)
             {
@@ -81,7 +82,7 @@ public class FieldOfView : MonoBehaviour
     {
         if (player == null || maskMaterial == null) return;
 
-        lookDir = Vector3.Slerp(lookDir, (CameraController.Instance.GetMousePos() - transform.position).normalized, fovRotateSpeed * Time.deltaTime);
+        lookDir = Vector3.Slerp(lookDir, (Camera.main.GetWorldPosToMouse() - transform.position).normalized, fovRotateSpeed * Time.deltaTime);
 
         maskMaterial.SetVector("_PlayerPos", player.position);
         maskMaterial.SetVector("_PlayerForward", lookDir);

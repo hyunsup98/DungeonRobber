@@ -3,20 +3,19 @@ using UnityEngine;
 public sealed partial class Player_Controller
 {
     /// <summary>
-    /// Rigidbodyï¿½ï¿½ velocityï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½
-    /// W, A, S, D Å°ï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½, Left Shiftï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½ï¿½ ï¿½Þ¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    /// RigidbodyÀÇ velocity¸¦ ÀÌ¿ëÇÑ ÀÌµ¿ ¸Þ¼­µå
+    /// W, A, S, D Å°¸¦ ÀÌ¿ëÇØ ÀÌµ¿ ±¸Çö, Left Shift¸¦ ÀÌ¿ëÇØ ´Þ¸®±â ±¸Çö
     /// </summary>
     private void Move()
     {
-        //ï¿½Ìµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¶ï¿½ï¿½
-        if(CheckPlayerBehaviorState(PlayerBehaviorState.IsCanMove))
+        //ÀÌµ¿ÀÌ °¡´ÉÇÑ »óÅÂ¶ó¸é
         if(CheckPlayerBehaviorState(PlayerBehaviorState.IsCanMove))
         {
             float horizontal = Input.GetAxisRaw("Horizontal");
             float vertical = Input.GetAxisRaw("Vertical");
             Vector3 moveDir = new Vector3(horizontal, 0, vertical).normalized;
 
-            //ï¿½Ô·ï¿½ Å° ï¿½ï¿½ï¿½Í°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½È°ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            //ÀÔ·Â Å° º¤ÅÍ°ª¿¡ µû¶ó¼­ °È°í ÀÖ´Â »óÅÂÀÎÁö ¾Æ´ÑÁö ¼¼ÆÃ
             if (moveDir.sqrMagnitude < 0.005f)
             {
                 RemovePlayerBehaviorState(PlayerBehaviorState.IsWalk);
@@ -27,22 +26,21 @@ public sealed partial class Player_Controller
             }
 
             if(CheckPlayerBehaviorState(PlayerBehaviorState.IsWalk))
-            if(CheckPlayerBehaviorState(PlayerBehaviorState.IsWalk))
             {
                 if (Input.GetKey(KeyCode.LeftShift))
                 {
-                    //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ - ï¿½Þ¸ï¿½ï¿½ï¿½
+                    //¿ÞÂÊ ½¬ÇÁÆ®¸¦ ´­·¶À» ¶§ - ´Þ¸®±â
                     AddPlayerBehaviorState(PlayerBehaviorState.IsSprint);
                     transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(moveDir), 10 * Time.deltaTime);
                 }
                 else
                 {
-                    //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾ï¿½ï¿½ï¿½ ï¿½ï¿½ - ï¿½È±ï¿½
+                    //¿ÞÂÊ ½¬ÇÁÆ®¸¦ ´©¸£Áö ¾Ê¾ÒÀ» ¶§ - °È±â
                     RemovePlayerBehaviorState(PlayerBehaviorState.IsSprint);
                 }
             }
 
-            //ï¿½Ô·Â¹ï¿½ï¿½ï¿½ moveDir(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Í·ï¿½ ï¿½ï¿½È¯
+            //ÀÔ·Â¹ÞÀº moveDir(¿ùµåÁÂÇ¥ ±âÁØ)À» ·ÎÄÃÁÂÇ¥ ±âÁØ ¹æÇâ º¤ÅÍ·Î º¯È¯
             Vector3 localMoveDir = transform.InverseTransformDirection(moveDir).normalized;
             SetMoveAnimationBlend(localMoveDir);
 
@@ -51,7 +49,7 @@ public sealed partial class Player_Controller
     }
 
     /// <summary>
-    /// ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ì½º ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½Ù¶óº¸´ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½
+    /// ÇÃ·¹ÀÌ¾î°¡ ¸¶¿ì½º Æ÷ÀÎÅÍ¸¦ ¹Ù¶óº¸´Â ¸Þ¼­µå
     /// </summary>
     private void LookAtMousePoint()
     {
@@ -59,9 +57,7 @@ public sealed partial class Player_Controller
 
         Vector3 direction = worldPos - transform.position;
         direction.y = transform.position.y;
-        direction.y = transform.position.y;
 
-        if(direction.sqrMagnitude > 0.001f)
         if(direction.sqrMagnitude > 0.001f)
         {
             Quaternion targetRot = Quaternion.LookRotation(direction);
@@ -70,15 +66,14 @@ public sealed partial class Player_Controller
     }
 
     /// <summary>
-    /// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½
+    /// ÇÃ·¹ÀÌ¾îÀÇ ÀÌµ¿ ¾Ö´Ï¸ÞÀÌ¼Ç ºí·»µùÀ» º¸°£ Ã³¸®ÇÏ´Â ¸Þ¼­µå
     /// </summary>
-    /// <param name="dir"> ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ forward ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ </param>
+    /// <param name="dir"> ÇÃ·¹ÀÌ¾îÀÇ forward ±âÁØ ÀÌµ¿ÇÏ´Â ¹æÇâ º¤ÅÍ </param>
     private void SetMoveAnimationBlend(Vector3 dir)
     {
         float smoothX = 0;
         float smoothZ = 0;
 
-        if(CheckPlayerBehaviorState(PlayerBehaviorState.IsWalk))
         if(CheckPlayerBehaviorState(PlayerBehaviorState.IsWalk))
         {
             smoothX = Mathf.Lerp(playerAnimator.GetFloat("moveX"), dir.x, 10 * Time.deltaTime);
