@@ -1,42 +1,39 @@
 using System;
-using System.Collections;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 [System.Flags]
 public enum PlayerBehaviorState : int
 {
     None        = 0,
-    Alive       = 1 << 0,       //ÇÃ·¹ÀÌ¾î°¡ »ì¾ÆÀÖ´Â »óÅÂ = Ã¼·ÂÀÌ 0º¸´Ù Å­
-    Dead        = 1 << 1,       //ÇÃ·¹ÀÌ¾î°¡ Á×Àº »óÅÂ = Ã¼·ÂÀÌ 0 ÀÌÇÏ
-    IsCanMove   = 1 << 2,       //ÇÃ·¹ÀÌ¾î°¡ ¿òÁ÷ÀÏ ¼ö ÀÖ´Â »óÅÂ
-    IsWalk      = 1 << 3,       //ÇÃ·¹ÀÌ¾î°¡ °È°í ÀÖ´Â »óÅÂ
-    IsSprint    = 1 << 4,       //ÇÃ·¹ÀÌ¾î°¡ ´Þ¸®°í ÀÖ´Â »óÅÂ
-    IsDoingUpperBody = 1 << 5,  //ÇÃ·¹ÀÌ¾î°¡ »óÃ¼°¡ ÇÏ´Â µ¿ÀÛÀ» ÇÏ°í ÀÖ´ÂÁö¿¡ ´ëÇÑ »óÅÂ - °ø°Ý, ¸Ô±â, ¸¶½Ã±â, »óÀÚ ¿­±â µîÀÇ ¸ð¼Ç
+    Alive       = 1 << 0,       //ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ = Ã¼ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ Å­
+    Dead        = 1 << 1,       //ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ = Ã¼ï¿½ï¿½ï¿½ï¿½ 0 ï¿½ï¿½ï¿½ï¿½
+    IsCanMove   = 1 << 2,       //ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½
+    IsWalk      = 1 << 3,       //ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½È°ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½
+    IsSprint    = 1 << 4        //ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½Þ¸ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½
 }
 
 /// <summary>
-/// ÇÃ·¹ÀÌ¾î¿¡ °ü·ÃµÈ ±â´ÉµéÀ» ´ã´çÇÏ´Â Å¬·¡½º
-/// ÀÌµ¿, °ø°Ý, ¾Ö´Ï¸ÞÀÌ¼Ç µîÀÇ ¿ä¼Ò¸¦ ´ã´ç
+/// ï¿½Ã·ï¿½ï¿½Ì¾î¿¡ ï¿½ï¿½ï¿½Ãµï¿½ ï¿½ï¿½Éµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½
+/// ï¿½Ìµï¿½, ï¿½ï¿½ï¿½ï¿½, ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ò¸ï¿½ ï¿½ï¿½ï¿½
 /// </summary>
 public sealed partial class Player_Controller : Entity
 {
     [SerializeField] private BaseBuff freeze;
 
-    [Header("ÄÄÆ÷³ÍÆ® º¯¼ö")]
-    [SerializeField] private Camera mainCamera;         //¸ÞÀÎ Ä«¸Þ¶ó
-    [SerializeField] private Rigidbody playerRigid;     //ÇÃ·¹ÀÌ¾î Rigidbody
-    [SerializeField] private Animator playerAnimator;   //ÇÃ·¹ÀÌ¾î ¾Ö´Ï¸ÞÀÌÅÍ
-    [SerializeField] private Transform attackPos;       //ÇÃ·¹ÀÌ¾î°¡ °ø°ÝÇÒ ¶§ °ø°Ý Å½Áö¸¦ ½ÃÀÛÇÒ À§Ä¡
+    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½")]
+    [SerializeField] private Camera mainCamera;         //ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½
+    [SerializeField] private Rigidbody playerRigid;     //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ Rigidbody
+    [SerializeField] private Animator playerAnimator;   //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½
+    [SerializeField] private Transform attackPos;       //ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
 
-    [Header("ÀÌµ¿ °ü·Ã º¯¼ö")]
-    [SerializeField] private float runSpeed;            //ÇÃ·¹ÀÌ¾î ´Þ¸®±â ¼Óµµ
+    [Header("ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½")]
+    [SerializeField] private float runSpeed;            //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Þ¸ï¿½ï¿½ï¿½ ï¿½Óµï¿½
 
-    [Header("°ø°Ý °ü·Ã º¯¼ö")]
-    [SerializeField] private LayerMask attackMask;      //°ø°ÝÇÒ ´ë»ó ·¹ÀÌ¾î
-    public event Action playerDeadAction;               //ÇÃ·¹ÀÌ¾î°¡ Á×¾úÀ» ¶§ ¹ß»ýÇÒ ÀÌº¥Æ®
+    [Header("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½")]
+    [SerializeField] private LayerMask attackMask;      //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¾ï¿½
+    public event Action playerDeadAction;               //ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½×¾ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ß»ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ®
 
-    private PlayerBehaviorState playerBehaviorState;    //ÇÃ·¹ÀÌ¾î Çàµ¿¿¡ °ü·ÃµÈ »óÅÂ ÇÃ·¡±×
+    private PlayerBehaviorState playerBehaviorState;    //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½àµ¿ï¿½ï¿½ ï¿½ï¿½ï¿½Ãµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½ï¿½
 
     private void Awake()
     {
@@ -61,13 +58,20 @@ public sealed partial class Player_Controller : Entity
     {
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
-        //°ø°Ý
+        //ï¿½ï¿½ï¿½ï¿½
         if (Input.GetMouseButtonDown(0))
         {
             Attack();
         }
 
-        //¸¶¿ì½º Ä¿¼­ ¹Ù¶óº¸±â
+        //ï¿½ï¿½ï¿½ì½º Ä¿ï¿½ï¿½ ï¿½Ù¶óº¸±ï¿½
+        if(!CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint))
+        {
+            LookAtMousePoint();
+        }
+
+        if(Input.GetKeyDown(KeyCode.F))
+        //ï¿½ï¿½ï¿½ì½º Ä¿ï¿½ï¿½ ï¿½Ù¶óº¸±ï¿½
         if(!CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint))
         {
             LookAtMousePoint();
@@ -84,13 +88,13 @@ public sealed partial class Player_Controller : Entity
     {
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
-        //ÀÌµ¿
+        //ï¿½Ìµï¿½
         Move();
     }
 
     /// <summary>
-    /// ÃÊ±âÈ­ ¸Þ¼­µå
-    /// ÇÃ·¹ÀÌ¾î ÀÌµ¿¼Óµµ µî ÃÊ±âÈ­
+    /// ï¿½Ê±ï¿½È­ ï¿½Þ¼ï¿½ï¿½ï¿½
+    /// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ìµï¿½ï¿½Óµï¿½ ï¿½ï¿½ ï¿½Ê±ï¿½È­
     /// </summary>
     protected override void Init()
     {
@@ -102,7 +106,7 @@ public sealed partial class Player_Controller : Entity
         playerBehaviorState = PlayerBehaviorState.Alive | PlayerBehaviorState.IsCanMove;
     }
 
-    //todo, »óÃ¼ Çàµ¿ ¾Ö´Ï¸ÞÀÌ¼Ç ·¹ÀÌ¾î º¸°£ ÀÛ¾÷ÀÎµ¥ ¿øÇÏ´Â ¹æÇâÀ¸·Î ¾È³ª¿Í¼­ Àá½Ã º¸·ù
+    //todo, ï¿½ï¿½Ã¼ ï¿½àµ¿ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Û¾ï¿½ï¿½Îµï¿½ ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½È³ï¿½ï¿½Í¼ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     private IEnumerator PlayOtherAnimatorLayer(string motionName)
     {
         playerAnimator.SetTrigger(motionName);
@@ -125,29 +129,29 @@ public sealed partial class Player_Controller : Entity
         }
     }
 
-    #region ÇÃ·¹ÀÌ¾îÀÇ Çàµ¿ »óÅÂ Á¦¾î
+    #region ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½àµ¿ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î Çàµ¿ »óÅÂ ÇÃ·¡±×¿¡ »õ·Î¿î »óÅÂ Ãß°¡
+    /// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½àµ¿ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½×¿ï¿½ ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
     /// </summary>
-    /// <param name="state"> Ãß°¡ÇÒ »óÅÂ </param>
+    /// <param name="state"> ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ </param>
     private void AddPlayerBehaviorState(PlayerBehaviorState state)
     {
         playerBehaviorState |= state;
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î Çàµ¿ »óÅÂ ÇÃ·¡±×¿¡ ÀÖ´Â »óÅÂ Á¦°Å
+    /// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½àµ¿ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½×¿ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     /// </summary>
-    /// <param name="state"> »èÁ¦ÇÒ »óÅÂ </param>
+    /// <param name="state"> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ </param>
     private void RemovePlayerBehaviorState(PlayerBehaviorState state)
     {
         playerBehaviorState &= ~state;
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î Çàµ¿ »óÅÂ ÇÃ·¡±×¿¡ »óÅÂ°¡ È°¼ºÈ­µÇ¾î ÀÖ´ÂÁö Ã¼Å©
+    /// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½àµ¿ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½×¿ï¿½ ï¿½ï¿½ï¿½Â°ï¿½ È°ï¿½ï¿½È­ï¿½Ç¾ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ Ã¼Å©
     /// </summary>
-    /// <param name="states"> Ã¼Å©ÇÒ »óÅÂ ¸ñ·Ï </param>
+    /// <param name="states"> Ã¼Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ </param>
     /// <returns></returns>
     private bool CheckPlayerBehaviorState(params PlayerBehaviorState[] states)
     {
