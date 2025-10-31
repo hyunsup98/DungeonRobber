@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class ItemTest : MonoBehaviour
 {
-    private WeaponItem defaultWeapon;
-    private ConsumableItem speedRune;
-    private SellableItem necklace;
+    //private WeaponItem defaultWeapon;
+    //private ConsumableItem speedRune;
+    //private SellableItem necklace;
 
     private void Awake()
     {
@@ -46,15 +46,15 @@ public class ItemTest : MonoBehaviour
     // 아이템 사용 메소드
     public void UseItem(string itemName)
     {
-        if (itemName == "speedRune")
-        {
-            speedRune.Use();
-        }
+        //if (itemName == "speedRune")
+        //{
+        //    speedRune.Use();
+        //}
     }
 
     // 아이템 판매 메소드
     public void SellItem()
     {
-        necklace.Sell();
+        //necklace.Sell();
     }
 }

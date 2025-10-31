@@ -24,8 +24,8 @@ public class Item : ScriptableObject
     
     public GameObject itemPrefab;  // 아이템의 프리팹 (아이템 생성시 프리팹으로 찍어냄)
 
-    [Header("아이템 사용 액션")]
-    public ItemAction useAction;
+    //[Header("아이템 사용 액션")]
+    //public ItemAction useAction;
 
     public string weaponType;  // 무기 유형
 }

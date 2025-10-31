@@ -19,7 +19,7 @@ public class Inventory_Controller
     /// </summary>
     /// <param name="item"></param>
     /// <returns>bool 아이템 존재 여부</returns>
-    public bool HasItem(Item item) { return true; }
-    public void AddItem(Item item) { }
-    public void RemoveItem(Item item) { }
+    //public bool HasItem(Item item) { return true; }
+    //public void AddItem(Item item) { }
+    //public void RemoveItem(Item item) { }
 }
