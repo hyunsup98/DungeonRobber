@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Loading;
@@ -17,12 +17,11 @@ public class Inventory : MonoBehaviour
     private GameObject player;
     private Item[] invenArray;
 
-    private void Awake()
-    {
-        if (slotParent != null)
-            slots = slotParent.GetComponentsInChildren<Slot>();
-    }
-#endif
+    //private void Awake()
+    //{
+    //    if (slotParent != null)
+    //        slots = slotParent.GetComponentsInChildren<Slot>();
+    //}
 
     private void Awake()
     {
@@ -236,6 +235,7 @@ public class Inventory : MonoBehaviour
     public bool AddItem(Item item)
     {
         if (slots == null || items == null)
+        { 
             FreshSlot();
             return true;
         }
@@ -268,8 +268,6 @@ public class Inventory : MonoBehaviour
             return false;
         }
     }
-
-        Item[] randomItems = new Item[] { speedRune, necklace };
 
     // ���� �ε��� ��� ���� (����)
     internal void RemoveItem(int idx)
