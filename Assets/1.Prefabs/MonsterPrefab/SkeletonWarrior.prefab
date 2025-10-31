@@ -119,7 +119,7 @@ MonoBehaviour:
   monsterrib: {fileID: 1311017699481238877}
   previousWaypoint: {fileID: 0}
   targetWaypoint: {fileID: 0}
-  monsterAnimator: {fileID: 0}
+  monsterAnimator: {fileID: -4544868021683638809}
   colliders: []
   Waypoints: []
   isDetective: 0

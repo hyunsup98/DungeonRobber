@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
-using static UnityEditor.Progress;
 
 public class Player : MonoBehaviour
 {

@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 /// <summary>
 /// 빙결 효과 → 이동 속도를 느려지게 하는 효과
