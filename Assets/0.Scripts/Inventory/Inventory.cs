@@ -1,98 +1,323 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using TMPro;
+using Unity.Loading;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 using static UnityEditor.Progress;
 
 public class Inventory : MonoBehaviour
 {
-    // º¸À¯ ÁßÀÎ ¾ÆÀÌÅÛ ¸®½ºÆ®¸¦ ºÒ·¯¿Í¼­ UI·Î Ç¥½Ã
-    // EÅ°¸¦ ´©¸£¸é ÀÎº¥Åä¸® Ã¢ÀÌ ¿­¸®°í ´ÝÈ÷´Â ±â´É < Item/Player.cs¿¡¼­ Ã³¸® >
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ò·ï¿½ï¿½Í¼ï¿½ UIï¿½ï¿½ Ç¥ï¿½ï¿½
+    // EÅ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½ï¿½ä¸® Ã¢ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ < Item/Player.csï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ >
 
-    [SerializeField] int invenCapacity = 10;
+    public List<Item> items;
 
     private GameObject player;
     private Item[] invenArray;
 
-    void Awake()
-    {
-        player = GameObject.FindGameObjectWithTag("Player");
-        invenArray = new Item[invenCapacity];
-    }
+    [SerializeField] GameObject inventoryRoot;
 
-    void Update()
+    private void Awake()
     {
-        TextMeshProUGUI invenText = GameObject.FindGameObjectWithTag("InvenText")?.GetComponent<TextMeshProUGUI>();
-        invenText.text = $"Inventory: {String.Join(" / ", Array.ConvertAll(invenArray, item => item != null ? item.Name : " "))}";
+        // ï¿½Îºï¿½ï¿½ä¸® 9Ä­
+        items = new List<Item>() { null, null, null, null, null, null, null, null, null };
+        //FreshSlot();
+        HideInventory();
     }
 
     /// <summary>
-    /// ¾ÆÀÌÅÛ º¸À¯ È®ÀÎ
+    /// ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Î¸ï¿½ ï¿½ï¿½È¯ï¿½Õ´Ï´ï¿½.
+    /// </summary>
+    public bool IsOpen => inventoryRoot != null && inventoryRoot.activeSelf;
+
+    /// <summary>
+    /// ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+    /// </summary>
+    public void ToggleInventory()
+    {
+    }
+
+    /// <summary>
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
     /// </summary>
     /// <param name="itemName"></param>
-    /// <returns>º¸À¯¿©ºÎ bool</returns>
-    public bool HasItem(string itemName)
+    /// <returns>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ bool</returns>
+    //public bool HasItem(string itemName)
+    //{
+    //    foreach (var invItem in invenArray)
+    //    {
+    //        if (invItem != null && invItem.Name == itemName)
+    //        {
+    //            return true;
+    //        }
+    //    }
+    //    return false;
+    //}
+
+    //public void AddItem(Item newItem)
+    //{
+    //    if (HasItem(newItem.Name))
+    //    {
+    //        ShowInventory();
+    //    }
+    //}
+
+    /// <summary>
+    /// ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ Ç¥ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+    /// </summary>
+    public void ShowInventory()
     {
-        foreach (var invItem in invenArray)
-        {
-            if (invItem != null && invItem.Name == itemName)
-            {
-                return true;
-            }
-        }
-        return false;
+        if (inventoryRoot != null) inventoryRoot.SetActive(true);
+        //FreshSlot();
     }
 
-    public void AddItem(Item newItem)
+    /// <summary>
+    /// ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.
+    /// </summary>
+    public void HideInventory()
     {
-        if (HasItem(newItem.Name))
+        // ï¿½ï¿½ï¿½Ø½ï¿½Æ® ï¿½Þ´ï¿½ ï¿½ï¿½ï¿½ï¿½
+        InventoryContextMenu inventoryContextMenu = InventoryContextMenu.GetOrFind();
+        if (inventoryContextMenu != null)
+            inventoryContextMenu.Hide();
+
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½Ô¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+        //ItemTooltip itemTooltip = ItemTooltip.GetOrFind();
+        //if (itemTooltip != null)
+        //    itemTooltip.Hide();
+
+        if (inventoryRoot != null) inventoryRoot.SetActive(false);
+    }
+
+    /// <summary>
+    /// ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ UIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+    /// </summary>
+    //public void FreshSlot()
+    //{
+    //    if (slotParent == null)
+    //        return;
+
+    //    if (slots == null || slots.Length == 0)
+    //        slots = slotParent.GetComponentsInChildren<Slot>();
+
+    //    int i = 0;
+    //    for (; i < slots.Length; i++)
+    //    {
+    //        // ï¿½ï¿½ï¿½Ô¿ï¿½ owner / index ï¿½Ò´ï¿½
+    //        slots[i].ownerInventory = this;
+    //        slots[i].Item = items[i];
+    //        // ï¿½ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
+    //        if(slots[i].ItemQuantity > 0)
+    //            slots[i].GetComponentInChildren<Text>().text = slots[i].ItemQuantity.ToString();
+    //        else
+    //            slots[i].GetComponentInChildren<Text>().text = "";
+    //    }
+    //    //for (; i < slots.Length; i++)
+    //    //{
+    //    //    slots[i].ownerInventory = this;
+    //    //    slots[i].Item = null;
+    //    //}
+
+        
+
+
+
+    //    PrintItems();
+    //}
+
+    public enum SlotType
+    {
+        Inventory,
+        QuickSlots
+    }
+
+    /// <summary>
+    /// ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+    /// </summary>
+    /// <param name="from">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½</param>
+    /// <param name="fromIdx"></param>
+    /// <param name="to">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½</param>
+    /// <param name="toIdx"></param>
+    //public void SwapItem(SlotType from, int fromIdx, SlotType to, int toIdx)
+    //{
+    //    Debug.Log($"SwapItem: ï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ idx1: {fromIdx}, idx2: {toIdx}");
+        
+    //    // ï¿½ï¿½È¿ï¿½ï¿½ ï¿½Ë»ï¿½
+    //    if (slotParent == null) return;
+    //    if (fromIdx < 0 || fromIdx >= items.Count || toIdx < 0 || toIdx >= items.Count)
+    //    {
+    //        Debug.LogWarning("SwapItem: ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¿ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
+    //        return;
+    //    }
+        
+    //    if (from == SlotType.Inventory && to == SlotType.Inventory)
+    //    {
+    //        // ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ ï¿½ï¿½È¯
+    //        var tempSlot = slots[fromIdx];
+    //        slots[fromIdx] = slots[toIdx];
+    //        slots[toIdx] = tempSlot;
+
+    //        //var tempItem = items[fromIdx];
+    //        //items[fromIdx] = items[toIdx];
+    //        //items[toIdx] = tempItem;
+    //    }
+    //    else if (from == SlotType.Inventory && to == SlotType.QuickSlots)
+    //    {
+    //        // ï¿½Îºï¿½ï¿½ä¸® -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+    //        QuickSlot_Controller quickSlots = FindObjectOfType<QuickSlot_Controller>();
+    //        if (quickSlots == null)
+    //        {
+    //            Debug.LogWarning("SwapItem: QuickSlots ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+    //            return;
+    //        }
+    //        quickSlots.items[toIdx] = items[fromIdx];
+    //        quickSlots.FreshSlot();
+    //    }
+    //    else if (from == SlotType.QuickSlots && to == SlotType.Inventory)
+    //    {
+    //        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ -> ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    //        QuickSlot_Controller quickSlots = FindObjectOfType<QuickSlot_Controller>();
+    //        if (quickSlots == null)
+    //        {
+    //            Debug.LogWarning("SwapItem: QuickSlots ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+    //            return;
+    //        }
+    //        quickSlots.RemoveItem(quickSlots.items[fromIdx]);
+    //    }
+    //    else if (from == SlotType.Inventory && to == SlotType.Inventory)
+    //    {
+    //        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½È¯
+    //        QuickSlot_Controller quickSlots = FindObjectOfType<QuickSlot_Controller>();
+    //        if (quickSlots == null)
+    //        {
+    //            Debug.LogWarning("SwapItem: QuickSlots ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+    //            return;
+    //        }
+    //        var temp = quickSlots.items[fromIdx];
+    //        quickSlots.items[fromIdx] = quickSlots.items[toIdx];
+    //        quickSlots.items[toIdx] = temp;
+    //        quickSlots.FreshSlot();
+    //    }
+    //    else
+    //    {
+    //        Debug.LogWarning("SwapItem: ï¿½ß¸ï¿½ï¿½ï¿½ from/to ï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.");
+    //        return;
+    //    }
+
+    //    FreshSlot();
+    //}
+
+    //public bool AddItem(int idx, Item item)
+    //{
+    //    if (slots == null || items == null)
+    //        FreshSlot();
+
+    //    if (idx < 0 || idx >= items.Count)
+    //    {
+    //        Debug.Log("AddItem: ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¿ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
+    //        return false;
+    //    }
+
+    //    items[idx] = item;
+    //    FreshSlot();
+    //    Debug.Log($"ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ '{item.itemName}' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+    //    return true;
+    //}
+
+    //public bool AddItem(Item item)
+    //{
+    //    speedRune = gameObject.AddComponent<ConsumableItem>();
+    //    speedRune.Name = "Speed Rune";
+    //    speedRune.Type = ItemType.Consumable;
+    //    speedRune.Grade = ItemGrade.Rare;
+    //    speedRune.Description = "ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½Óµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½. ï¿½ï¿½ï¿½ï¿½ Å½ï¿½ï¿½ï¿½Ì³ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.";
+    //    speedRune.ConsumeType = ConsumableType.Effect;
+    //    speedRune.Power = 2f;
+    //    speedRune.Duration = 5;
+
+    //    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ ï¿½Ë»ï¿½
+    //    if (items.Find(x => x == item) != null)
+    //    {
+    //        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    //        int itemIdx = items.FindIndex(x => x == item);
+    //        Debug.Log($"ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ ï¿½Ì¹ï¿½ '{item.itemName}' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö½ï¿½ï¿½Ï´ï¿½. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åµï¿½Ï´ï¿½.");
+    //        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    //        slots[itemIdx].ItemQuantity++;
+    //        FreshSlot();
+    //        return true;
+    //    }
+
+    //    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Ä­ Ã£ï¿½Æ¼ï¿½ ï¿½ß°ï¿½
+    //    int idx = items.FindIndex(x => x == null);
+    //    if (idx != -1)
+    //    {
+    //        items[idx] = item;
+    //        Debug.Log($"ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ '{item.itemName}' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+    //        slots[idx].ItemQuantity++;
+    //        FreshSlot();
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö½ï¿½ï¿½Ï´ï¿½.");
+    //        return false;
+    //    }
+    //}
+
+        //Item[] randomItems = new Item[] { speedRune, necklace };
+
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½)
+    internal void RemoveItem(int idx)
+    {
+        if (idx >= 0 && idx < items.Count)
         {
-            Debug.Log($"ÀÌ¹Ì '{newItem.Name}' ¾ÆÀÌÅÛÀ» º¸À¯ ÁßÀÔ´Ï´Ù.");
+            items[idx] = null;
+            //FreshSlot();
+            Debug.Log($"ï¿½Îºï¿½ï¿½ä¸® {idx + 1}ï¿½ï¿½Â° ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ÅµÇ¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+        }
+    }
+
+    /// <summary>
+    /// Item ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½î¿¡ï¿½ï¿½ È£ï¿½ï¿½ï¿½)
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    internal void RemoveItem(Item item)
+    {
+        if (item == null) return;
+
+        int idx = items.FindIndex(x => x == item);
+        if (idx != -1) {
+            items[idx] = null;
+            //FreshSlot();
+            Debug.Log($"ï¿½Îºï¿½ï¿½ä¸® '{item.itemName}' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ÅµÇ¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
             return;
         }
-        // ÀÌ¹Ì º¸À¯ÁßÀÎ °æ¿ì ¼ö·® Áõ°¡????
-
-        for (int i = 0; i < invenArray.Length; i++)
+        else
         {
-            if (invenArray[i] == null)
-            {
-                invenArray[i] = newItem;
-                Debug.Log($"¾ÆÀÌÅÛ '{newItem.Name}'(ÀÌ)°¡ ÀÎº¥Åä¸®¿¡ Ãß°¡µÇ¾ú½À´Ï´Ù.");
-                // Äü½½·Ô¿¡ ÀÚµ¿ ÇÒ´çÇÏ´Â ±â´É Ãß°¡ ¿¹Á¤
-                return;
-            }
+            Debug.LogWarning("RemoveItem: ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
         }
-        Debug.Log("ÀÎº¥Åä¸®°¡ °¡µæ Ã¡½À´Ï´Ù. ¾ÆÀÌÅÛÀ» Ãß°¡ÇÒ ¼ö ¾ø½À´Ï´Ù.");
     }
 
-    ///////////////////////////////////////////////// Å×½ºÆ®¿ë ¸Þ¼­µå /////////////////////////////////////////////////
-
-    private WeaponItem defaultWeapon;
-    private ConsumableItem speedRune;
-    private SellableItem necklace;
-
-    public Item GetRandomItem()
-    {
-        speedRune = gameObject.AddComponent<ConsumableItem>();
-        speedRune.Name = "Speed Rune";
-        speedRune.Type = ItemType.Consumable;
-        speedRune.Grade = ItemGrade.Rare;
-        speedRune.Description = "»ç¿ëÇÏ¸é ÀÏÁ¤ ½Ã°£ µ¿¾È ÀÌµ¿ ¼Óµµ°¡ »¡¶óÁö´Â ·é. ´øÀü Å½ÇèÀÌ³ª ÀûÀ» ÇÇÇÒ ¶§¿¡ À¯¿ëÇÏ´Ù.";
-        speedRune.ConsumeType = ConsumableType.Effect;
-        speedRune.Power = 2f;
-        speedRune.Duration = 5;
-
-        necklace = gameObject.AddComponent<SellableItem>();
-        necklace.Name = "Cursed Skul";
-        necklace.Type = ItemType.Sellable;
-        necklace.Grade = ItemGrade.Unique;
-        necklace.Description = "À¸½º½ºÇÑ ±â¿îÀ» Ç³±â´Â ÀúÁÖ¹ÞÀº ÇØ°ñ. »ó´çÇÑ °¡Ä¡°¡ ÀÖ¾î º¸ÀÎ´Ù.";
-        necklace.Price = 150;
-
-        Item[] randomItems = new Item[] { speedRune, necklace };
-
-        return randomItems[UnityEngine.Random.Range(0, randomItems.Length)];
-    }
+    // ï¿½ï¿½ï¿½ï¿½×¿ï¿½: ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+    //public void PrintItems()
+    //{
+    //    Debug.Log("=== Inventory Items ===");
+    //    String logs = "";
+    //    for (int i = 0; i < items.Count; i++)
+    //    {
+    //        var item = items[i];
+    //        if (item != null)
+    //        {
+    //            logs += $"Slot {i}: {item.itemName}({slots[i].ItemQuantity})\n";
+    //        }
+    //        else
+    //        {
+    //            logs += $"Slot {i}: (empty)\n";
+    //        }
+    //    }
+    //    Debug.Log(logs+"\n=======================");
+    //}
 }
