@@ -115,14 +115,16 @@ MonoBehaviour:
   detectedRangeRadius: 0
   detectlayer:
     serializedVersion: 2
-    m_Bits: 0
-  agent: {fileID: 0}
+    m_Bits: 128
+  agent: {fileID: 3780790520304856486}
   monsterrib: {fileID: 1311017699481238877}
   previousWaypoint: {fileID: 0}
   targetWaypoint: {fileID: 0}
   monsterAnimator: {fileID: -4544868021683638809}
   colliders: []
-  Waypoints: []
+  Waypoints:
+  - {fileID: 0}
+  - {fileID: 0}
   isDetective: 0
 --- !u!95 &-4544868021683638809
 Animator:
@@ -160,7 +162,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2

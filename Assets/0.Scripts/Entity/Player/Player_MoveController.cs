@@ -53,10 +53,10 @@ public sealed partial class Player_Controller
     /// </summary>
     private void LookAtMousePoint()
     {
-        Vector3 worldPos = Camera.main.GetWorldPosToMouse();
+        Vector3 worldPos = Camera.main.GetWorldPosToMouse(transform);
 
         Vector3 direction = worldPos - transform.position;
-        direction.y = transform.position.y;
+        direction.y = 0f;
 
         if(direction.sqrMagnitude > 0.001f)
         {
