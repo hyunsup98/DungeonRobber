@@ -13,17 +13,17 @@ public sealed partial class Player_Controller
 
         foreach(var hit in hits)
         {
-            //todo °ø°Ý ·ÎÁ÷ ³Ö±â
-            Debug.Log("°ø°Ý!");
+            //todo ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö±ï¿½
+            Debug.Log("ï¿½ï¿½ï¿½ï¿½!");
         }
     }
 
     /// <summary>
-    /// ´ë¹ÌÁö ÇÇ°Ý ¸Þ¼­µå
-    /// ÇÃ·¹ÀÌ¾îÀÇ Ã¼·ÂÀ» ±ð¾ÆÁÜ, ÇÇ°Ý °ü·Ã ¸ð¼Ç, »ç¿îµå µîÀ» ÀÔÀ½
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ç°ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½
+    /// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ Ã¼ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½Ç°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     /// </summary>
-    /// <param name="damage"> ÇÃ·¹ÀÌ¾î°¡ ÀÔÀ» ´ë¹ÌÁöÀÇ ¼öÄ¡ </param>
-    protected override void GetDamage(float damage)
+    /// <param name="damage"> ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ </param>
+    public override void GetDamage(float damage)
     {
         stats.ModifyStat(StatType.HP, -damage);
 

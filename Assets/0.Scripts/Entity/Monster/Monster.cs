@@ -21,7 +21,7 @@ public abstract class Monster : Entity
     public bool isDetective = false; //감지했는가를 나타내는 변수 
 
     protected abstract override void Attack();
-    protected abstract override void GetDamage(float damage);
+    public abstract override void GetDamage(float damage);
     protected abstract IEnumerator DetectTarget();// 적 감지를 위한 코루틴 함수
     protected abstract void DetectAction(); //감지했을 때 취하는 행동 메서드
     protected abstract void OverlookAction(); //감지하지 못했을 때 취하는 행동 메서드
