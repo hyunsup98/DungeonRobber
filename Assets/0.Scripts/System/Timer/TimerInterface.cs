@@ -1,7 +1,7 @@
 using UnityEngine;
 public interface IGameTimerObserver
 {
-    public void OnTimerChanged(float currentTime);
+    public void OnTimerChanged(int minute, int hour);
 }
 
 public interface IDangerousTimeObserver
