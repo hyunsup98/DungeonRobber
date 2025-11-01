@@ -11,6 +11,7 @@ public enum PlayerBehaviorState : int
     IsWalk      = 1 << 3,       //플레이어가 걷고 있는 상태
     IsSprint    = 1 << 4,       //플레이어가 달리고 있는 상태
     IsAttack    = 1 << 5,       //플레이어가 공격하고 있는 상태
+    IsDodge      = 1 << 6,      //플레이어가 다이빙(구르기) 하는 상태
 }
 
 /// <summary>
@@ -31,10 +32,32 @@ public sealed partial class Player_Controller : Entity
 
     [Header("이동 관련 변수")]
     [SerializeField] private float runSpeed;            //플레이어 달리기 속도
+    [SerializeField] private float dodgeForce;          //구르기 힘
 
     [Header("공격 관련 변수")]
     [SerializeField] private LayerMask attackMask;      //공격할 대상 레이어
     public event Action playerDeadAction;               //플레이어가 죽었을 때 발생할 이벤트
+
+    [Header("스태미너 관련 변수")]
+    [SerializeField] private float maxStamina = 100f;
+    private float stamina;
+    public float Stamina
+    {
+        get { return stamina; }
+        set
+        {
+            if(value > maxStamina)
+            {
+                value = maxStamina;
+            }
+            else if(value < 0)
+            {
+                value = 0;
+            }
+
+            stamina = value;
+        }
+    }
 
     private PlayerBehaviorState playerBehaviorState;    //플레이어 행동에 관련된 상태 플래그
 
@@ -75,6 +98,7 @@ public sealed partial class Player_Controller : Entity
     {
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
+
         //공격
         if (Input.GetMouseButtonDown(0))
         {
@@ -82,12 +106,12 @@ public sealed partial class Player_Controller : Entity
         }
 
         //마우스 커서 바라보기
-        if(!CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint))
+        if (!CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint) && !CheckPlayerBehaviorState(PlayerBehaviorState.IsDodge))
         {
             LookAtMousePoint();
         }
 
-        if(Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F))
         {
             GetDamage(5f);
         }
@@ -111,6 +135,8 @@ public sealed partial class Player_Controller : Entity
 
         if (runSpeed < stats.GetStat(StatType.MoveSpeed))
             runSpeed = stats.GetStat(StatType.MoveSpeed) * 1.5f;
+
+        stamina = maxStamina;
 
         playerBehaviorState = PlayerBehaviorState.Alive | PlayerBehaviorState.IsCanMove;
     }

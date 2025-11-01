@@ -43,10 +43,11 @@ public class FieldOfView : MonoBehaviour
         foreach (var target in targetCol)
         {
             Vector3 dirToTarget = target.transform.position - transform.position;
+            dirToTarget.y = 0f;
 
             float angleBetween = Vector3.Angle(lookDir.normalized, dirToTarget.normalized);
 
-            if (angleBetween < viewAngle * 0.5f || dirToTarget.sqrMagnitude <= viewInnerRadius * viewInnerRadius)
+            if (angleBetween <= viewAngle * 0.5f || dirToTarget.sqrMagnitude <= viewInnerRadius * viewInnerRadius)
             {
                 if (!Physics.Raycast(transform.position, dirToTarget, viewDistance, obstacleMask))
                 {
@@ -83,6 +84,7 @@ public class FieldOfView : MonoBehaviour
         if (player == null || maskMaterial == null) return;
 
         lookDir = Vector3.Slerp(lookDir.normalized, (Camera.main.GetWorldPosToMouse(transform) - transform.position).normalized, fovRotateSpeed * Time.deltaTime);
+        lookDir.y = 0f;
 
         maskMaterial.SetVector("_PlayerPos", player.position);
         maskMaterial.SetVector("_PlayerForward", lookDir);

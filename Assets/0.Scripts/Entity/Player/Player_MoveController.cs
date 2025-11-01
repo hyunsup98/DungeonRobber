@@ -1,3 +1,5 @@
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public sealed partial class Player_Controller
@@ -25,7 +27,17 @@ public sealed partial class Player_Controller
                 AddPlayerBehaviorState(PlayerBehaviorState.IsWalk);
             }
 
-            if(CheckPlayerBehaviorState(PlayerBehaviorState.IsWalk))
+            //구르기
+            if (Input.GetKey(KeyCode.Space))
+            {
+                if (!CheckPlayerBehaviorState(PlayerBehaviorState.IsDodge))
+                {
+                    StartCoroutine(Dive(moveDir));
+                    return;
+                }
+            }
+
+            if (CheckPlayerBehaviorState(PlayerBehaviorState.IsWalk))
             {
                 if (Input.GetKey(KeyCode.LeftShift))
                 {
@@ -58,7 +70,7 @@ public sealed partial class Player_Controller
         Vector3 direction = worldPos - transform.position;
         direction.y = 0f;
 
-        if(direction.sqrMagnitude > 0.001f)
+        if(direction.sqrMagnitude > 0.005f)
         {
             Quaternion targetRot = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 10f);
@@ -82,5 +94,34 @@ public sealed partial class Player_Controller
 
         playerAnimator.SetFloat("moveX", smoothX);
         playerAnimator.SetFloat("speed", smoothZ);
+    }
+
+    private IEnumerator Dive(Vector3 moveDir)
+    {
+        //상태 플래그 변경 및 구르기 애니메이션 적용
+        AddPlayerBehaviorState(PlayerBehaviorState.IsDodge);
+        RemovePlayerBehaviorState(PlayerBehaviorState.IsCanMove);
+        playerAnimator.SetTrigger("dodge");
+
+        //플레이어 구르기 물리 적용
+        if(moveDir.sqrMagnitude <= 0.0005f)
+        {
+            playerRigid.AddForce(transform.forward * dodgeForce, ForceMode.Impulse);
+        }
+        else
+        {
+            playerRigid.velocity = Vector3.zero;
+            transform.rotation = Quaternion.LookRotation(moveDir);
+            playerRigid.AddForce(moveDir * dodgeForce, ForceMode.Impulse);
+        }
+
+        yield return new WaitUntil(() => 
+            playerAnimator.GetCurrentAnimatorStateInfo(0).IsName("Dodge") && 
+            playerAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f
+            );
+        yield return CoroutineManager.waitForSeconds(0.1f);
+
+        RemovePlayerBehaviorState(PlayerBehaviorState.IsDodge);
+        AddPlayerBehaviorState(PlayerBehaviorState.IsCanMove);
     }
 }
