@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 [System.Flags]
@@ -12,7 +10,7 @@ public enum PlayerBehaviorState : int
     IsCanMove   = 1 << 2,       //플레이어가 움직일 수 있는 상태
     IsWalk      = 1 << 3,       //플레이어가 걷고 있는 상태
     IsSprint    = 1 << 4,       //플레이어가 달리고 있는 상태
-    IsDoingUpperBody = 1 << 5,  //플레이어가 상체가 하는 동작을 하고 있는지에 대한 상태 - 공격, 먹기, 마시기, 상자 열기 등의 모션
+    IsAttack    = 1 << 5,       //플레이어가 공격하고 있는 상태
 }
 
 /// <summary>
@@ -21,6 +19,10 @@ public enum PlayerBehaviorState : int
 /// </summary>
 public sealed partial class Player_Controller : Entity
 {
+    public static Player_Controller Instance { get; private set; }  //이미 Entity 클래스를 상속받고 있기에 따로 만들어줌
+
+    public event Action onPlayerStatChanged;
+
     [Header("컴포넌트 변수")]
     [SerializeField] private Camera mainCamera;         //메인 카메라
     [SerializeField] private Rigidbody playerRigid;     //플레이어 Rigidbody
@@ -36,8 +38,22 @@ public sealed partial class Player_Controller : Entity
 
     private PlayerBehaviorState playerBehaviorState;    //플레이어 행동에 관련된 상태 플래그
 
+    //플레이어의 스탯을 외부에서 받아오는 메서드
+    public BaseStat GetPlayerStat() => stats;
+
     private void Awake()
     {
+        #region 싱글턴
+        if(Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        #endregion
+
         if (mainCamera == null)
             mainCamera = Camera.main;
 
@@ -70,6 +86,11 @@ public sealed partial class Player_Controller : Entity
         {
             LookAtMousePoint();
         }
+
+        if(Input.GetKeyDown(KeyCode.F))
+        {
+            GetDamage(5f);
+        }
     }
 
     private void FixedUpdate()
@@ -92,29 +113,6 @@ public sealed partial class Player_Controller : Entity
             runSpeed = stats.GetStat(StatType.MoveSpeed) * 1.5f;
 
         playerBehaviorState = PlayerBehaviorState.Alive | PlayerBehaviorState.IsCanMove;
-    }
-
-    //todo, 상체 행동 애니메이션 레이어 보간 작업인데 원하는 방향으로 안나와서 잠시 보류
-    private IEnumerator PlayOtherAnimatorLayer(string motionName)
-    {
-        playerAnimator.SetTrigger(motionName);
-        playerAnimator.SetLayerWeight(1, 1);
-        AddPlayerBehaviorState(PlayerBehaviorState.IsDoingUpperBody);
-
-        while (true)
-        {
-            if(playerAnimator.GetCurrentAnimatorStateInfo(1).normalizedTime < 1f)
-            {
-                playerAnimator.SetLayerWeight(1, 1 - playerAnimator.GetCurrentAnimatorStateInfo(1).normalizedTime);
-            }
-            else
-            {
-                RemovePlayerBehaviorState(PlayerBehaviorState.IsDoingUpperBody);
-                break;
-            }
-
-            yield return null;
-        }
     }
 
     #region 플레이어의 행동 상태 제어
@@ -140,7 +138,7 @@ public sealed partial class Player_Controller : Entity
     /// 플레이어 행동 상태 플래그에 상태가 활성화되어 있는지 체크
     /// </summary>
     /// <param name="states"> 체크할 상태 목록 </param>
-    /// <returns></returns>
+    /// <returns> True = 해당 비트 플래그가 1일 경우 / False = 해당 비트 플래그가 0일 경우 </returns>
     private bool CheckPlayerBehaviorState(params PlayerBehaviorState[] states)
     {
         foreach(var state in states)
@@ -158,5 +156,7 @@ public sealed partial class Player_Controller : Entity
     private void OnDestroy()
     {
         playerDeadAction -= Dead;
+
+        StopAllCoroutines();
     }
 }

@@ -29,12 +29,6 @@ public abstract class BaseBuff : MonoBehaviour
     private float restoreValue = 0f;                        //효과가 끝난 후 수치를 되돌릴 경우 저장해놓을 기존 수치값
 
     private Coroutine buffCoroutine;
-    private WaitForSeconds seconds;                         //WaitForSeconds 캐싱
-
-    private void Awake()
-    {
-        seconds = isTick ? new WaitForSeconds(tickTime) : new WaitForSeconds(duration);
-    }
 
     //버프가 활성화되었을 때 호출할 메서드
     public virtual void OnActivate(List<BaseBuff> list, BaseStat stat)
@@ -70,7 +64,7 @@ public abstract class BaseBuff : MonoBehaviour
             while (timer > 0)
             {
                 OnTick(stat);
-                yield return seconds;
+                yield return CoroutineManager.waitForSeconds(tickTime);
                 timer -= tickTime;
             }
         }
@@ -78,7 +72,7 @@ public abstract class BaseBuff : MonoBehaviour
         {
             //isTick이 false면 duration만큼 기다림
             OnTick(stat);
-            yield return seconds;
+            yield return CoroutineManager.waitForSeconds(duration);
         }
 
         OnDeActivate(list, stat);

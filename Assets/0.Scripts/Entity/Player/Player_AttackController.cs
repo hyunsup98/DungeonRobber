@@ -1,9 +1,24 @@
+using System.Collections;
 using UnityEngine;
 
 public sealed partial class Player_Controller
 {
     protected override void Attack()
     {
+        if (CheckPlayerBehaviorState(PlayerBehaviorState.IsAttack)) return;
+
+        StartCoroutine(DoAttack());
+    }
+
+    /// <summary>
+    /// 실질적인 공격 메서드
+    /// 공격 속도(AttackDelay) 만큼 IsAttack을 True로 바꿈
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator DoAttack()
+    {
+        AddPlayerBehaviorState(PlayerBehaviorState.IsAttack);
+
         playerAnimator.SetTrigger("attack");
 
         Vector3 dir = transform.forward;
@@ -11,11 +26,16 @@ public sealed partial class Player_Controller
 
         RaycastHit[] hits = Physics.BoxCastAll(atkPos, new Vector3(0.5f, 0.4f, stats.GetStat(StatType.AttackRange) * 0.5f), dir, transform.rotation, 0f, attackMask);
 
-        foreach(var hit in hits)
+        foreach (var hit in hits)
         {
-            //todo 공격 로직 넣기
-            Debug.Log("공격!");
+            if(hit.collider.TryGetComponent<Monster>(out var enemy))
+            {
+                enemy.GetDamage(stats.GetStat(StatType.AttackRange));
+            }
         }
+
+        yield return CoroutineManager.waitForSeconds(stats.GetStat(StatType.AttackDelay));
+        RemovePlayerBehaviorState(PlayerBehaviorState.IsAttack);
     }
 
     /// <summary>
@@ -23,11 +43,12 @@ public sealed partial class Player_Controller
     /// 플레이어의 체력을 깎아줌, 피격 관련 모션, 사운드 등을 입음
     /// </summary>
     /// <param name="damage"> 플레이어가 입을 대미지의 수치 </param>
-    protected override void GetDamage(float damage)
+    public override void GetDamage(float damage)
     {
         stats.ModifyStat(StatType.HP, -damage);
+        onPlayerStatChanged?.Invoke();
 
-        if(stats.GetStat(StatType.HP) <= 0)
+        if (stats.GetStat(StatType.HP) <= 0)
         {
             playerDeadAction?.Invoke();
         }

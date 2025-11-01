@@ -85,7 +85,7 @@ public class SkeletonWarrior : Monster
     /// 데미지 피격 메서드 
     /// </summary>
     /// <param name="damage"> 해당 몬스터가 입을 피해 </param>
-    protected override void GetDamage(float damage)
+    public override void GetDamage(float damage)
     {
         monsterAnimator.SetTrigger("GetDamage");
         stats.ModifyStat(StatType.HP, -damage);
