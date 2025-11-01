@@ -6,6 +6,7 @@ public class FieldOfView : MonoBehaviour
     [SerializeField] private float viewAngle = 90f;         //시야각
     [SerializeField] private float viewInnerRadius = 3f;    //플레이어 주변 시야 범위
     [SerializeField] private float viewDistance = 22f;      //부채꼴 시야각의 최대 시야 거리
+    [SerializeField] private float offsetY = 0.5f;          //레이캐스트를 쏠 때 y 좌표 위치(캐릭터 position이 바닥에 있기 때문에 감지를 못할 때가 있어서 올려줌)
     [SerializeField] private LayerMask targetMask;          //적(Enemy) 레이어마스크
     [SerializeField] private LayerMask obstacleMask;        //장애물, 벽 레이어마스크
 
@@ -52,7 +53,8 @@ public class FieldOfView : MonoBehaviour
 
             if (angleBetween <= viewAngle * 0.5f || dirToTarget.sqrMagnitude <= viewInnerRadius * viewInnerRadius)
             {
-                if (!Physics.Raycast(transform.position, dirToTarget, Vector3.Distance(transform.position, target.transform.position), obstacleMask))
+                dirToTarget.y = offsetY;
+                if (!Physics.Raycast(new Vector3(transform.position.x, offsetY, transform.position.z), dirToTarget, Vector3.Distance(transform.position, target.transform.position), obstacleMask))
                 {
                     SetVisible(target.transform, true);
                     continue;
