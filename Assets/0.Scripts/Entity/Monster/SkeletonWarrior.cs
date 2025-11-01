@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Android.Types;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.Animations;
 
@@ -8,6 +10,7 @@ public class SkeletonWarrior : Monster
 {
     [SerializeField] WaitForSeconds detectDelay = new WaitForSeconds(1f);//감지 딜레이 
     [SerializeField] WaitForSeconds animeDelay = new WaitForSeconds(0.5f);//애니메이션 딜레이 
+    Entity player;
     int playerLayer;
     int WaypointLayer;   
     Coroutine detectPlayerCoroutine; //감지 코루틴  변수
@@ -69,12 +72,17 @@ public class SkeletonWarrior : Monster
 
     protected override void Attack()
     {
-        //todo 공격 구현
         SetMoveBool(false); //이동 멈춤
-        Debug.Log("Attack");
         monsterAnimator.SetTrigger("Attack");
-        
-       
+    }
+    
+    public void AttackPlayer()
+    {
+       if(Vector3.SqrMagnitude(target.transform.position - transform.position) <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange))
+        {
+            target.GetComponentInParent<Entity>().GetDamage(stats.GetStat(StatType.AttackDamage)); 
+        }
+                     
     }
 
     /// <summary>
@@ -87,10 +95,10 @@ public class SkeletonWarrior : Monster
         targetDistance = Vector3.SqrMagnitude(tempVector); // 단순 비교이므로 sqrMagnitude 사용
         transform.LookAt(target.transform.position); //타겟 바라보기
 
-        if (targetDistance <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange)) //공격 사거리안에 들어오면 공격 
+        if (targetDistance <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange)) //공격 사거리안에 들어오면 공격시작 
         {            
             //▼ 플레이어가 장애물 뒤에 숨어있지 않고 공격범위 내라면 
-            if (Physics.Raycast(transform.position + (Vector3.up * 1.5f), transform.forward, out rayhit, stats.GetStat(StatType.AttackRange), obstacleTargetLayer) && rayhit.collider.CompareTag("Player")) 
+            if (Physics.Raycast(transform.position + (Vector3.up * 1.5f), transform.forward, out rayhit, stats.GetStat(StatType.AttackRange), obstacleLayer | targetLayer) && rayhit.collider.CompareTag("Player")) 
             {                                               
                 Attack();               
             }
