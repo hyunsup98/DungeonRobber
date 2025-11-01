@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6469290160795724211
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9201803083939894017}
+  - component: {fileID: 3044377558356368519}
+  m_Layer: 0
+  m_Name: MiniMapController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9201803083939894017
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6469290160795724211}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 960, y: 540, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3044377558356368519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6469290160795724211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a3e458b56f508745949b6df59ab93ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  zoneManager: {fileID: 7625713682982165177, guid: 9d447a9c4769fe34ea59e363907aa9b7, type: 3}
+  playerTransform: {fileID: 0}
+  minimapCanvasPrefab: {fileID: 7265598898277835913, guid: 8502da5c2ba96a648a1f89eb88f4dbd3, type: 3}
+  worldMin: {x: -50, y: -50}
+  worldMax: {x: 50, y: 50}
+  zoneSpriteSets:
+  - zoneName: 1
+    normal: {fileID: 21300000, guid: 0f4fa28e36a924848b25bed1b1c1bf89, type: 3}
+    warning: {fileID: 21300000, guid: 0c31f95dc26f07d46b64739315adf03e, type: 3}
+    locked: {fileID: 21300000, guid: a15521fab2664d34f82f82e3a01164fe, type: 3}
+    overrideRoot: {fileID: 0}
+    overrideStateIcon: {fileID: 0}
+    overrideLabel: {fileID: 0}
+  - zoneName: 2
+    normal: {fileID: 21300000, guid: 90d50d793b202184a80b2a5aa6fe7016, type: 3}
+    warning: {fileID: 21300000, guid: ab46078847eb8354ebf23820bc2dbcac, type: 3}
+    locked: {fileID: 21300000, guid: 12cd5c7b0a004e7469b5f4bc3fe91668, type: 3}
+    overrideRoot: {fileID: 0}
+    overrideStateIcon: {fileID: 0}
+    overrideLabel: {fileID: 0}
+  - zoneName: 3
+    normal: {fileID: 21300000, guid: c6cc68b3eff2f3c4cab8f4c8d3e1a25b, type: 3}
+    warning: {fileID: 21300000, guid: 3ab12f252b85d354a9b9d43d3a4fe031, type: 3}
+    locked: {fileID: 21300000, guid: a40b5ad71fdc92342910f0c6548a77a4, type: 3}
+    overrideRoot: {fileID: 0}
+    overrideStateIcon: {fileID: 0}
+    overrideLabel: {fileID: 0}
+  - zoneName: 4
+    normal: {fileID: 21300000, guid: 66ccab77b7af98d42a1ce75bc9ae136e, type: 3}
+    warning: {fileID: 21300000, guid: d50f9721e0a7f864ab01552704d477a9, type: 3}
+    locked: {fileID: 21300000, guid: 6b558452e4e29194795ebca0d2b20fcb, type: 3}
+    overrideRoot: {fileID: 0}
+    overrideStateIcon: {fileID: 0}
+    overrideLabel: {fileID: 0}
+  - zoneName: 5
+    normal: {fileID: 21300000, guid: 7d2de320354a2e64ea5b76af3210a4cf, type: 3}
+    warning: {fileID: 21300000, guid: bb1738e3cc4715f47bff088c31286e13, type: 3}
+    locked: {fileID: 21300000, guid: 69a7d33effcac914db125f929691d473, type: 3}
+    overrideRoot: {fileID: 0}
+    overrideStateIcon: {fileID: 0}
+    overrideLabel: {fileID: 0}
+  - zoneName: 6
+    normal: {fileID: 21300000, guid: 0a007295a9afcdb4ba006d2f2a2d3702, type: 3}
+    warning: {fileID: 21300000, guid: 89efe06b82a01d545ab0e9367362ea43, type: 3}
+    locked: {fileID: 21300000, guid: d0143f05655d80441b2a0df49f170d2f, type: 3}
+    overrideRoot: {fileID: 0}
+    overrideStateIcon: {fileID: 0}
+    overrideLabel: {fileID: 0}
+  - zoneName: 7
+    normal: {fileID: 21300000, guid: e9b3c52f996c5aa459583d109c213366, type: 3}
+    warning: {fileID: 21300000, guid: bffe8e853b57d6d439b53938fdd046bf, type: 3}
+    locked: {fileID: 21300000, guid: 89b52ccf2742e1e47883901d9d9d55b8, type: 3}
+    overrideRoot: {fileID: 0}
+    overrideStateIcon: {fileID: 0}
+    overrideLabel: {fileID: 0}
+  playerFollowSpeed: 10
+  blinkInterval: 0.5
+  warningDimAlpha: 0.35
