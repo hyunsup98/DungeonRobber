@@ -778,32 +778,6 @@ Transform:
   - {fileID: 859550262}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 61.4, y: 0, z: 0}
---- !u!1 &1422839122 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5048565078041827740, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
-  m_PrefabInstance: {fileID: 7289093373496051408}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &1422839127
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1422839122}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: a6e1b293f7ed5584fa548ddde966e03e, type: 3}
-  m_Controller: {fileID: 9100000, guid: abdba650875ce194d91b9f48b7e9a4a6, type: 2}
-  m_CullingMode: 1
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1643840509
 GameObject:
   m_ObjectHideFlags: 0
@@ -1251,48 +1225,21 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2221373778831208721, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
-      propertyPath: dodgeForce
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 2221373778831208721, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
       propertyPath: mainCamera
       value: 
       objectReference: {fileID: 1405820079}
-    - target: {fileID: 2221373778831208721, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
-      propertyPath: diveCoolTime
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2221373778831208721, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
-      propertyPath: playerAnimator
-      value: 
-      objectReference: {fileID: 1422839127}
-    - target: {fileID: 2221373778831208721, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
-      propertyPath: stats.baseStats.Array.data[4].<Value>k__BackingField
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2465718992621701338, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
       propertyPath: fovQuad
       value: 
       objectReference: {fileID: 859550262}
-    - target: {fileID: 4926076781645048277, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5048565078041827740, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 8428292921748122077, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
-      propertyPath: m_Drag
-      value: 0.5
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5048565078041827740, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1422839127}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

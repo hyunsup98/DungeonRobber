@@ -11,8 +11,8 @@ public sealed partial class Player_Controller
     }
 
     /// <summary>
-    /// �������� ���� �޼���
-    /// ���� �ӵ�(AttackDelay) ��ŭ IsAttack�� True�� �ٲ�
+    /// 실질적인 공격 메서드
+    /// 공격 속도(AttackDelay) 만큼 IsAttack을 True로 바꿈
     /// </summary>
     /// <returns></returns>
     private IEnumerator DoAttack()
@@ -39,10 +39,10 @@ public sealed partial class Player_Controller
     }
 
     /// <summary>
-    /// ����� �ǰ� �޼���
-    /// �÷��̾��� ü���� �����, �ǰ� ���� ���, ���� ���� ����
+    /// 대미지 피격 메서드
+    /// 플레이어의 체력을 깎아줌, 피격 관련 모션, 사운드 등을 입음
     /// </summary>
-    /// <param name="damage"> �÷��̾ ���� ������� ��ġ </param>
+    /// <param name="damage"> 플레이어가 입을 대미지의 수치 </param>
     public override void GetDamage(float damage)
     {
         stats.ModifyStat(StatType.HP, -damage);

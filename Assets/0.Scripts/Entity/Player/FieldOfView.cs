@@ -29,27 +29,30 @@ public class FieldOfView : MonoBehaviour
     {
         InitFOVShader();
         SetFOVShader();
+        FindVisibleTargets();
     }
 
     private void FixedUpdate()
     {
-        FindVisibleTargets();
+        //FindVisibleTargets();
     }
 
     private void FindVisibleTargets()
     {
         Collider[] targetCol = Physics.OverlapSphere(transform.position, viewDistance, targetMask);
 
+        Debug.Log(targetCol.Length);
+
         foreach (var target in targetCol)
         {
             Vector3 dirToTarget = target.transform.position - transform.position;
             dirToTarget.y = 0f;
 
-            float angleBetween = Vector3.Angle(lookDir.normalized, dirToTarget.normalized);
+            float angleBetween = Vector3.Angle(lookDir, dirToTarget);
 
             if (angleBetween <= viewAngle * 0.5f || dirToTarget.sqrMagnitude <= viewInnerRadius * viewInnerRadius)
             {
-                if (!Physics.Raycast(transform.position, dirToTarget, viewDistance, obstacleMask))
+                if (!Physics.Raycast(transform.position, dirToTarget, Vector3.Distance(transform.position, target.transform.position), obstacleMask))
                 {
                     SetVisible(target.transform, true);
                     continue;
