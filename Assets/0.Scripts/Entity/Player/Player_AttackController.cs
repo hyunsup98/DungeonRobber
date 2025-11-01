@@ -11,8 +11,8 @@ public sealed partial class Player_Controller
     }
 
     /// <summary>
-    /// ½ÇÁúÀûÀÎ °ø°İ ¸Ş¼­µå
-    /// °ø°İ ¼Óµµ(AttackDelay) ¸¸Å­ IsAttackÀ» True·Î ¹Ù²Ş
+    /// ì‹¤ì§ˆì ì¸ ê³µê²© ë©”ì„œë“œ
+    /// ê³µê²© ì†ë„(AttackDelay) ë§Œí¼ IsAttackì„ Trueë¡œ ë°”ê¿ˆ
     /// </summary>
     /// <returns></returns>
     private IEnumerator DoAttack()
@@ -39,10 +39,10 @@ public sealed partial class Player_Controller
     }
 
     /// <summary>
-    /// ´ë¹ÌÁö ÇÇ°İ ¸Ş¼­µå
-    /// ÇÃ·¹ÀÌ¾îÀÇ Ã¼·ÂÀ» ±ğ¾ÆÁÜ, ÇÇ°İ °ü·Ã ¸ğ¼Ç, »ç¿îµå µîÀ» ÀÔÀ½
+    /// ëŒ€ë¯¸ì§€ í”¼ê²© ë©”ì„œë“œ
+    /// í”Œë ˆì´ì–´ì˜ ì²´ë ¥ì„ ê¹ì•„ì¤Œ, í”¼ê²© ê´€ë ¨ ëª¨ì…˜, ì‚¬ìš´ë“œ ë“±ì„ ì…ìŒ
     /// </summary>
-    /// <param name="damage"> ÇÃ·¹ÀÌ¾î°¡ ÀÔÀ» ´ë¹ÌÁöÀÇ ¼öÄ¡ </param>
+    /// <param name="damage"> í”Œë ˆì´ì–´ê°€ ì…ì„ ëŒ€ë¯¸ì§€ì˜ ìˆ˜ì¹˜ </param>
     public override void GetDamage(float damage)
     {
         stats.ModifyStat(StatType.HP, -damage);
