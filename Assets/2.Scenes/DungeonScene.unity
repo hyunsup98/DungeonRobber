@@ -7329,6 +7329,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1913144132}
     - target: {fileID: 2465718992621701338, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
+      propertyPath: viewDistance
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 2465718992621701338, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
       propertyPath: obstacleMask.m_Bits
       value: 768
       objectReference: {fileID: 0}
