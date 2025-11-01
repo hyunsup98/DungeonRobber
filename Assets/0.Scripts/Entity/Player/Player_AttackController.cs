@@ -5,7 +5,7 @@ public sealed partial class Player_Controller
 {
     protected override void Attack()
     {
-        if (CheckPlayerBehaviorState(PlayerBehaviorState.IsAttack)) return;
+        if (CheckPlayerBehaviorState(PlayerBehaviorState.IsAttack) || CheckPlayerBehaviorState(PlayerBehaviorState.IsDodge)) return;
 
         StartCoroutine(DoAttack());
     }
@@ -61,13 +61,4 @@ public sealed partial class Player_Controller
         RemovePlayerBehaviorState(PlayerBehaviorState.Alive);
         AddPlayerBehaviorState(PlayerBehaviorState.Dead);
     }
-
-    //private void OnDrawGizmos()
-    //{
-    //    Vector3 dir = transform.forward;
-    //    Vector3 atkPos = attackPos.position + (transform.forward * (attackRange * 0.5f));
-
-    //    Gizmos.color = Color.green;
-    //    Gizmos.DrawCube(atkPos, new Vector3(1f, 0.8f, attackRange));
-    //}
 }
