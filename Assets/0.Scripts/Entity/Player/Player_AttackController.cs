@@ -30,7 +30,8 @@ public sealed partial class Player_Controller
         {
             if(hit.collider.TryGetComponent<Monster>(out var enemy))
             {
-                enemy.GetDamage(stats.GetStat(StatType.AttackRange));
+                enemy.GetDamage(stats.GetStat(StatType.AttackDamage));
+                Debug.Log($"대미지: {stats.GetStat(StatType.AttackDamage)}");
             }
         }
 

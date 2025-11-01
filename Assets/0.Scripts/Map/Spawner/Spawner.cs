@@ -132,8 +132,11 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
         // ·£´ý À§Ä¡ ÈÄº¸ Å½»ö
         for (int i = 0; i < maxAttempts; i++)
         {
-            float x = Random.Range(-_mapSpawnSize.x / 2, _mapSpawnSize.x / 2);
-            float z = Random.Range(-_mapSpawnSize.y / 2, _mapSpawnSize.y / 2);
+            float offsetX = transform.position.x;
+            float offsetZ = transform.position.z;
+
+            float x = Random.Range(offsetX - (_mapSpawnSize.x / 2), offsetX + ( _mapSpawnSize.x / 2));
+            float z = Random.Range(offsetZ - (_mapSpawnSize.y / 2), offsetZ + (_mapSpawnSize.y / 2));
             Vector3 spawnPos = new Vector3(x, _raycastHeight, z);
 
 

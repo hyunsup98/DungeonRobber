@@ -11,23 +11,25 @@ public class DangerouText : MonoBehaviour, IDangerousTimeObserver
     [SerializeField] TextMeshProUGUI dangerousTMP;
 
     [Tooltip("위험 시간 알림으로 나올 텍스트 ")]
-    [SerializeField] string inputText;
     [SerializeField] TimerFunc timerFunc; // 타이머 기능 
+    string inputText;
     
 
     Coroutine dangerCouroutine;
-    WaitForSeconds textDelay = new WaitForSeconds(5f); //위험 텍스트 얼마나 띄울지 
+    [SerializeField] private float textDelay = 5f;
 
     private void Awake()
     {
         timerFunc.addDangerousTimeEvent(this);
 
+        inputText = $"밤이 되었습니다 \n위험 지역을 조심하세요";
     }
 
     private void OnDestroy()
     {
         timerFunc.delDangerousTimeEvent(this);
     }
+
     public void OnDangerousTimeReached()
     {
         if(dangerCouroutine == null)
@@ -46,9 +48,8 @@ public class DangerouText : MonoBehaviour, IDangerousTimeObserver
         dangerousTMP.color = Color.red;
         dangerousTMP.text = inputText;
 
-        yield return textDelay;
+        yield return CoroutineManager.waitForSeconds(textDelay);
         
         ClearText();
-
     }
 }

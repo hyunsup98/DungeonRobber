@@ -998,12 +998,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ab65d6962f63c54b943c15fea1d03cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  panel: {fileID: 5512012528645811988}
-  background: {fileID: 4062584160887862}
-  markersParent: {fileID: 3900228013484151470}
-  playerIcon: {fileID: 6439621075737069848}
-  messageText: {fileID: 2646372367637526048}
-  hideOnAwake: 1
+  _miniMapPanel: {fileID: 0}
+  _miniMapBackground: {fileID: 0}
+  _miniMapMarkersParent: {fileID: 0}
+  _miniMapPlayerIcon: {fileID: 0}
+  _miniMapMessageText: {fileID: 0}
+  _miniMapHideOnAwake: 1
 --- !u!1 &8587595561438467642
 GameObject:
   m_ObjectHideFlags: 0

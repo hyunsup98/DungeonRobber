@@ -42,8 +42,6 @@ public class FieldOfView : MonoBehaviour
     {
         Collider[] targetCol = Physics.OverlapSphere(transform.position, viewDistance, targetMask);
 
-        Debug.Log(targetCol.Length);
-
         foreach (var target in targetCol)
         {
             Vector3 dirToTarget = target.transform.position - transform.position;

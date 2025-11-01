@@ -9,11 +9,12 @@ using UnityEngine.Animations;
 
 public class SkeletonWarrior : Monster
 {
-    [SerializeField] WaitForSeconds detectDelay = new WaitForSeconds(1f);//감지 딜레이 
-    [SerializeField] WaitForSeconds animeDelay = new WaitForSeconds(0.5f);//애니메이션 딜레이 
+    [SerializeField] private float detectSeconds = 1f;      //감지 딜레이 
+    [SerializeField] private float animeSeconds = 0.5f;     //애니메이션 딜레이 
     int playerLayer;
     int WaypointLayer;   
     Coroutine detectPlayerCoroutine; //감지 코루틴  변수
+    bool isAlive = true;
 
     private void Awake()
     {
@@ -31,6 +32,8 @@ public class SkeletonWarrior : Monster
     }
     private void FixedUpdate()
     {
+        if (!isAlive) return;
+
         agent.speed = stats.GetStat(StatType.MoveSpeed);
 
         if (isDetectTarget) //감지했을 때
@@ -136,12 +139,18 @@ public class SkeletonWarrior : Monster
     {
         monsterAnimator.SetTrigger("GetDamage");
         stats.ModifyStat(StatType.HP, -damage);
+        Debug.Log($"적 hp: {stats.GetStat(StatType.HP)}");
 
         if (stats.GetStat(StatType.HP) <= 0)
         {
-            monsterAnimator.SetTrigger("Die");
-            Destroy(this);
+            isAlive = false;
+            monsterAnimator.SetBool("Dead", true);
         }
+    }
+
+    public void DestroyMonster()
+    {
+        Destroy(gameObject);
     }
 
     /// <summary>
@@ -159,8 +168,7 @@ public class SkeletonWarrior : Monster
             previousWaypoint = targetWaypoint; //이전 목적지에 현재 목적지 저장                        
 
             while (true && isDetectTarget == false)
-            {
-                Debug.Log(waypoints.Count);            
+            {     
                 if (waypoints.Count <= 1) //목적지가 하나밖에 없으면
                     break;
 
@@ -224,7 +232,7 @@ public class SkeletonWarrior : Monster
             {
                 isDetectTarget = false;
             }
-            yield return detectDelay;
+            yield return CoroutineManager.waitForSeconds(detectSeconds);
         }
     }
 
@@ -245,7 +253,7 @@ public class SkeletonWarrior : Monster
             yield return null;
         }
         agent.isStopped = false; //애니메이션 재생 끝나면 다시 이동 가능
-        yield return animeDelay;
+        yield return CoroutineManager.waitForSeconds(animeSeconds);
     } 
 
     private IEnumerator AttackDelay()

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum GameState
 {
@@ -48,5 +49,21 @@ public class GameManager : Singleton<GameManager>
     private void Awake()
     {
         SingletonInit();
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.F1))
+        {
+            SceneManager.LoadScene("TitleScene");
+        }
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            SceneManager.LoadScene("BaseScene");
+        }
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            SceneManager.LoadScene("DungeonScene");
+        }
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //존 상태를 관리하는 매니저
-public class ZoneManager : MonoBehaviour
+public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
 {
     //존 상태
     public enum ZoneState
@@ -44,6 +44,9 @@ public class ZoneManager : MonoBehaviour
         [HideInInspector] public ZoneState state = ZoneState.Normal;
         [HideInInspector] public GameObject lockedEffectInstance;
     }
+
+    //게임 시간 관리 클래스
+    [SerializeField] private TimerFunc timerFunc;
 
     //존 리스트
     [Header("Zone Settings")]
@@ -115,7 +118,10 @@ public class ZoneManager : MonoBehaviour
     //시작 시 스케줄 시작
     private void Start()
     {
-        StartCoroutine(LockSchedulerLoop());
+        if(timerFunc != null)
+        {
+            timerFunc.addDangerousTimeEvent(this);
+        }
         NotifyZonesUpdated();
     }
 
@@ -132,8 +138,6 @@ public class ZoneManager : MonoBehaviour
     //일정 시간마다 잠금 스케줄 실행
     private IEnumerator LockSchedulerLoop()
     {
-        WaitForSeconds wait = new WaitForSeconds(timeBetweenLocks);
-
         while (true)
         {
             if (AllLocked() == true)
@@ -142,7 +146,7 @@ public class ZoneManager : MonoBehaviour
                 yield break;
             }
 
-            yield return wait;
+            yield return CoroutineManager.waitForSeconds(timeBetweenLocks);
 
             Zone target = GetRandomNormalZone();
             if (target == null)
@@ -166,7 +170,7 @@ public class ZoneManager : MonoBehaviour
     //경고 후 잠금
     private IEnumerator WarningThenLock(Zone z)
     {
-        yield return new WaitForSeconds(warningDuration);
+        yield return CoroutineManager.waitForSeconds(warningDuration);
 
         if (z.state == ZoneState.Warning)
         {
@@ -337,5 +341,10 @@ public class ZoneManager : MonoBehaviour
         {
             OnZonesUpdated();
         }
+    }
+
+    public void OnDangerousTimeReached()
+    {
+        StartCoroutine(LockSchedulerLoop());
     }
 }

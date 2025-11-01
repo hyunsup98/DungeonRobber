@@ -12,7 +12,7 @@ public class TimerFunc : Singleton<TimerFunc> //싱글톤으로 구현
     int minute, hour; 
     bool isnotify; //위험 시간 알림 했는지
 
-    List<IDangerousTimeObserver> dangerousTimeObserver = new List<IDangerousTimeObserver>(); //위험 시간일떄 하는 행동리스트 
+    List<IDangerousTimeObserver> dangerousTimeObserver = new List<IDangerousTimeObserver>(); //위험 시간일떄 하는 행동리스트
     List<IGameTimerObserver> gameTimerObserver  = new List<IGameTimerObserver>(); //시간 변경시 하는 행동리스트
 
     public void addDangerousTimeEvent(IDangerousTimeObserver observer) => dangerousTimeObserver.Add(observer);
