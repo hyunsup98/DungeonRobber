@@ -44,9 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a3e458b56f508745949b6df59ab93ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  zoneManager: {fileID: 0}
+  zoneManager: {fileID: 7625713682982165177, guid: 9d447a9c4769fe34ea59e363907aa9b7, type: 3}
   playerTransform: {fileID: 0}
-  minimapCanvasPrefab: {fileID: 0}
+  minimapCanvasPrefab: {fileID: 7265598898277835913, guid: 8502da5c2ba96a648a1f89eb88f4dbd3, type: 3}
   worldMin: {x: -50, y: -50}
   worldMax: {x: 50, y: 50}
   zoneSpriteSets:
