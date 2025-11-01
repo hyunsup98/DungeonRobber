@@ -5,7 +5,7 @@ using System;
 /// <summary>
 /// 타이머의 UI를 설정해주는 스크립트 
 /// </summary>
-public class TimerUI: MonoBehaviour,IGameTimerObserver
+public class TimerUI: MonoBehaviour, IGameTimerObserver
 {
     [SerializeField] TextMeshProUGUI timeText;
     [SerializeField] TimerFunc timerFunc;
@@ -22,7 +22,7 @@ public class TimerUI: MonoBehaviour,IGameTimerObserver
 
     public void OnTimerChanged(int minute, int hour)
     {
-        if (hour >= 12)
+        if (hour >= 12) //오후인가?
         {
             timeText.text = string.Format($"PM {hour:D2}:{minute:D2}");
         }
