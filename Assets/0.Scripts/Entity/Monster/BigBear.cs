@@ -20,6 +20,12 @@ public class BigBear : Monster
     {
         Init();
     }
+
+    private void Start()
+    {
+        attackDelaytime = new WaitForSeconds(stats.GetStat(StatType.AttackDelay));
+    }
+    
     private void FixedUpdate()
     {
         agent.speed = stats.GetStat(StatType.MoveSpeed);

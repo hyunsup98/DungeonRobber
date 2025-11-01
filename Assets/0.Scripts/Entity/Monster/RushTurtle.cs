@@ -1,18 +1,15 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.Android.Types;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Animations;
 
-public class SkeletonWarrior : Monster
+
+public class RushTurtle : Monster
 {
     [SerializeField] WaitForSeconds detectDelay = new WaitForSeconds(1f);//감지 딜레이 
     [SerializeField] WaitForSeconds animeDelay = new WaitForSeconds(0.5f);//애니메이션 딜레이 
+    [SerializeField] BaseBuff stunned; //스턴  
     int playerLayer;
     int WaypointLayer;   
+    bool isCanMove;
     Coroutine detectPlayerCoroutine; //감지 코루틴  변수
 
     private void Awake()
@@ -24,10 +21,6 @@ public class SkeletonWarrior : Monster
     {
         Init();
         StartCoroutine(WaitAnimationEnd("Spawn")); //스폰 애니메이션 종료까지 대기     
-    }
-    private void Start()
-    {
-        attackDelaytime = new WaitForSeconds(stats.GetStat(StatType.AttackDelay));
     }
     private void FixedUpdate()
     {
@@ -73,22 +66,21 @@ public class SkeletonWarrior : Monster
 
     protected override void Attack()
     {
-        if(!isAttackCooltime)//공격 쿨타임이 아닐때 
+        isCanMove = true;
+        if (!isAttackCooltime && isCanMove)//공격 쿨타임이 아닐때 
         {
-            SetMoveBool(false); //이동 멈춤
-            monsterAnimator.SetTrigger("Attack");
             StartCoroutine(AttackDelay());
         }
     }
     
-    public void AttackPlayer()
+
+    void OnTriggerEnter(Collider other)
     {
-       if(Vector3.SqrMagnitude(target.transform.position - transform.position) <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange))
-        {
-            target.GetComponentInParent<Entity>().GetDamage(stats.GetStat(StatType.AttackDamage)); 
-        }
-                     
+       
+
     }
+
+
 
     /// <summary>
     /// 감지했을 때 취하는 행동 메서드
@@ -101,7 +93,7 @@ public class SkeletonWarrior : Monster
         transform.LookAt(target.transform.position); //타겟 바라보기
         bool isPlayerinhit = false;
 
-        if (targetDistance <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange)) //공격 사거리안에 들어오면 공격시작 
+          if (targetDistance <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange)) //공격 사거리안에 들어오면 공격시작 
         {
             RaycastHit[] hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0.5f, 0.5f), transform.forward, transform.rotation, stats.GetStat(StatType.AttackRange), obstacleLayer | targetLayer);
             //▼ 플레이어가 장애물 뒤에 숨어있지 않고 공격범위 내라면 
@@ -134,12 +126,12 @@ public class SkeletonWarrior : Monster
     /// <param name="damage"> 해당 몬스터가 입을 피해 </param>
     public override void GetDamage(float damage)
     {
-        monsterAnimator.SetTrigger("GetDamage");
+        
         stats.ModifyStat(StatType.HP, -damage);
 
         if (stats.GetStat(StatType.HP) <= 0)
         {
-            monsterAnimator.SetTrigger("Die");
+            
             Destroy(this);
         }
     }
@@ -180,7 +172,7 @@ public class SkeletonWarrior : Monster
     void SetMoveBool(bool toSetBool)
     {
         agent.isStopped = !toSetBool;
-        monsterAnimator.SetBool("isWalk", toSetBool);
+        
     }
 
 
