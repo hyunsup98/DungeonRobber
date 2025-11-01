@@ -83,6 +83,6 @@ Material:
     m_Colors:
     - _Color: {r: 0, g: 0, b: 0, a: 0.47058824}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _PlayerForward: {r: -0.85970473, g: 0.25240692, b: 0.4440673, a: 0}
-    - _PlayerPos: {r: 16.184792, g: -2.087317, b: -13.134502, a: 0}
+    - _PlayerForward: {r: -0.8635905, g: 0.2505461, b: 0.43753228, a: 0}
+    - _PlayerPos: {r: 4.483192, g: -2.032746, b: 22.846031, a: 0}
   m_BuildTextureStacks: []
