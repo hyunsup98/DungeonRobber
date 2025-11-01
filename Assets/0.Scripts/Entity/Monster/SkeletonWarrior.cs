@@ -69,8 +69,12 @@ public class SkeletonWarrior : Monster
 
     protected override void Attack()
     {
-        SetMoveBool(false); //이동 멈춤
-        monsterAnimator.SetTrigger("Attack");
+        if(!isAttackCooltime)//공격 쿨타임이 아닐때 
+        {
+            SetMoveBool(false); //이동 멈춤
+            monsterAnimator.SetTrigger("Attack");
+            StartCoroutine(AttackDelay());
+        }
     }
     
     public void AttackPlayer()
@@ -183,7 +187,6 @@ public class SkeletonWarrior : Monster
     /// <returns></returns>
     protected override IEnumerator DetectTarget()
     {
-        
         bool foundTarget;
         while (true)
         {
@@ -220,7 +223,7 @@ public class SkeletonWarrior : Monster
             yield return detectDelay;
         }
     }
-    
+
     /// <summary>
     /// 애니메이션 종료 대기 코루틴
     /// </summary>
@@ -239,5 +242,15 @@ public class SkeletonWarrior : Monster
         }
         agent.isStopped = false; //애니메이션 재생 끝나면 다시 이동 가능
         yield return animeDelay;
-    }          
+    } 
+
+    private IEnumerator AttackDelay()
+    {
+        isAttackCooltime = true;
+
+        yield return attackDelaytime;
+
+        isAttackCooltime = false;
+    }
+             
 }

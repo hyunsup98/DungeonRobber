@@ -27,10 +27,14 @@ public abstract class Monster : Entity
     [SerializeField] protected Transform targetWaypoint; // 현재 목적지 위치 
     [SerializeField] protected Collider[] colliders; // 감지된 물체 넣어놓는 배열
     [SerializeField] protected List<Transform> waypoints; //순찰 지점들 저장용 리스트
+
+    [Header("이 아래는 하위 몬스터가 가지고 있는 로컬 변수")]
     
 
     protected RaycastHit rayhit; //레이캐스트 히트 정보 저장용 변수   
     protected bool isDetectTarget = false; //감지했는가를 나타내는 변수 
+    protected bool isAttackCooltime = false; //공격 쿨타임인지를 나타내는 변수
+    protected WaitForSeconds attackDelaytime; //공격 딜레이 시간 
     protected LayerMask detectLayer;
     
 
@@ -46,6 +50,7 @@ public abstract class Monster : Entity
         detectLayer |= destinationLayer; //detectLayer에 destinationLayer속 레이어 추가
         detectLayer |= targetLayer;
         waypoints = new List<Transform>();
+        
     }
 
 }
