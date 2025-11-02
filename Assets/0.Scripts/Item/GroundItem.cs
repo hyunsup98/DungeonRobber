@@ -10,6 +10,7 @@ public class GroundItem : MonoBehaviour
 
     [Header("설정")]
     [SerializeField] private float pickupRange = 2f;
+    public float PickupRange => pickupRange; // 외부 접근을 위해 프로퍼티 추가
     [SerializeField] private float rotationSpeed = 60f;
     [SerializeField] private bool autoRotate = true;
 

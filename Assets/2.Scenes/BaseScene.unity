@@ -15585,7 +15585,7 @@ PrefabInstance:
     - target: {fileID: 1409478471627055454, guid: 0e8367e8d2d86064db568f3549241e00, type: 3}
       propertyPath: groundItemPrefab
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 7290317975778534051, guid: 2c961574b6df34147a7c192713631342, type: 3}
     - target: {fileID: 7097844912244019975, guid: 0e8367e8d2d86064db568f3549241e00, type: 3}
       propertyPath: m_Name
       value: chest

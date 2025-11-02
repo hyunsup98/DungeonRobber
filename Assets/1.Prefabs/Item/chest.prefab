@@ -89,7 +89,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3f29d4d9a2f1bf642b2682a3b6635c67, type: 2}
   - {fileID: 11400000, guid: 4a75ac14be5f28548b4e8e1e931e8126, type: 2}
   - {fileID: 11400000, guid: 3f29d4d9a2f1bf642b2682a3b6635c67, type: 2}
-  groundItemPrefab: {fileID: 0}
+  groundItemPrefab: {fileID: 7290317975778534051, guid: 2c961574b6df34147a7c192713631342, type: 3}
   isOpened: 0
   isSpawning: 0
 --- !u!65 &722141780068522892

@@ -93,6 +93,12 @@ public class TreasureChest : MonoBehaviour
             collider.isTrigger = false; // 물리 상호작용을 위해 false
         }
         
+        // 빛나는 Material 설정
+        SetupGlowingMaterial(mesh);
+        
+        // 작은 빛 추가
+        SetupItemLight(prefab);
+        
         // Rigidbody 추가 (튀어나가기 위해)
         Rigidbody rb = prefab.AddComponent<Rigidbody>();
         rb.useGravity = true;
@@ -101,6 +107,40 @@ public class TreasureChest : MonoBehaviour
         
         groundItemPrefab = prefab;
         prefab.SetActive(false); // 프리팹이므로 비활성화
+    }
+    
+    /// <summary>
+    /// 빛나는 Material을 설정합니다.
+    /// </summary>
+    private void SetupGlowingMaterial(GameObject meshObj)
+    {
+        Renderer renderer = meshObj.GetComponent<Renderer>();
+        if (renderer == null)
+            return;
+        
+        // 새로운 Material 생성 또는 기존 Material 복사
+        Material mat = new Material(Shader.Find("Standard"));
+        mat.EnableKeyword("_EMISSION");
+        
+        // Emission 색상 설정 (아이템이 빛나게)
+        Color emissionColor = new Color(1f, 0.8f, 0.3f, 1f); // 황금색 빛
+        mat.SetColor("_EmissionColor", emissionColor);
+        mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+        
+        renderer.material = mat;
+    }
+    
+    /// <summary>
+    /// 아이템에 작은 빛을 추가합니다.
+    /// </summary>
+    private void SetupItemLight(GameObject itemObj)
+    {
+        Light light = itemObj.AddComponent<Light>();
+        light.type = LightType.Point;
+        light.color = new Color(1f, 0.8f, 0.3f, 1f); // 황금색
+        light.range = 3f; // 작은 범위
+        light.intensity = 1.5f;
+        light.shadows = LightShadows.None; // 성능을 위해 그림자 없음
     }
     
     /// <summary>
@@ -138,7 +178,7 @@ public class TreasureChest : MonoBehaviour
                 continue;
             
             // GroundItem 생성 (상자 위치의 약간 위에서)
-            Vector3 spawnPosition = transform.position + Vector3.up * 0.5f;
+            Vector3 spawnPosition = transform.position + Vector3.up * 2f;
             GameObject groundItemObj = Instantiate(groundItemPrefab, spawnPosition, Quaternion.identity);
             groundItemObj.SetActive(true);
             
@@ -152,6 +192,9 @@ public class TreasureChest : MonoBehaviour
             {
                 Debug.LogWarning("TreasureChest: GroundItem 컴포넌트를 찾을 수 없습니다.");
             }
+            
+            // 빛나는 효과 확인 및 추가 (프리팹에 없을 경우)
+            EnsureGlowingEffect(groundItemObj);
             
             // Rigidbody 확인 및 추가
             EnsureRigidbody(groundItemObj);
@@ -193,6 +236,40 @@ public class TreasureChest : MonoBehaviour
         }
         
         return selected;
+    }
+    
+    /// <summary>
+    /// GroundItem에 빛나는 효과가 있는지 확인하고 없으면 추가합니다.
+    /// </summary>
+    private void EnsureGlowingEffect(GameObject itemObj)
+    {
+        // Light 컴포넌트 확인
+        Light light = itemObj.GetComponent<Light>();
+        if (light == null)
+        {
+            SetupItemLight(itemObj);
+        }
+        
+        // Material Emission 확인
+        Renderer renderer = itemObj.GetComponentInChildren<Renderer>();
+        if (renderer != null && renderer.material != null)
+        {
+            Material mat = renderer.material;
+            // Emission이 활성화되어 있는지 확인
+            if (!mat.IsKeywordEnabled("_EMISSION"))
+            {
+                SetupGlowingMaterial(renderer.gameObject);
+            }
+        }
+        else
+        {
+            // Renderer가 없으면 찾아서 설정
+            Renderer childRenderer = itemObj.GetComponentInChildren<Renderer>();
+            if (childRenderer != null)
+            {
+                SetupGlowingMaterial(childRenderer.gameObject);
+            }
+        }
     }
     
     /// <summary>
