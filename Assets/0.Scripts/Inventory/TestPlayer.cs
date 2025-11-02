@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class TestPlayer : MonoBehaviour
+public class TestPlayer : Entity
 {
     [Header("인벤토리")]
     public Inventory inventory;
@@ -18,17 +18,117 @@ public class TestPlayer : MonoBehaviour
     [SerializeField] private float interactionRange = 3f;
     
     private GameObject currentNearbyShop = null;
-    
-    [Header("버프 시스템")]
-    [SerializeField] private BaseStat stats = new BaseStat();
-    private BuffManager buffManager = new BuffManager();
 
     void Awake()
     {
-        // 스탯 초기화
+        // Entity의 Init() 호출
+        Init();
+        
+        // 스탯 초기화 (Entity의 Init()에서 이미 호출되었지만, baseStats 설정 후 다시 호출)
         stats.Init();
+        
+        // Init() 후 stats 리스트가 제대로 초기화되었는지 확인
+        ValidateAndFixStats();
     }
-
+    
+    // Entity 추상 메서드 구현
+    protected override void Attack()
+    {
+        // TestPlayer는 공격 기능이 없으므로 빈 구현
+    }
+    
+    public override void GetDamage(float damage)
+    {
+        // TestPlayer는 피해 기능이 없으므로 빈 구현
+    }
+    
+    /// <summary>
+    /// Init() 후 stats 리스트가 제대로 초기화되었는지 확인하고 수정합니다.
+    /// 모든 필수 StatType이 있는지 확인하고 없으면 추가합니다.
+    /// </summary>
+    private void ValidateAndFixStats()
+    {
+        // stats 필드에 직접 접근
+        var statsField = typeof(BaseStat).GetField("stats", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var baseStatsField = typeof(BaseStat).GetField("baseStats", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        
+        if (statsField != null && baseStatsField != null)
+        {
+            var statsList = statsField.GetValue(stats) as System.Collections.Generic.List<Stat>;
+            var baseStatsList = baseStatsField.GetValue(stats) as System.Collections.Generic.List<Stat>;
+            
+            if (statsList == null || baseStatsList == null)
+                return;
+            
+            // 필수 StatType 목록
+            StatType[] requiredStatTypes = {
+                StatType.HP,
+                StatType.MoveSpeed,
+                StatType.AttackDamage,
+                StatType.AttackRange,
+                StatType.AttackDelay
+            };
+            
+            // 각 필수 StatType이 stats에 있는지 확인하고 없으면 추가
+            bool hasAddedAny = false;
+            foreach (var statType in requiredStatTypes)
+            {
+                // stats 리스트에 해당 StatType이 있는지 확인
+                bool existsInStats = statsList.Exists(s => s.Type == statType);
+                
+                if (!existsInStats)
+                {
+                    // baseStats에서 찾아보기
+                    Stat baseStat = baseStatsList.Find(s => s.Type == statType);
+                    
+                    if (baseStat != null)
+                    {
+                        // baseStats에 있으면 그 값을 사용
+                        statsList.Add(new Stat(statType, baseStat.Value));
+                    }
+                    else
+                    {
+                        // baseStats에도 없으면 기본값 사용
+                        float defaultValue = GetDefaultStatValue(statType);
+                        statsList.Add(new Stat(statType, defaultValue));
+                        // baseStats에도 추가 (나중을 위해)
+                        baseStatsList.Add(new Stat(statType, defaultValue));
+                    }
+                    hasAddedAny = true;
+                }
+            }
+            
+            if (hasAddedAny)
+            {
+                Debug.Log("TestPlayer: 누락된 스탯을 추가했습니다.");
+            }
+        }
+    }
+    
+    /// <summary>
+    /// StatType에 따른 기본값을 반환합니다.
+    /// </summary>
+    private float GetDefaultStatValue(StatType type)
+    {
+        switch (type)
+        {
+            case StatType.HP:
+                return 100f;
+            case StatType.MoveSpeed:
+                return 5f;
+            case StatType.AttackDamage:
+                return 10f;
+            case StatType.AttackRange:
+                return 2f;
+            case StatType.AttackDelay:
+                return 1f;
+            default:
+                return 0f;
+        }
+    }
+    
     void Update()
     {
         // 마우스 우클릭 (아이템 획득)
@@ -199,8 +299,18 @@ public class TestPlayer : MonoBehaviour
             // 일반 아이템 버프 적용
             if (item.useBuff != null)
             {
-                buffManager.ApplyBuff(item.useBuff, stats);
-                Debug.Log($"'{item.itemName}' 버프 효과가 적용되었습니다!");
+                // 버프 적용 전에 스탯이 제대로 초기화되었는지 확인
+                EnsureStatsInitialized();
+                
+                try
+                {
+                    ApplyBuffToEntity(item.useBuff);
+                    Debug.Log($"'{item.itemName}' 버프 효과가 적용되었습니다!");
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"'{item.itemName}' 버프 적용 중 오류 발생: {e.Message}");
+                }
             }
             else
             {
@@ -303,8 +413,26 @@ public class TestPlayer : MonoBehaviour
     {
         if (buff != null)
         {
-            buffManager.ApplyBuff(buff, stats);
+            // 버프 적용 전에 스탯이 제대로 초기화되었는지 확인
+            EnsureStatsInitialized();
+            
+            try
+            {
+                ApplyBuffToEntity(buff);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"버프 적용 중 오류 발생: {e.Message}");
+            }
         }
+    }
+    
+    /// <summary>
+    /// 스탯이 제대로 초기화되었는지 확인하고, 필요시 초기화합니다.
+    /// </summary>
+    private void EnsureStatsInitialized()
+    {
+        ValidateAndFixStats();
     }
 
     //void HitCheckObject(RaycastHit hit3D)

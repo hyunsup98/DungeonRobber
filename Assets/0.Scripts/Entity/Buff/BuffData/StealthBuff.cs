@@ -15,20 +15,14 @@ public class StealthBuff : BaseBuff
         // 플레이어 오브젝트 찾기
         if (playerObject == null)
         {
-            // 테스트 플레이어 찾기 (나중엔 플레이어 컨트롤러로 변경 예정)
-            TestPlayer testPlayer = FindObjectOfType<TestPlayer>(); 
-            if (testPlayer != null)
+            // Player_Controller 찾기
+            Player_Controller player = Player_Controller.Instance;
+            if (player == null)
+                player = FindObjectOfType<Player_Controller>();
+            
+            if (player != null)
             {
-                playerObject = testPlayer.gameObject;
-            }
-            else
-            {
-                // TestPlayer가 없으면 Player_Controller 찾기
-                Player_Controller player = FindObjectOfType<Player_Controller>();
-                if (player != null)
-                {
-                    playerObject = player.gameObject;
-                }
+                playerObject = player.gameObject;
             }
         }
 

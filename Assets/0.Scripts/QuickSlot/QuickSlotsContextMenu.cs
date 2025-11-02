@@ -193,8 +193,11 @@ public class QuickSlotsContextMenu : MonoBehaviour
         // 아이템 버프 적용
         if (currentItem.useBuff != null)
         {
-            // TestPlayer 찾아서 버프 적용
-            TestPlayer player = FindObjectOfType<TestPlayer>();
+            // Player_Controller 찾아서 버프 적용
+            Player_Controller player = Player_Controller.Instance;
+            if (player == null)
+                player = FindObjectOfType<Player_Controller>();
+            
             if (player != null)
             {
                 player.ApplyItemBuff(currentItem.useBuff);
@@ -202,7 +205,7 @@ public class QuickSlotsContextMenu : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("TestPlayer를 찾을 수 없습니다!");
+                Debug.LogWarning("Player_Controller를 찾을 수 없습니다!");
             }
         }
         else

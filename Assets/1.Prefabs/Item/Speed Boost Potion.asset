@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Speed Boost Potion
   m_EditorClassIdentifier: 
   itemName: "\uAC00\uC18D \uD3EC\uC158"
-  description: "\uB9C8\uC2DC\uBA74 "
+  description: "\uB9C8\uC2DC\uBA74 \uC7A0\uC2DC \uB3D9\uC548 \uBE60\uB974\uAC8C \uC6C0\uC9C1\uC77C
+    \uC218 \uC788\uAC8C \uB418\uB294 \uBB3C\uC57D."
   itemType: 2
   buyPrice: 100
   sellPrice: 50
