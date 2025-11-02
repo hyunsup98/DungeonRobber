@@ -3,21 +3,32 @@ using UnityEngine.SceneManagement;
 
 public class UI_PauseMenu : MonoBehaviour
 {
-    //°ÔÀÓ Àç°³ ¹öÆ° Å¬¸¯
+    //ê²Œì„ ì¬ê°œ ë²„íŠ¼ í´ë¦­
     public void OnClickResume()
     {
-
+        gameObject.SetActive(false);
     }
 
-    //¼¼ÆÃ ¹öÆ° Å¬¸¯
+    //ì„¸íŒ… ë²„íŠ¼ í´ë¦­
     public void OnClickSetting()
     {
         UIManager.Instance.OnOffUI(UIManager.Instance.settings.gameObject, true);
     }
 
-    //Å¸ÀÌÆ² °¡±â ¹öÆ° Å¬¸¯
+    //íƒ€ì´í‹€ ê°€ê¸° ë²„íŠ¼ í´ë¦­
     public void OnClickTitle()
     {
-        SceneManager.LoadScene("TitleScene");
+        gameObject.SetActive(false);
+        GameManager.Instance.CurrentGameState = GameState.Title;
+    }
+
+    private void OnEnable()
+    {
+        Time.timeScale = 0f;
+    }
+
+    private void OnDisable()
+    {
+        Time.timeScale = 1f;
     }
 }
