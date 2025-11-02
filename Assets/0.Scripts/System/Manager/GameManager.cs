@@ -4,19 +4,20 @@ using UnityEngine.SceneManagement;
 
 public enum GameState
 {
-    Title,          //Å¸ÀÌÆ² ¾À »óÅÂ
-    Base,           //º£ÀÌ½º ¾À »óÅÂ
-    Dungeon,        //´øÀü(ÀÎ°ÔÀÓ) »óÅÂ
-    Pause           //ÀÏ½ÃÁ¤Áö »óÅÂ
+    Title,          //íƒ€ì´í‹€ ì”¬ ìƒíƒœ
+    Base,           //ë² ì´ìŠ¤ ì”¬ ìƒíƒœ
+    Dungeon,        //ë˜ì „(ì¸ê²Œì„) ìƒíƒœ
+    Pause           //ì¼ì‹œì •ì§€ ìƒíƒœ
 }
 
 public class GameManager : Singleton<GameManager>
 {
-    #region °ÔÀÓ »óÅÂ °ü¸® µ¨¸®°ÔÀÌÆ® ¹× ÇÁ·ÎÆÛÆ¼
-    public event Action onGameStateTitle;       //GameState°¡ TitleÀÌ µÇ¾úÀ» ¶§ ½ÇÇàÇÒ ¾×¼Ç
-    public event Action onGameStateBase;        //GameState°¡ Base°¡ µÇ¾úÀ» ¶§ ½ÇÇàÇÒ ¾×¼Ç
-    public event Action onGameStateDungeon;     //GameState°¡ DungeonÀÌ µÇ¾úÀ» ¶§ ½ÇÇàÇÒ ¾×¼Ç
-    public event Action onGameStatePause;       //GameState°¡ Pause°¡ µÇ¾úÀ» ¶§ ½ÇÇàÇÒ ¾×¼Ç
+    #region ê²Œì„ ìƒíƒœ ê´€ë¦¬ ë¸ë¦¬ê²Œì´íŠ¸ ë° í”„ë¡œí¼í‹°
+    public event Action onSceneChanged;         //ì–´ë–¤ ì”¬ì´ë“  ë³€ê²½ë˜ì—ˆì„ ë•Œ ì‹¤í–‰í•  ì•¡ì…˜ ì´ë²¤íŠ¸
+    public event Action onGameStateTitle;       //GameStateê°€ Titleì´ ë˜ì—ˆì„ ë•Œ ì‹¤í–‰í•  ì•¡ì…˜ ì´ë²¤íŠ¸
+    public event Action onGameStateBase;        //GameStateê°€ Baseê°€ ë˜ì—ˆì„ ë•Œ ì‹¤í–‰í•  ì•¡ì…˜ ì´ë²¤íŠ¸
+    public event Action onGameStateDungeon;     //GameStateê°€ Dungeonì´ ë˜ì—ˆì„ ë•Œ ì‹¤í–‰í•  ì•¡ì…˜ ì´ë²¤íŠ¸
+    public event Action onGameStatePause;       //GameStateê°€ Pauseê°€ ë˜ì—ˆì„ ë•Œ ì‹¤í–‰í•  ì•¡ì…˜ ì´ë²¤íŠ¸
 
     private GameState currentGameState;
     public GameState CurrentGameState
@@ -28,20 +29,25 @@ public class GameManager : Singleton<GameManager>
 
             if(value == GameState.Title)
             {
+                SceneManager.LoadScene("TitleScene");
                 onGameStateTitle?.Invoke();
             }
             else if(value == GameState.Base)
             {
+                SceneManager.LoadScene("BaseScene");
                 onGameStateBase?.Invoke();
             }
             else if(value == GameState.Dungeon)
             {
+                SceneManager.LoadScene("DungeonScene");
                 onGameStateDungeon?.Invoke();
             }
             else if(value == GameState.Pause)
             {
                 onGameStatePause?.Invoke();
             }
+
+            currentGameState = value;
         }
     }
     #endregion
@@ -51,19 +57,4 @@ public class GameManager : Singleton<GameManager>
         SingletonInit();
     }
 
-    private void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.F1))
-        {
-            SceneManager.LoadScene("TitleScene");
-        }
-        if (Input.GetKeyDown(KeyCode.F2))
-        {
-            SceneManager.LoadScene("BaseScene");
-        }
-        if (Input.GetKeyDown(KeyCode.F3))
-        {
-            SceneManager.LoadScene("DungeonScene");
-        }
-    }
 }

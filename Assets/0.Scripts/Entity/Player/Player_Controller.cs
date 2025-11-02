@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [System.Flags]
 public enum PlayerBehaviorState : int
@@ -100,10 +101,12 @@ public sealed partial class Player_Controller : Entity
     private void Start()
     {
         playerDeadAction += Dead;
+        GameManager.Instance.onSceneChanged += Init;
     }
 
     private void Update()
     {
+        if (GameManager.Instance.CurrentGameState == GameState.Title || GameManager.Instance.CurrentGameState == GameState.Pause) return;
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
 
@@ -121,15 +124,11 @@ public sealed partial class Player_Controller : Entity
 
         //스태미너 회복
         RecoveryStamina();
-
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            GetDamage(5f);
-        }
     }
 
     private void FixedUpdate()
     {
+        if (GameManager.Instance.CurrentGameState == GameState.Title || GameManager.Instance.CurrentGameState == GameState.Pause) return;
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
         //이동

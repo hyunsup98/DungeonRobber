@@ -1,20 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class StageManager : MonoBehaviour
 {
-    [SerializeField] private AudioClip bgmClip;     //°¢ ¾ÀÀÌ ½ÃÀÛµÉ ¶§ ½ÇÇàÇÒ BGM Å¬¸³
+    [SerializeField] private AudioClip bgmClip;     //ê° ì”¬ì´ ì‹œì‘ë  ë•Œ ì‹¤í–‰í•  BGM í´ë¦½
+    [SerializeField] private Transform spawnPos;    //í”Œë ˆì´ì–´ê°€ ì²˜ìŒì— ì‹œì‘í•  ìœ„ì¹˜
 
     private void Start()
     {
         PlayBGM();
+        if(Player_Controller.Instance != null && spawnPos != null)
+        {
+            Player_Controller.Instance.transform.position = spawnPos.position;
+        }
     }
 
     private void PlayBGM()
     {
         if (bgmClip == null) return;
 
-        SoundManager.Instance.PlayBGM(bgmClip, 0.3f);
+        SoundManager.Instance.PlayBGM(bgmClip);
     }
 }

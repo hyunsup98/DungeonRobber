@@ -59,4 +59,39 @@ public class UIManager : Singleton<UIManager>
 
         obj.SetActive(activeSelf);
     }
+
+    private void UpdateUIByTitleScene()
+    {
+        OnOffUI(playerStat.gameObject, false);
+    }
+
+    private void UpdateUIByBaseScene()
+    {
+        OnOffUI(playerStat.gameObject, true);
+    }
+
+    private void UpdateUIByDungeonScene()
+    {
+        OnOffUI(playerStat.gameObject, true);
+    }
+
+    private void OnEnable()
+    {
+        if(GameManager.Instance != null)
+        {
+            GameManager.Instance.onGameStateTitle += UpdateUIByTitleScene;
+            GameManager.Instance.onGameStateBase += UpdateUIByBaseScene;
+            GameManager.Instance.onGameStateDungeon += UpdateUIByDungeonScene;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if(GameManager.Instance != null)
+        {
+            GameManager.Instance.onGameStateTitle -= UpdateUIByTitleScene;
+            GameManager.Instance.onGameStateBase -= UpdateUIByBaseScene;
+            GameManager.Instance.onGameStateDungeon -= UpdateUIByDungeonScene;
+        }
+    }
 }

@@ -1,27 +1,38 @@
 using UnityEngine;
 
 /// <summary>
-/// °¡Àå ÇÏÀ§ÀÇ ÆÄ»ı Å¬·¡½º¿¡¼­ SingletonInit() ¸Ş¼­µå¸¦ ÅëÇØ ½Ì±ÛÅÏ ÃÊ±â ¼¼ÆÃ ¼öÇà
+/// ê°€ì¥ í•˜ìœ„ì˜ íŒŒìƒ í´ë˜ìŠ¤ì—ì„œ SingletonInit() ë©”ì„œë“œë¥¼ í†µí•´ ì‹±ê¸€í„´ ì´ˆê¸° ì„¸íŒ… ìˆ˜í–‰
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
     private static T instance;
+    private static object _lock = new object();
+    private static bool applicationQuit = false;
+
     public static T Instance
     {
         get
         {
-            if (instance == null)
+            if(applicationQuit)
             {
-                instance = FindAnyObjectByType<T>();
+                return null;
+            }
 
+            lock(_lock)
+            {
                 if (instance == null)
                 {
-                    GameObject obj = new GameObject(typeof(T).Name, typeof(T));
-                    instance = obj.AddComponent<T>();
+                    instance = FindAnyObjectByType<T>();
+
+                    if (instance == null)
+                    {
+                        GameObject obj = new GameObject(typeof(T).Name, typeof(T));
+                        instance = obj.AddComponent<T>();
+                    }
                 }
+                return instance;
             }
-            return instance;
         }
     }
 
@@ -45,4 +56,15 @@ public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
     }
+
+    protected virtual void OnApplicationQuit()
+    {
+        applicationQuit = true;
+    }
+
+    protected virtual void OnDestroy()
+    {
+        applicationQuit = true;
+    }
+
 }
