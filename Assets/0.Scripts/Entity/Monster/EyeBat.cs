@@ -4,8 +4,8 @@ using UnityEngine;
 public class EyeBat : Monster
 {
     [SerializeField] BaseBuff slowbuff; //적용할 디버프  
-    [SerializeField] WaitForSeconds detectDelay = new WaitForSeconds(1f);//감지 딜레이 
-    [SerializeField] WaitForSeconds animeDelay = new WaitForSeconds(0.5f);//애니메이션 딜레이 
+    [SerializeField] float detectDelay = 1f;//감지 딜레이 
+    [SerializeField] float  animeDelay = 0.5f;//애니메이션 딜레이 
     
     int playerLayer;
     int WaypointLayer;
@@ -23,7 +23,7 @@ public class EyeBat : Monster
     }
     private void Start()
     {
-        attackDelaytime = new WaitForSeconds(stats.GetStat(StatType.AttackDelay));
+        attackDelaytime = stats.GetStat(StatType.AttackDelay);
     }
     private void FixedUpdate()
     {
@@ -224,7 +224,7 @@ public class EyeBat : Monster
             {
                 isDetectTarget = false;
             }
-            yield return detectDelay;
+            yield return CoroutineManager.waitForSeconds(detectDelay);
         }
     }
 
@@ -245,14 +245,14 @@ public class EyeBat : Monster
             yield return null;
         }
         agent.isStopped = false; //애니메이션 재생 끝나면 다시 이동 가능
-        yield return animeDelay;
+        yield return CoroutineManager.waitForSeconds(animeDelay);
     }
 
     private IEnumerator AttackDelay()
     {
         isAttackCooltime = true;
 
-        yield return attackDelaytime;
+        yield return CoroutineManager.waitForSeconds(attackDelaytime);
 
         isAttackCooltime = false;
     }

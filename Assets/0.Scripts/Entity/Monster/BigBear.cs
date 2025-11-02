@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class BigBear : Monster
 {
-    [SerializeField] WaitForSeconds detectDelay = new WaitForSeconds(1f);//감지 딜레이 
-    [SerializeField] WaitForSeconds animeDelay = new WaitForSeconds(0.5f);//애니메이션 딜레이 
+    [SerializeField] private float detectDelay = 1f;//감지 딜레이 
+    [SerializeField] private float animeDelay = 0.5f;//애니메이션 딜레이 
     Vector3 homePosition;
     bool isHome;//집인지 확인하는 변수
     int playerLayer;
     Coroutine detectPlayerCoroutine; //감지 코루틴 변수
-
+    bool isAlive = true; //생존여부 확인 
     private void Awake()
     {
         awakeinit();
@@ -23,11 +23,13 @@ public class BigBear : Monster
 
     private void Start()
     {
-        attackDelaytime = new WaitForSeconds(stats.GetStat(StatType.AttackDelay));
+        attackDelaytime = stats.GetStat(StatType.AttackDelay);
     }
     
     private void FixedUpdate()
     {
+        if (!isAlive) return;
+
         agent.speed = stats.GetStat(StatType.MoveSpeed);
         
         if (isDetectTarget) //감지했을 때
@@ -136,7 +138,7 @@ public class BigBear : Monster
 
         if (stats.GetStat(StatType.HP) <= 0)
         {
-            
+            isAlive = false;
             Destroy(this);
         }
     }
@@ -232,13 +234,13 @@ public class BigBear : Monster
             yield return null;
         }
         agent.isStopped = false; //애니메이션 재생 끝나면 다시 이동 가능
-        yield return animeDelay;
+        yield return CoroutineManager.waitForSeconds(animeDelay);
     }
     private IEnumerator AttackDelay()
     {
         isAttackCooltime = true;
 
-        yield return attackDelaytime;
+        yield return CoroutineManager.waitForSeconds(attackDelaytime);
 
         isAttackCooltime = false;
     }

@@ -28,7 +28,7 @@ public class SkeletonWarrior : Monster
     }
     private void Start()
     {
-        attackDelaytime = new WaitForSeconds(stats.GetStat(StatType.AttackDelay));
+        attackDelaytime = stats.GetStat(StatType.AttackDelay);
     }
     private void FixedUpdate()
     {
@@ -260,7 +260,7 @@ public class SkeletonWarrior : Monster
     {
         isAttackCooltime = true;
 
-        yield return attackDelaytime;
+        yield return CoroutineManager.waitForSeconds(attackDelaytime);
 
         isAttackCooltime = false;
     }
