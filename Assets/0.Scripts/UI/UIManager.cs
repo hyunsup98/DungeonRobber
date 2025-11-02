@@ -10,12 +10,15 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private GameObject playerStatUI;       //스탯창만 가지는 오브젝트
     private Presenter_PlayerStat presenter_PlayerStat;
 
+    //설정창
+    [field: SerializeField] public UI_Settings settings { get; private set; }       //설정창을 관리하는 클래스
+    private Presenter_Settings presenter_Settings;
+
     #endregion
 
     #region 단순한 기능이라 직접 관리해줄 변수들
 
     [field : SerializeField] public UI_InteractiveMessage textInteractive { get; private set; } //상호작용 키 텍스트 클래스
-    [field : SerializeField] public UI_Settings settings { get; private set; }                  //설정창 클래스
     [field: SerializeField] public UI_PauseMenu pauseMenu { get; private set; }                 //일시정지 메뉴
 
     #endregion
@@ -27,8 +30,10 @@ public class UIManager : Singleton<UIManager>
 
     private void Start()
     {
-        //플레이어 스탯과 스탯 UI를 이어주는 Presenter 클래스 생성
-        presenter_PlayerStat = new Presenter_PlayerStat(Player_Controller.Instance, playerStat);
+        //플레이어 스탯과 스탯 UI를 이어주는 Presenter 클래스 생성, 플레이어가 생길 때 만들기
+        //presenter_PlayerStat = new Presenter_PlayerStat(Player_Controller.Instance, playerStat);
+
+        presenter_Settings = new Presenter_Settings(SoundManager.Instance, settings);
     }
 
     private void Update()

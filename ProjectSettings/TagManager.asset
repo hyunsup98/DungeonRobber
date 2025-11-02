@@ -7,6 +7,9 @@ TagManager:
   - GoldText
   - InvenText
   - Inventory
+  - InvenManager
+  - DragImage
+  - Shopper
   layers:
   - Default
   - TransparentFX

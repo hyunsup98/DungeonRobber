@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/0.Scripts/Item/Item Actions.meta
+guid: f1204857cda483c4c896e84a848a4201
+========
 guid: 56e8501df0513b441a76bccc2b463841
+>>>>>>>> develop:Assets/1.Prefabs/Map.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

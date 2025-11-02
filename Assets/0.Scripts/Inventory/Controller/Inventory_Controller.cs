@@ -1,25 +1,69 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Inventory_Controller
+/// <summary>
+/// ì¸ë²¤í† ë¦¬ ë¹„ì¦ˆë‹ˆìŠ¤ ë¡œì§ ì»¨íŠ¸ë¡¤ëŸ¬
+/// Inventory.csì™€ UIController ì‚¬ì´ì˜ ì¤‘ê°œ ì—­í• 
+/// </summary>
+public class Inventory_Controller : MonoBehaviour
 {
-    // ÀÎº¥Åä¸® °ü·Ã ¸Ş¼­µå
-    // get, add, remove µî
+    [Header("References")]
+    [SerializeField] private Inventory inventory;
+    [SerializeField] private QuickSlot_Controller quickSlots;
 
-    
-    
-    
-    
-    
-    // public ¸Ş¼­µå
+    private void Awake()
+    {
+        // ì°¸ì¡°ê°€ ì—†ìœ¼ë©´ ìë™ìœ¼ë¡œ ì°¾ê¸°
+        if (inventory == null)
+            inventory = FindObjectOfType<Inventory>();
+        
+        if (quickSlots == null)
+            quickSlots = FindObjectOfType<QuickSlot_Controller>();
+
+        // QuickSlotsì— Inventory ì°¸ì¡° ì„¤ì •
+        if (quickSlots != null)
+            quickSlots.inventory = inventory;
+    }
 
     /// <summary>
-    /// ÀÎº¥Åä¸®¿¡ ¾ÆÀÌÅÛÀÌ ÀÖ´ÂÁö È®ÀÎÇÕ´Ï´Ù.
+    /// ì™¸ë¶€ì—ì„œ ì¸ë²¤í† ë¦¬ ì ‘ê·¼
     /// </summary>
-    /// <param name="item"></param>
-    /// <returns>bool ¾ÆÀÌÅÛ Á¸Àç ¿©ºÎ</returns>
-    public bool HasItem(Item item) { return true; }
-    public void AddItem(Item item) { }
-    public void RemoveItem(Item item) { }
+    public Inventory GetInventory()
+    {
+        return inventory;
+    }
+
+    /// <summary>
+    /// ì™¸ë¶€ì—ì„œ í€µìŠ¬ë¡¯ ì ‘ê·¼
+    /// </summary>
+    public QuickSlot_Controller GetQuickSlots()
+    {
+        return quickSlots;
+    }
+
+    /// <summary>
+    /// ì•„ì´í…œì„ ì¸ë²¤í† ë¦¬ì— ì¶”ê°€
+    /// </summary>
+    public bool AddItemToInventory(Item item)
+    {
+        if (inventory != null)
+            return inventory.AddItem(item);
+        
+        return false;
+    }
+
+    /// <summary>
+    /// ì•„ì´í…œì„ í€µìŠ¬ë¡¯ì— ì¶”ê°€
+    /// </summary>
+    public void AddItemToQuickSlots(Item item)
+    {
+        quickSlots?.AddItem(item);
+    }
+
+    /// <summary>
+    /// ì¸ë²¤í† ë¦¬ í† ê¸€
+    /// </summary>
+    public void ToggleInventoryUI()
+    {
+        inventory?.ToggleInventory();
+    }
 }

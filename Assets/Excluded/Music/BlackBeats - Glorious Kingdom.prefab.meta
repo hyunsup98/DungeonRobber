@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/1.Prefabs/QuickSlot.prefab.meta
+guid: 9d9cde76a4f4c26468d19b61cbdaab7b
+========
 guid: fbca36bd1244a094498880d21e913775
+>>>>>>>> develop:Assets/Excluded/Music/BlackBeats - Glorious Kingdom.prefab.meta
 PrefabImporter:
   externalObjects: {}
   userData: 

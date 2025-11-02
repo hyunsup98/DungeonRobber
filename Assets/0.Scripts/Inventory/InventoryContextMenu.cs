@@ -1,19 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// 인벤토리 컨텍스트 메뉴 (우클릭 메뉴)
+/// </summary>
 public class InventoryContextMenu : MonoBehaviour
 {
     public static InventoryContextMenu Instance { get; private set; }
 
     [Header("UI")]
-    [SerializeField] private RectTransform menuRoot; // �޴� ��Ʈ(RectTransform)
+    [SerializeField] private RectTransform menuRoot; // 메뉴 루트(RectTransform)
+    [SerializeField] private Button useButton;
+    [SerializeField] private Button equipButton;
+    [SerializeField] private Button sellButton;
     [SerializeField] private Button addToQuickButton;
     [SerializeField] private Button discardButton;
 
-    [Tooltip("�ɼ�: �����Ϳ��� �Ҵ��ϸ� �ڵ����� ���˴ϴ�. ��������� ��Ÿ�ӿ� Find�մϴ�.")]
+    [Tooltip("옵션: 에디터에서 할당하면 자동으로 찾을 필요가 없습니다. 할당하지 않으면 씬에서 Find합니다.")]
     [SerializeField] private QuickSlot_Controller quickSlots;
+    [SerializeField] private Shop shop;
 
     private Canvas parentCanvas;
     private RectTransform canvasRect;
@@ -31,6 +36,9 @@ public class InventoryContextMenu : MonoBehaviour
         parentCanvas = GetComponentInParent<Canvas>();
         if (parentCanvas != null) canvasRect = parentCanvas.GetComponent<RectTransform>();
 
+        if (useButton != null) useButton.onClick.AddListener(OnUse);
+        if (equipButton != null) equipButton.onClick.AddListener(OnEquip);
+        if (sellButton != null) sellButton.onClick.AddListener(OnSell);
         if (addToQuickButton != null) addToQuickButton.onClick.AddListener(OnAddToQuick);
         if (discardButton != null) discardButton.onClick.AddListener(OnDiscard);
     }
@@ -38,6 +46,9 @@ public class InventoryContextMenu : MonoBehaviour
     void OnDestroy()
     {
         if (Instance == this) Instance = null;
+        if (useButton != null) useButton.onClick.RemoveListener(OnUse);
+        if (equipButton != null) equipButton.onClick.RemoveListener(OnEquip);
+        if (sellButton != null) sellButton.onClick.RemoveListener(OnSell);
         if (addToQuickButton != null) addToQuickButton.onClick.RemoveListener(OnAddToQuick);
         if (discardButton != null) discardButton.onClick.RemoveListener(OnDiscard);
     }
@@ -62,6 +73,11 @@ public class InventoryContextMenu : MonoBehaviour
         currentInventory = slot.ownerInventory ?? slot.GetComponentInParent<Inventory>();
         if (quickSlots == null)
             quickSlots = FindObjectOfType<QuickSlot_Controller>();
+        if (shop == null)
+            shop = FindObjectOfType<Shop>();
+
+        // 버튼 표시/숨김 처리
+        UpdateButtonVisibility();
 
         if (menuRoot != null)
         {
@@ -106,20 +122,92 @@ public class InventoryContextMenu : MonoBehaviour
         menuRoot.position += delta;
     }
 
+    /// <summary>
+    /// 버튼 표시/숨김 처리
+    /// </summary>
+    private void UpdateButtonVisibility()
+    {
+        if (currentItem == null)
+        {
+            if (useButton != null) useButton.gameObject.SetActive(false);
+            if (equipButton != null) equipButton.gameObject.SetActive(false);
+            if (sellButton != null) sellButton.gameObject.SetActive(false);
+            if (addToQuickButton != null) addToQuickButton.gameObject.SetActive(false);
+            if (discardButton != null) discardButton.gameObject.SetActive(false);
+            return;
+        }
+
+        // 사용: Consumable 타입만
+        if (useButton != null)
+            useButton.gameObject.SetActive(currentItem.itemType == Item.ItemType.Consumable);
+
+        // 장비: Weapon, Equipment 타입만
+        if (equipButton != null)
+            equipButton.gameObject.SetActive(currentItem.itemType == Item.ItemType.Weapon || currentItem.itemType == Item.ItemType.Equipment);
+
+        // 판매: 상점 UI가 열려있을 때만
+        if (sellButton != null)
+        {
+            if (shop == null) shop = FindObjectOfType<Shop>();
+            sellButton.gameObject.SetActive(shop != null && shop.IsOpen);
+        }
+
+        // 퀵슬롯: Consumable 타입만
+        if (addToQuickButton != null)
+            addToQuickButton.gameObject.SetActive(currentItem.itemType == Item.ItemType.Consumable);
+
+        // 버리기: 항상 표시
+        if (discardButton != null)
+            discardButton.gameObject.SetActive(true);
+    }
+
+    private void OnUse()
+    {
+        if (currentItem == null) return;
+        
+        // TODO: 실제 효과 구현 (HP 회복, 버프 등)
+        Debug.Log($"'{currentItem.itemName}' 아이템을 사용했습니다!");
+        
+        // 소비 아이템은 개수 감소 또는 제거
+        currentInventory?.RemoveItem(currentSlot.Index);
+        Hide();
+    }
+
+    private void OnEquip()
+    {
+        if (currentItem == null) return;
+        
+        // TODO: 장비 슬롯에 장착 (장비 시스템 구현 필요)
+        Debug.Log($"'{currentItem.itemName}' 장비를 장착했습니다!");
+        Hide();
+    }
+
+    private void OnSell()
+    {
+        if (currentItem == null) return;
+        
+        if (shop == null) shop = FindObjectOfType<Shop>();
+        if (shop != null)
+        {
+            shop.SellItem(currentItem, 1);
+            currentInventory?.RemoveItem(currentSlot.Index);
+        }
+        Hide();
+    }
+
     private void OnAddToQuick()
     {
         if (currentItem == null) return;
         if (quickSlots == null) quickSlots = FindObjectOfType<QuickSlot_Controller>();
 
         quickSlots?.AddItem(currentItem);
-        //currentInventory?.RemoveItem(currentItem);
         Hide();
     }
 
     private void OnDiscard()
     {
         if (currentItem == null) return;
-        currentInventory?.RemoveItem(currentItem);
+        currentInventory?.RemoveItem(currentSlot.Index);
         Hide();
     }
 
@@ -129,7 +217,7 @@ public class InventoryContextMenu : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                // �޴� �� Ŭ�� �� �ݱ�
+                // 메뉴 밖 클릭 시 닫기
                 Camera cam = parentCanvas != null && parentCanvas.renderMode == RenderMode.ScreenSpaceCamera ? parentCanvas.worldCamera : null;
                 if (!RectTransformUtility.RectangleContainsScreenPoint(menuRoot, Input.mousePosition, cam))
                     Hide();

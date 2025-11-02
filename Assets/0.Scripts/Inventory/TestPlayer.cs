@@ -5,49 +5,194 @@ using UnityEngine;
 
 public class TestPlayer : MonoBehaviour
 {
-    [Header("�κ��丮")]
+    [Header("인벤토리")]
     public Inventory inventory;
 
-    [Header("������")]
+    [Header("퀵슬롯")]
     public QuickSlot_Controller quickSlots;
+
+    [Header("상점")]
+    public Shop shop;
+
+    [Header("상점 NPC 감지")]
+    [SerializeField] private float interactionRange = 3f;
+    
+    private GameObject currentNearbyShop = null;
 
     void Update()
     {
-        // ���콺 ��Ŭ�� (��ȣ�ۿ�)
+        // 마우스 우클릭 (아이템 획득)
         if (Input.GetMouseButtonDown(1))
         {
-            Debug.Log("Right Click");
-            //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            //RaycastHit hit3D;
-            //if (Physics.Raycast(ray, out hit3D))
-            //    HitCheckObject(hit3D);
+            TryPickupItem();
         }
 
         if (Input.anyKeyDown)
         {
-            // ���� 1~6�� (������)
-            //for (int i = 0; i < 6; i++)
-            //{
-            //    if (Input.GetKeyDown(KeyCode.Alpha1 + i))
-            //    {
-            //        // ������ i��° ĭ ������ ���� �ҷ���
-            //        Item item = quickSlots.GetItem(i);
-            //        Debug.Log($"Using item: {(item != null ? item.itemName : "None")}");
-            //        if (item != null && item.useAction != null)
-            //        {
-            //            item.useAction.Use(item, gameObject);
-            //            // ������ ��� �� ������, �κ��丮���� ����
-            //            quickSlots.RemoveItem(i);
-            //        }
-            //    }
-            //}
+            // 슬롯 1~6번 (퀵슬롯)
+            for (int i = 0; i < 6; i++)
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+                {
+                    // 퀵슬롯 i번째 칸에서 아이템 가져오기
+                    Item item = quickSlots?.GetItem(i);
+                    
+                    if (item != null)
+                    {
+                        UseItem(item, i);
+                    }
+                }
+            }
 
-            // Tab Ű (�κ��丮 ����/�ݱ�)
+            // Tab 키 (인벤토리 열기/닫기)
             if (Input.GetKeyDown(KeyCode.Tab))
             {
                 if (inventory != null)
                     inventory.ToggleInventory();
             }
+
+            // Q 키 (상점 열기/닫기)
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                if (currentNearbyShop != null && shop != null)
+                {
+                    // 상점 열림/닫힘 토글
+                    if (!shop.IsOpen)
+                    {
+                        shop.ShowShop();
+                        if (inventory != null && !inventory.IsOpen)
+                            inventory.ShowInventory();
+                    }
+                    else
+                    {
+                        shop.HideShop();
+                        // 인벤토리는 상점이 닫힐 때만 닫음 (Tab으로도 닫을 수 있음)
+                    }
+                }
+                else if (shop != null && shop.IsOpen)
+                {
+                    // 상점이 열려있고 NPC 근처가 아니면 상점만 닫기
+                    shop.HideShop();
+                }
+            }
+        }
+
+        // 상점 NPC 감지
+        CheckForNearbyShop();
+    }
+
+    /// <summary>
+    /// 근처에 상점 NPC가 있는지 확인
+    /// </summary>
+    private void CheckForNearbyShop()
+    {
+        Collider[] colliders = Physics.OverlapSphere(transform.position, interactionRange);
+        
+        GameObject foundShop = null;
+        foreach (var col in colliders)
+        {
+            if (col.CompareTag("Shopper"))
+            {
+                foundShop = col.gameObject;
+                break;
+            }
+        }
+
+        if (foundShop != currentNearbyShop)
+        {
+            currentNearbyShop = foundShop;
+            if (foundShop != null)
+            {
+                Debug.Log("[상점] NPC 접촉: Q키를 눌러 상점을 여십시오.");
+            }
+            else if (shop != null && shop.IsOpen)
+            {
+                // NPC에서 멀어지면 상점 자동 닫기
+                shop.HideShop();
+                if (inventory != null && inventory.IsOpen)
+                    inventory.HideInventory();
+            }
+        }
+    }
+
+    // 디버그용 기즈모 그리기
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = currentNearbyShop != null ? Color.green : Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, interactionRange);
+    }
+
+    /// <summary>
+    /// 맵에서 아이템 줍기 시도
+    /// </summary>
+    private void TryPickupItem()
+    {
+        // 카메라에서 마우스 위치로 레이캐스트
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 100f))
+        {
+            GroundItem groundItem = hit.collider.GetComponent<GroundItem>();
+            
+            if (groundItem != null)
+            {
+                // 줍기 가능한 거리인지 확인
+                if (groundItem.CanPickup(transform.position))
+                {
+                    Item pickedItem = groundItem.Pickup();
+                    
+                    if (pickedItem != null && inventory != null)
+                    {
+                        if (inventory.AddItem(pickedItem))
+                        {
+                            Debug.Log($"'{pickedItem.itemName}' 아이템을 획득했습니다!");
+                        }
+                        else
+                        {
+                            Debug.LogWarning("인벤토리가 가득 찼습니다.");
+                            // 아이템 다시 활성화
+                            groundItem.gameObject.SetActive(true);
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.Log("아이템이 너무 멀리 있습니다.");
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 아이템 사용
+    /// </summary>
+    /// <param name="item">사용할 아이템</param>
+    /// <param name="slotIndex">퀵슬롯 인덱스</param>
+    private void UseItem(Item item, int slotIndex)
+    {
+        if (item == null || quickSlots == null)
+            return;
+
+        Debug.Log($"아이템 사용 시도: {item.itemName}");
+
+        // 소비형 아이템 처리
+        if (item.itemType == Item.ItemType.Consumable)
+        {
+            // TODO: 실제 효과 구현 (HP 회복, 버프 등)
+            Debug.Log($"'{item.itemName}' 아이템을 사용했습니다!");
+            
+            // 사용 후 소비
+            quickSlots.RemoveItem(slotIndex);
+        }
+        else if (item.itemType == Item.ItemType.Equipment)
+        {
+            // TODO: 장비 장착 로직
+            Debug.Log($"'{item.itemName}' 장비를 장착했습니다!");
+        }
+        else
+        {
+            Debug.Log($"'{item.itemName}'는 사용할 수 없는 아이템입니다.");
         }
     }
 
@@ -60,11 +205,11 @@ public class TestPlayer : MonoBehaviour
     //        Item item = clickInterface.ClickItem();
     //        bool isAdded = inventory.AddItem(item);
             
-    //        // ������ ȹ�� ȿ����
+    //        // 아이템 획득 효과음
     //        // AudioSource.PlayClipAtPoint(pickupSound, transform.position);
 
-    //        // ������ ������Ʈ ����
-    //        // Destroy ���� �ʰ� ��Ȱ��ȭ ���� ���� ��
+    //        // 아이템 오브젝트 제거
+    //        // Destroy 대신 비활성화도 괜찮
     //        //Destroy(hit3D.transform.gameObject);
     //        if(isAdded) hit3D.transform.gameObject.SetActive(false);
     //    }
