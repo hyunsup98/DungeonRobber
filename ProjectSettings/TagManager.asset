@@ -9,6 +9,7 @@ TagManager:
   - Inventory
   - InvenManager
   - DragImage
+  - Shopper
   layers:
   - Default
   - TransparentFX

@@ -2,20 +2,15 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 퀵 슬롯 컨텍스트 메뉴 (우클릭 메뉴)
+/// 장비 슬롯 컨텍스트 메뉴 (우클릭 메뉴)
 /// </summary>
-public class QuickSlotsContextMenu : MonoBehaviour
+public class EquipContextMenu : MonoBehaviour
 {
-    public static QuickSlotsContextMenu Instance { get; private set; }
+    public static EquipContextMenu Instance { get; private set; }
 
     [Header("UI")]
     [SerializeField] private RectTransform menuRoot; // 메뉴 루트(RectTransform)
-    [SerializeField] private Button useButton;
-    [SerializeField] private Button removeFromQuickButton;
-    [SerializeField] private Button discardButton;
-
-    [Tooltip("옵션: 에디터에서 할당하면 자동으로 찾을 필요가 없습니다. 할당하지 않으면 씬에서 Find합니다.")]
-    [SerializeField] private QuickSlot_Controller quickSlots;
+    [SerializeField] private Button unequipButton;
 
     private Canvas parentCanvas;
     private RectTransform canvasRect;
@@ -33,23 +28,19 @@ public class QuickSlotsContextMenu : MonoBehaviour
         parentCanvas = GetComponentInParent<Canvas>();
         if (parentCanvas != null) canvasRect = parentCanvas.GetComponent<RectTransform>();
 
-        if (useButton != null) useButton.onClick.AddListener(OnUse);
-        if (removeFromQuickButton != null) removeFromQuickButton.onClick.AddListener(OnRemoveFromQuick);
-        if (discardButton != null) discardButton.onClick.AddListener(OnDiscard);
+        if (unequipButton != null) unequipButton.onClick.AddListener(OnUnequip);
     }
 
     void OnDestroy()
     {
         if (Instance == this) Instance = null;
-        if (useButton != null) useButton.onClick.RemoveListener(OnUse);
-        if (removeFromQuickButton != null) removeFromQuickButton.onClick.RemoveListener(OnRemoveFromQuick);
-        if (discardButton != null) discardButton.onClick.RemoveListener(OnDiscard);
+        if (unequipButton != null) unequipButton.onClick.RemoveListener(OnUnequip);
     }
 
-    public static QuickSlotsContextMenu GetOrFind()
+    public static EquipContextMenu GetOrFind()
     {
         if (Instance == null)
-            Instance = FindObjectOfType<QuickSlotsContextMenu>();
+            Instance = FindObjectOfType<EquipContextMenu>();
         return Instance;
     }
 
@@ -64,11 +55,6 @@ public class QuickSlotsContextMenu : MonoBehaviour
         }
 
         currentInventory = slot.ownerInventory ?? slot.GetComponentInParent<Inventory>();
-        if (quickSlots == null)
-            quickSlots = FindObjectOfType<QuickSlot_Controller>();
-
-        // 버튼 표시/숨김 처리
-        UpdateButtonVisibility();
 
         if (menuRoot != null)
         {
@@ -113,68 +99,22 @@ public class QuickSlotsContextMenu : MonoBehaviour
         menuRoot.position += delta;
     }
 
-    /// <summary>
-    /// 버튼 표시/숨김 처리
-    /// </summary>
-    private void UpdateButtonVisibility()
+    private void OnUnequip()
     {
-        if (currentItem == null)
+        if (currentItem == null) return;
+
+        // 장비 슬롯에서 제거
+        if (currentSlot != null)
         {
-            if (useButton != null) useButton.gameObject.SetActive(false);
-            if (removeFromQuickButton != null) removeFromQuickButton.gameObject.SetActive(false);
-            if (discardButton != null) discardButton.gameObject.SetActive(false);
-            return;
+            currentSlot.Item = null;
         }
 
-        // 사용: Consumable 타입만
-        if (useButton != null)
-            useButton.gameObject.SetActive(currentItem.itemType == Item.ItemType.Consumable);
-
-        // 등록해제: 항상 표시
-        if (removeFromQuickButton != null)
-            removeFromQuickButton.gameObject.SetActive(true);
-
-        // 버리기: 항상 표시
-        if (discardButton != null)
-            discardButton.gameObject.SetActive(true);
-    }
-
-    private void OnUse()
-    {
-        if (currentItem == null) return;
-        
-        // TODO: 실제 효과 구현 (HP 회복, 버프 등)
-        Debug.Log($"'{currentItem.itemName}' 아이템을 사용했습니다!");
-        
-        // 사용 후 소비
-        quickSlots?.RemoveItem(currentSlot.Index);
-        Hide();
-    }
-
-    private void OnRemoveFromQuick()
-    {
-        if (currentItem == null) return;
-        if (quickSlots == null) quickSlots = FindObjectOfType<QuickSlot_Controller>();
-
-        // 퀵슬롯에서 제거 (인벤토리는 유지)
-        quickSlots?.RemoveItem(currentSlot.Index);
-        Hide();
-    }
-
-    private void OnDiscard()
-    {
-        if (currentItem == null) return;
-        
-        // 퀵슬롯에서 제거
-        if (quickSlots == null) quickSlots = FindObjectOfType<QuickSlot_Controller>();
-        quickSlots?.RemoveItem(currentSlot.Index);
-        
-        // 인벤토리에서도 제거
+        // 인벤토리로 이동
         if (currentInventory != null)
         {
-            currentInventory.RemoveItem(currentItem);
+            currentInventory.AddItem(currentItem);
         }
-        
+
         Hide();
     }
 
@@ -192,3 +132,4 @@ public class QuickSlotsContextMenu : MonoBehaviour
         }
     }
 }
+
