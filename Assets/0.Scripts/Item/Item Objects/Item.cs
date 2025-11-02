@@ -3,29 +3,31 @@ using UnityEngine;
 [CreateAssetMenu]
 public class Item : ScriptableObject
 {
-    public enum ItemType  // ¾ÆÀÌÅÛ À¯Çü
+    public enum ItemType
     {
-        Equipment,
-        Consumable,
-        Sellable,
-        ETC,
+        Weapon,      // ë¬´ê¸° (ì¥ë¹„ ìŠ¬ë¡¯ì—ë§Œ ë“±ë¡)
+        Equipment,   // ì¥ë¹„ (ì¥ë¹„ ìŠ¬ë¡¯ì— ë“±ë¡ ê°€ëŠ¥)
+        Consumable,  // ì†Œë¹„ ì•„ì´í…œ (ì‚¬ìš© ê°€ëŠ¥)
+        Sellable,    // íŒë§¤ ê°€ëŠ¥í•œ ì•„ì´í…œ
+        ETC,         // ê¸°íƒ€
     }
 
-    [Header("¾ÆÀÌÅÛ ÀÌ¸§")]
-    public string itemName; // ¾ÆÀÌÅÛÀÇ ÀÌ¸§
+    [Header("ì•„ì´í…œ ì •ë³´")]
+    public string itemName;
     
     [TextArea]
     public string description;
     
-    public ItemType itemType; // ¾ÆÀÌÅÛ À¯Çü
+    public ItemType itemType;
     
-    [Header("¾ÆÀÌÅÛ ÀÌ¹ÌÁö")]
-    public Sprite itemImage; // ¾ÆÀÌÅÛÀÇ ÀÌ¹ÌÁö(ÀÎº¥Åä¸® ¾È¿¡¼­ ¶ç¿ï ÀÌ¹ÌÁö)
+    [Header("ê°€ê²© ì •ë³´")]
+    public int buyPrice = 100;   // êµ¬ë§¤ ê°€ê²©
+    public int sellPrice = 50;   // íŒë§¤ ê°€ê²©
     
-    public GameObject itemPrefab;  // ¾ÆÀÌÅÛÀÇ ÇÁ¸®ÆÕ (¾ÆÀÌÅÛ »ı¼º½Ã ÇÁ¸®ÆÕÀ¸·Î Âï¾î³¿)
+    [Header("ì•„ì´í…œ ì´ë¯¸ì§€")]
+    public Sprite itemImage;
+    
+    public GameObject itemPrefab;
 
-    //[Header("¾ÆÀÌÅÛ »ç¿ë ¾×¼Ç")]
-    //public ItemAction useAction;
-
-    public string weaponType;  // ¹«±â À¯Çü
+    public string weaponType;
 }

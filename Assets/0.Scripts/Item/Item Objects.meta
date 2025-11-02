@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/0.Scripts/Item/Item Objects.meta
 guid: 433d71b30d37b984b874b85aa331c7c1
+========
+guid: 69adb4f84cb32ce4296eca77870c1181
+>>>>>>>> develop:Assets/0.Scripts/Inventory/Controller.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

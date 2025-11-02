@@ -1,119 +1,87 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using System.Globalization;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static Inventory;
 
-public class ItemDrag : MonoBehaviour
+/// <summary>
+/// ì•„ì´í…œ ë“œë˜ê·¸ ì•¤ ë“œë¡­ ì‹œìŠ¤í…œ
+/// ì¸ë²¤í† ë¦¬, í€µìŠ¬ë¡¯, ì¥ë¹„ ìŠ¬ë¡¯ ê°„ ì•„ì´í…œ ì´ë™ ì§€ì›
+/// </summary>
+public class ItemDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-
-    public Transform dragImage;   // ºó ÀÌ¹ÌÁö °´Ã¼.
-
-    private Image EmptyImg; // ºó ÀÌ¹ÌÁö.
-    private Slot slot;      // ÇöÀç ½½·Ô¿¡ ½ºÅ©¸³Æ®
+    private Image dragImage;
+    private Slot slot;
 
     void Start()
     {
-        // ÇöÀç ½½·ÔÀÇ ½ºÅ©¸³Æ®¸¦ °¡Á®¿Â´Ù.
-        slot = GetComponent<Slot>();
-        // ºó ÀÌ¹ÌÁö °´Ã¼¸¦ ÅÂ±×¸¦ ÀÌ¿ëÇÏ¿© °¡Á®¿Â´Ù.
-        dragImage = GameObject.FindGameObjectWithTag("DragImage").transform;
-        // ºó ÀÌ¹ÌÁö °´Ã¼°¡ °¡Áø ImageÄÄÆ÷³ÍÆ®¸¦ °¡Á®¿Â´Ù.
-        EmptyImg = dragImage.GetComponent<Image>();
+        // í˜„ì¬ ìŠ¬ë¡¯ì˜ ì»¨íŠ¸ë¡¤ëŸ¬ë¥¼ ê°€ì ¸ì˜µë‹ˆë‹¤ (ìì‹ì—ì„œë„ ì°¾ê¸°)
+        slot = GetComponent<Slot>() ?? GetComponentInChildren<Slot>();
+        
+        // ë“œë˜ê·¸ ì´ë¯¸ì§€ë¥¼ íƒœê·¸ë¥¼ í™œìš©í•´ì„œ ì°¾ìŠµë‹ˆë‹¤
+        GameObject dragImageObj = GameObject.FindGameObjectWithTag("DragImage");
+        if (dragImageObj != null)
+        {
+            dragImage = dragImageObj.GetComponent<Image>();
+        }
+        else
+        {
+            Debug.LogWarning("DragImageë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤! 'DragImage' íƒœê·¸ê°€ ì„¤ì •ë˜ì–´ ìˆëŠ”ì§€ í™•ì¸í•˜ì„¸ìš”.");
+        }
     }
 
-    public void Down()
+    public void OnBeginDrag(PointerEventData eventData)
     {
-        // ½½·Ô¿¡ ¾ÆÀÌÅÛÀÌ ¾øÀ¸¸é ÇÔ¼öÁ¾·á.
-        if (slot.Item == null)
+        // ìŠ¬ë¡¯ì— ì•„ì´í…œì´ ì—†ìœ¼ë©´ ë“œë˜ê·¸ ë¶ˆê°€
+        if (slot == null || slot.Item == null || dragImage == null)
             return;
 
-        // ¾ÆÀÌÅÛ »ç¿ë½Ã.
-        //if (Input.GetMouseButtonDown(1))
-        //{
-        //    slot.ItemUse();
-        //    return;
-        //}
-
-        // ºó ÀÌ¹ÌÁö °´Ã¼¸¦ È°¼ºÈ­ ½ÃÅ²´Ù.
+        // ë“œë˜ê·¸ ì´ë¯¸ì§€ í™œì„±í™”
         dragImage.gameObject.SetActive(true);
 
-        // ºó ÀÌ¹ÌÁöÀÇ »çÀÌÁî¸¦ º¯°æÇÑ´Ù.(ÇØ»óµµ°¡ ¹Ù²ğ°æ¿ì¸¦ ´ëºñ.)
-        float Size = slot.transform.GetComponent<RectTransform>().sizeDelta.x;
-        EmptyImg.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Size);
-        EmptyImg.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Size);
+        // ë“œë˜ê·¸ ì´ë¯¸ì§€ í¬ê¸°ë¥¼ ì„¤ì •í•©ë‹ˆë‹¤
+        float size = GetComponent<RectTransform>().sizeDelta.x;
+        dragImage.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size);
+        dragImage.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size);
 
-        // ºó ÀÌ¹ÌÁöÀÇ ½ºÇÁ¶óÀÌÆ®¸¦ ½½·ÔÀÇ ½ºÇÁ¶óÀÌÆ®·Î º¯°æÇÑ´Ù.
-        EmptyImg.sprite = slot.Item.itemImage;
-        // ºó ÀÌ¹ÌÁöÀÇ À§Ä¡¸¦ ¸¶¿ì½ºÀ§·Î °¡Á®¿Â´Ù.
+        // ë“œë˜ê·¸ ì´ë¯¸ì§€ì— ì•„ì´í…œ ìŠ¤í”„ë¼ì´íŠ¸ ì„¤ì •
+        dragImage.sprite = slot.Item.itemImage;
+        dragImage.color = new Color(1, 1, 1, 0.8f); // ì•½ê°„ íˆ¬ëª…í•˜ê²Œ
+        
+        // ìŠ¬ë¡¯ ì´ë¯¸ì§€ ë°˜íˆ¬ëª… ì²˜ë¦¬
+        Image slotImage = GetComponent<Image>();
+        if (slotImage != null)
+        {
+            slotImage.color = new Color(slotImage.color.r, slotImage.color.g, slotImage.color.b, 0.5f);
+        }
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        // ë“œë˜ê·¸ ì´ë¯¸ì§€ê°€ ì—†ê±°ë‚˜ ìŠ¬ë¡¯ì— ì•„ì´í…œì´ ì—†ìœ¼ë©´ ì¤‘ë‹¨
+        if (slot == null || slot.Item == null || dragImage == null)
+            return;
+
+        // ë“œë˜ê·¸ ì´ë¯¸ì§€ ìœ„ì¹˜ë¥¼ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ë¡œ ì´ë™
         dragImage.transform.position = Input.mousePosition;
-        // ½½·ÔÀÇ ¾ÆÀÌÅÛ ÀÌ¹ÌÁö¸¦ ¾ø¾ÖÁØ´Ù.
-        Image slotImage = slot.GetComponent<Image>();
-        slotImage.sprite = null;
-        slotImage.color = new Color(slotImage.color.r, slotImage.color.g, slotImage.color.b, 0f);
-        // ½½·ÔÀÇ ÅØ½ºÆ® ¼ıÀÚ¸¦ ¾ø¾ÖÁØ´Ù.
-        //slot.text.text = "";
     }
 
-    public void Drag()
+    public void OnEndDrag(PointerEventData eventData)
     {
-        // isImgÇÃ·¡±×°¡ falseÀÌ¸é ½½·Ô¿¡ ¾ÆÀÌÅÛÀÌ Á¸ÀçÇÏÁö ¾Ê´Â °ÍÀÌ¹Ç·Î ÇÔ¼ö Á¾·á.
-        if (slot.Item == null)
+        if (slot == null || slot.Item == null || dragImage == null)
+        {
+            EndDragVisuals();
             return;
+        }
 
-        dragImage.transform.position = Input.mousePosition;
-    }
-
-    public void DragEnd()
-    {
-        Debug.Log("µå·¡±× Á¾·á ÇÔ¼ö ½ÇÇà");
-        // isImgÇÃ·¡±×°¡ falseÀÌ¸é ½½·Ô¿¡ ¾ÆÀÌÅÛÀÌ Á¸ÀçÇÏÁö ¾Ê´Â °ÍÀÌ¹Ç·Î ÇÔ¼ö Á¾·á.
-        if (slot.Item == null)
-            return;
-
-        Swap(slot, dragImage.transform.position);
-        //slot = null;
-    }
-
-    public void Up()
-    {
-        // isImgÇÃ·¡±×°¡ falseÀÌ¸é ½½·Ô¿¡ ¾ÆÀÌÅÛÀÌ Á¸ÀçÇÏÁö ¾Ê´Â °ÍÀÌ¹Ç·Î ÇÔ¼ö Á¾·á.
-        if (slot.Item == null)
-            return;
-
-        // ºó ÀÌ¹ÌÁö °´Ã¼ ºñÈ°¼ºÈ­.
-        dragImage.gameObject.SetActive(false);
-        // ½½·ÔÀÇ ¾ÆÀÌÅÛ ÀÌ¹ÌÁö¸¦ º¹±¸ ½ÃÅ²´Ù.
-        //slot.UpdateInfo(true, slot.slot.Peek().DefaultImg);
-        Image slotImage = slot.GetComponent<Image>();
-        slotImage.sprite = EmptyImg.sprite;
-        slotImage.color = new Color(slotImage.color.r, slotImage.color.g, slotImage.color.b, 1f);
-        Debug.Log("¾ÆÀÌÅÛ µå·¡±× Á¾·á");
-    }
-
-    // °èÈ¹(ÀÇ»çÄÚµå):
-    // 1) UI ¿ä¼Ò(Graphic) ¾Æ·¡ÀÇ ½½·ÔÀ» ¸ÕÀú Ã£´Â´Ù:
-    //    - EventSystem.current¿Í PointerEventData¸¦ »ç¿ëÇØ GraphicRaycaster·Î Raycast ½ÇÇà
-    //    - RaycastResult ¸ñ·Ï¿¡¼­ Slot ÄÄÆ÷³ÍÆ®¸¦ Ã£±â (GetComponentInParent·Î À¯¿¬ÇÏ°Ô Å½»ö)
-    //    - Ã£À¸¸é ½½·Ô ±³Ã¼ ¼öÇà ÈÄ Á¾·á
-    // 2) UI¿¡¼­ ¸øÃ£À¸¸é ±âÁ¸ Physics.Raycast(3D Äİ¶óÀÌ´õ)·Î Æú¹é
-    // 3) µğ¹ö±× ·Î±×¸¦ Ãß°¡ÇÏ¿© ¾î¶² °æ·Î·Î Ã£¾Ò´ÂÁö È®ÀÎ
-    private void Swap(Slot slot, Vector2 position)
-    {
-        Debug.Log("Swap ÇÔ¼ö ½ÇÇà");
-
-        // UI GraphicRaycaster¸¦ ÅëÇÑ Raycast
+        // UI GraphicRaycasterë¡œ Raycast
         if (EventSystem.current != null)
         {
             PointerEventData ped = new PointerEventData(EventSystem.current);
-            ped.position = position;
+            ped.position = Input.mousePosition;
 
             List<RaycastResult> results = new List<RaycastResult>();
 
-            // ¿ì¼± dragImageÀÇ ºÎ¸ğ Äµ¹ö½º¿¡¼­ GraphicRaycaster¸¦ Ã£°í, ¾øÀ¸¸é ¾À ÀüÃ¼¿¡¼­ Ã£´Â´Ù.
+            // dragImageì˜ ë¶€ëª¨ ìº”ë²„ìŠ¤ë¡œë¶€í„° GraphicRaycasterë¥¼ ì°¾ì•„ì„œ Raycast ìˆ˜í–‰
             GraphicRaycaster gr = null;
             if (dragImage != null)
                 gr = dragImage.GetComponentInParent<GraphicRaycaster>();
@@ -123,37 +91,116 @@ public class ItemDrag : MonoBehaviour
             if (gr != null)
             {
                 gr.Raycast(ped, results);
-                Debug.Log($"UI Raycast °á°ú ¼ö: {results.Count}");
+                
                 foreach (var res in results)
                 {
-                    Debug.Log($"Raycast hit UI: {res.gameObject.name}");
                     Slot targetSlot = res.gameObject.GetComponent<Slot>() ?? res.gameObject.GetComponentInParent<Slot>();
+                    
                     if (targetSlot != null && targetSlot != slot)
                     {
-                        Debug.Log($"UI ½½·Ô ¹ß°ß ¹× ½º¿Ò: {targetSlot.name}");
-                        //Inventory inventory = slot.ownerInventory;
-                        //QuickSlot_Controller quickSlots = slot.ownerQuickSlots;
-                        //Inventory targetInventory = targetSlot.ownerInventory;
-                        //QuickSlot_Controller targetQuickSlots = targetSlot.ownerQuickSlots;
-
-                        //SlotType from = inventory != null ? SlotType.Inventory : SlotType.QuickSlots;
-                        //SlotType to = targetInventory != null ? SlotType.Inventory : SlotType.QuickSlots;
-
-                        //// ÀÎº¥Åä¸® ÅÂ±×·Î ÀÎº¥Åä¸® Ã£±â
-                        //Inventory generalInventory = GameObject.FindWithTag("Inventory").GetComponent<Inventory>();
-                        //generalInventory.SwapItem(from, slot.Index, to, targetSlot.Index);
-                        return;
+                        Debug.Log($"ìŠ¬ë¡¯ì— ë“œë¡­: {slot.name} -> {targetSlot.name}");
+                        SwapSlots(slot, targetSlot);
+                        break;
                     }
                 }
             }
-            else
-            {
-                Debug.LogWarning("GraphicRaycaster¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.");
-            }
         }
-        else
+
+        // ë“œë˜ê·¸ ì¢…ë£Œ ì²˜ë¦¬
+        EndDragVisuals();
+    }
+
+    /// <summary>
+    /// ë‘ ìŠ¬ë¡¯ì˜ ì•„ì´í…œì„ êµí™˜í•©ë‹ˆë‹¤
+    /// ì¸ë²¤í† ë¦¬ <-> í€µìŠ¬ë¡¯ ê°„ êµí™˜ ì§€ì›
+    /// </summary>
+    private void SwapSlots(Slot fromSlot, Slot toSlot)
+    {
+        if (fromSlot == null || toSlot == null)
+            return;
+
+        Item fromItem = fromSlot.Item;
+        Item toItem = toSlot.Item;
+
+        // ê°™ì€ ì†Œìœ ìì˜ ìŠ¬ë¡¯ë“¤ ê°„ êµí™˜ (ì¸ë²¤í† ë¦¬ <-> ì¸ë²¤í† ë¦¬ ë˜ëŠ” í€µìŠ¬ë¡¯ <-> í€µìŠ¬ë¡¯)
+        if (fromSlot.ownerInventory != null && toSlot.ownerInventory != null && 
+            fromSlot.ownerInventory == toSlot.ownerInventory)
         {
-            Debug.LogWarning("EventSystem.current°¡ null ÀÔ´Ï´Ù. UI Raycast ºÒ°¡.");
+            // ì¸ë²¤í† ë¦¬ ë‚´ë¶€ êµí™˜
+            fromSlot.ownerInventory.SwapItems(fromSlot.Index, toSlot.Index);
+            return;
+        }
+        
+        if (fromSlot.ownerQuickSlots != null && toSlot.ownerQuickSlots != null &&
+            fromSlot.ownerQuickSlots == toSlot.ownerQuickSlots)
+        {
+            // í€µìŠ¬ë¡¯ ë‚´ë¶€ êµí™˜
+            fromSlot.ownerQuickSlots.SwapItems(fromSlot.Index, toSlot.Index);
+            return;
+        }
+
+        // ì„œë¡œ ë‹¤ë¥¸ ì‹œìŠ¤í…œ ê°„ êµí™˜ (ì¸ë²¤í† ë¦¬ <-> í€µìŠ¬ë¡¯)
+        // í€µìŠ¬ë¡¯ì€ ì¸ë²¤í† ë¦¬ì˜ ë§í¬/ì°¸ì¡° ì—­í• 
+        if ((fromSlot.ownerInventory != null && toSlot.ownerQuickSlots != null) ||
+            (fromSlot.ownerQuickSlots != null && toSlot.ownerInventory != null))
+        {
+            // ì¸ë²¤í† ë¦¬ -> í€µìŠ¬ë¡¯
+            if (fromSlot.ownerInventory != null && toSlot.ownerQuickSlots != null)
+            {
+                // ê¸°ì¡´ í€µìŠ¬ë¡¯ ì•„ì´í…œ ì²˜ë¦¬
+                if (toItem != null)
+                {
+                    // í€µìŠ¬ë¡¯ì— ìˆë˜ ì•„ì´í…œì€ ê·¸ëƒ¥ í´ë¦¬ì–´
+                    fromSlot.ownerQuickSlots.items[toSlot.Index] = null;
+                }
+                // í€µìŠ¬ë¡¯ì— ì¸ë²¤í† ë¦¬ ì•„ì´í…œ ë§í¬ ì„¤ì •
+                fromSlot.ownerQuickSlots.items[toSlot.Index] = fromItem;
+                fromSlot.ownerQuickSlots.RefreshSlots();
+                Debug.Log($"ì¸ë²¤í† ë¦¬ -> í€µìŠ¬ë¡¯: '{fromItem?.itemName}' ë“±ë¡");
+            }
+            // í€µìŠ¬ë¡¯ -> ì¸ë²¤í† ë¦¬
+            else if (fromSlot.ownerQuickSlots != null && toSlot.ownerInventory != null)
+            {
+                // í€µìŠ¬ë¡¯ ë“±ë¡ í•´ì œ
+                fromSlot.ownerQuickSlots.items[fromSlot.Index] = null;
+                fromSlot.ownerQuickSlots.RefreshSlots();
+                
+                // ì¸ë²¤í† ë¦¬ì— ì•„ì´í…œì´ ìˆìœ¼ë©´ êµí™˜
+                if (toItem != null)
+                {
+                    // ì¸ë²¤í† ë¦¬ ì•„ì´í…œì„ í€µìŠ¬ë¡¯ì— ë“±ë¡
+                    fromSlot.ownerQuickSlots.items[fromSlot.Index] = toItem;
+                    fromSlot.ownerQuickSlots.RefreshSlots();
+                }
+                Debug.Log($"í€µìŠ¬ë¡¯ -> ì¸ë²¤í† ë¦¬: '{fromItem?.itemName}' ë“±ë¡ í•´ì œ");
+            }
+            
+            Debug.Log($"ì¸ë²¤í† ë¦¬ <-> í€µìŠ¬ë¡¯ êµí™˜: {fromItem?.itemName ?? "ë¹ˆ ìŠ¬ë¡¯"} <-> {toItem?.itemName ?? "ë¹ˆ ìŠ¬ë¡¯"}");
+            return;
+        }
+
+        Debug.LogWarning("ìŠ¬ë¡¯ êµí™˜ ì‹¤íŒ¨: í˜¸í™˜ë˜ì§€ ì•ŠëŠ” ìŠ¬ë¡¯ íƒ€ì…");
+    }
+
+    /// <summary>
+    /// ë“œë˜ê·¸ ì¢…ë£Œ ì‹œ ì‹œê°ì  ë³µì›
+    /// </summary>
+    private void EndDragVisuals()
+    {
+        if (dragImage != null)
+        {
+            // ë“œë˜ê·¸ ì´ë¯¸ì§€ ë¹„í™œì„±í™”
+            dragImage.gameObject.SetActive(false);
+        }
+
+        // ìŠ¬ë¡¯ ì´ë¯¸ì§€ ë³µì›
+        if (slot != null)
+        {
+            Image slotImage = GetComponent<Image>();
+            if (slotImage != null && slot.Item != null)
+            {
+                slotImage.color = new Color(slotImage.color.r, slotImage.color.g, slotImage.color.b, 1f);
+            }
         }
     }
 }

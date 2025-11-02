@@ -1,323 +1,315 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Loading;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
-using static UnityEditor.Progress;
 
+/// <summary>
+/// 플레이어의 인벤토리를 관리하는 메인 클래스
+/// </summary>
 public class Inventory : MonoBehaviour
 {
-    // ���� ���� ������ ����Ʈ�� �ҷ��ͼ� UI�� ǥ��
-    // EŰ�� ������ �κ��丮 â�� ������ ������ ��� < Item/Player.cs���� ó�� >
+    [Header("Inventory Settings")]
+    [SerializeField] private int inventorySize = 9;
+    
+    [Header("UI References")]
+    [SerializeField] private GameObject inventoryRoot;
+    [SerializeField] private Transform slotParent;
 
+    // 아이템 데이터
     public List<Item> items;
 
-    private GameObject player;
-    private Item[] invenArray;
-
-    [SerializeField] GameObject inventoryRoot;
+    // UI 슬롯들
+    private InvenSlot[] slots;
 
     private void Awake()
     {
-        // �κ��丮 9ĭ
-        items = new List<Item>() { null, null, null, null, null, null, null, null, null };
-        //FreshSlot();
+        // 인벤토리 크기만큼 null로 초기화
+        items = new List<Item>();
+        for (int i = 0; i < inventorySize; i++)
+        {
+            items.Add(null);
+        }
+        
+        InitializeSlots();
         HideInventory();
     }
 
+    private void InitializeSlots()
+    {
+        if (slotParent == null)
+        {
+            Debug.LogWarning("Inventory: slotParent가 설정되지 않았습니다.");
+            return;
+        }
+
+        slots = slotParent.GetComponentsInChildren<InvenSlot>();
+        if (slots == null || slots.Length == 0)
+        {
+            Debug.LogWarning("Inventory: 슬롯을 찾을 수 없습니다.");
+            return;
+        }
+
+        // 슬롯에 인벤토리 참조 할당 및 초기화
+        for (int i = 0; i < slots.Length && i < items.Count; i++)
+        {
+            slots[i].ownerInventory = this;
+            slots[i].Item = items[i];
+        }
+    }
+
     /// <summary>
-    /// �κ��丮 ���� ���θ� ��ȯ�մϴ�.
+    /// 인벤토리 열림 여부를 반환합니다.
     /// </summary>
     public bool IsOpen => inventoryRoot != null && inventoryRoot.activeSelf;
 
     /// <summary>
-    /// �κ��丮 ����/������ ����մϴ�.
+    /// 인벤토리 열기/닫기를 토글합니다.
     /// </summary>
     public void ToggleInventory()
     {
+        if (IsOpen)
+            HideInventory();
+        else
+            ShowInventory();
     }
 
     /// <summary>
-    /// ������ ���� Ȯ��
-    /// </summary>
-    /// <param name="itemName"></param>
-    /// <returns>�������� bool</returns>
-    //public bool HasItem(string itemName)
-    //{
-    //    foreach (var invItem in invenArray)
-    //    {
-    //        if (invItem != null && invItem.Name == itemName)
-    //        {
-    //            return true;
-    //        }
-    //    }
-    //    return false;
-    //}
-
-    //public void AddItem(Item newItem)
-    //{
-    //    if (HasItem(newItem.Name))
-    //    {
-    //        ShowInventory();
-    //    }
-    //}
-
-    /// <summary>
-    /// �κ��丮�� ǥ���մϴ�.
+    /// 인벤토리를 표시합니다.
     /// </summary>
     public void ShowInventory()
     {
-        if (inventoryRoot != null) inventoryRoot.SetActive(true);
-        //FreshSlot();
+        if (inventoryRoot != null)
+        {
+            inventoryRoot.SetActive(true);
+            RefreshSlots();
+        }
     }
 
     /// <summary>
-    /// �κ��丮�� ����ϴ�.
+    /// 인벤토리를 숨깁니다.
     /// </summary>
     public void HideInventory()
     {
-        // ���ؽ�Ʈ �޴� ����
+        // 컨텍스트 메뉴 숨기기
         InventoryContextMenu inventoryContextMenu = InventoryContextMenu.GetOrFind();
         if (inventoryContextMenu != null)
             inventoryContextMenu.Hide();
 
-        // ���� ���� (������ �κ��丮 ���Կ� ���� ���� ����� �� ���� ���� ����)
-        //ItemTooltip itemTooltip = ItemTooltip.GetOrFind();
-        //if (itemTooltip != null)
-        //    itemTooltip.Hide();
-
-        if (inventoryRoot != null) inventoryRoot.SetActive(false);
+        if (inventoryRoot != null)
+            inventoryRoot.SetActive(false);
     }
 
     /// <summary>
-    /// �κ��丮 ���� UI�� �����մϴ�.
+    /// 인벤토리 슬롯을 새로고침합니다.
     /// </summary>
-    //public void FreshSlot()
-    //{
-    //    if (slotParent == null)
-    //        return;
-
-    //    if (slots == null || slots.Length == 0)
-    //        slots = slotParent.GetComponentsInChildren<Slot>();
-
-    //    int i = 0;
-    //    for (; i < slots.Length; i++)
-    //    {
-    //        // ���Կ� owner / index �Ҵ�
-    //        slots[i].ownerInventory = this;
-    //        slots[i].Item = items[i];
-    //        // ���� �ؽ�Ʈ ����
-    //        if(slots[i].ItemQuantity > 0)
-    //            slots[i].GetComponentInChildren<Text>().text = slots[i].ItemQuantity.ToString();
-    //        else
-    //            slots[i].GetComponentInChildren<Text>().text = "";
-    //    }
-    //    //for (; i < slots.Length; i++)
-    //    //{
-    //    //    slots[i].ownerInventory = this;
-    //    //    slots[i].Item = null;
-    //    //}
-
-        
-
-
-
-    //    PrintItems();
-    //}
-
-    public enum SlotType
+    public void RefreshSlots()
     {
-        Inventory,
-        QuickSlots
-    }
-
-    /// <summary>
-    /// �κ��丮 �� ������ �� ������ ��ȯ �Ǵ� ���/������ ó���մϴ�.
-    /// </summary>
-    /// <param name="from">�������� �������� ��</param>
-    /// <param name="fromIdx"></param>
-    /// <param name="to">�������� ���� ��</param>
-    /// <param name="toIdx"></param>
-    //public void SwapItem(SlotType from, int fromIdx, SlotType to, int toIdx)
-    //{
-    //    Debug.Log($"SwapItem: �Ķ���� idx1: {fromIdx}, idx2: {toIdx}");
-        
-    //    // ��ȿ�� �˻�
-    //    if (slotParent == null) return;
-    //    if (fromIdx < 0 || fromIdx >= items.Count || toIdx < 0 || toIdx >= items.Count)
-    //    {
-    //        Debug.LogWarning("SwapItem: �ε����� ��ȿ���� �ʽ��ϴ�.");
-    //        return;
-    //    }
-        
-    //    if (from == SlotType.Inventory && to == SlotType.Inventory)
-    //    {
-    //        // �κ��丮 �� ��ȯ
-    //        var tempSlot = slots[fromIdx];
-    //        slots[fromIdx] = slots[toIdx];
-    //        slots[toIdx] = tempSlot;
-
-    //        //var tempItem = items[fromIdx];
-    //        //items[fromIdx] = items[toIdx];
-    //        //items[toIdx] = tempItem;
-    //    }
-    //    else if (from == SlotType.Inventory && to == SlotType.QuickSlots)
-    //    {
-    //        // �κ��丮 -> �������� ���
-    //        QuickSlot_Controller quickSlots = FindObjectOfType<QuickSlot_Controller>();
-    //        if (quickSlots == null)
-    //        {
-    //            Debug.LogWarning("SwapItem: QuickSlots ������Ʈ�� ã�� �� �����ϴ�.");
-    //            return;
-    //        }
-    //        quickSlots.items[toIdx] = items[fromIdx];
-    //        quickSlots.FreshSlot();
-    //    }
-    //    else if (from == SlotType.QuickSlots && to == SlotType.Inventory)
-    //    {
-    //        // ������ -> �κ��丮�� ��� ����
-    //        QuickSlot_Controller quickSlots = FindObjectOfType<QuickSlot_Controller>();
-    //        if (quickSlots == null)
-    //        {
-    //            Debug.LogWarning("SwapItem: QuickSlots ������Ʈ�� ã�� �� �����ϴ�.");
-    //            return;
-    //        }
-    //        quickSlots.RemoveItem(quickSlots.items[fromIdx]);
-    //    }
-    //    else if (from == SlotType.Inventory && to == SlotType.Inventory)
-    //    {
-    //        // ������ �� ��ȯ
-    //        QuickSlot_Controller quickSlots = FindObjectOfType<QuickSlot_Controller>();
-    //        if (quickSlots == null)
-    //        {
-    //            Debug.LogWarning("SwapItem: QuickSlots ������Ʈ�� ã�� �� �����ϴ�.");
-    //            return;
-    //        }
-    //        var temp = quickSlots.items[fromIdx];
-    //        quickSlots.items[fromIdx] = quickSlots.items[toIdx];
-    //        quickSlots.items[toIdx] = temp;
-    //        quickSlots.FreshSlot();
-    //    }
-    //    else
-    //    {
-    //        Debug.LogWarning("SwapItem: �߸��� from/to �Ķ�����Դϴ�.");
-    //        return;
-    //    }
-
-    //    FreshSlot();
-    //}
-
-    //public bool AddItem(int idx, Item item)
-    //{
-    //    if (slots == null || items == null)
-    //        FreshSlot();
-
-    //    if (idx < 0 || idx >= items.Count)
-    //    {
-    //        Debug.Log("AddItem: �ε����� ��ȿ���� �ʽ��ϴ�.");
-    //        return false;
-    //    }
-
-    //    items[idx] = item;
-    //    FreshSlot();
-    //    Debug.Log($"�κ��丮�� '{item.itemName}' �������� �߰��Ǿ����ϴ�.");
-    //    return true;
-    //}
-
-    //public bool AddItem(Item item)
-    //{
-    //    speedRune = gameObject.AddComponent<ConsumableItem>();
-    //    speedRune.Name = "Speed Rune";
-    //    speedRune.Type = ItemType.Consumable;
-    //    speedRune.Grade = ItemGrade.Rare;
-    //    speedRune.Description = "����ϸ� ���� �ð� ���� �̵� �ӵ��� �������� ��. ���� Ž���̳� ���� ���� ���� �����ϴ�.";
-    //    speedRune.ConsumeType = ConsumableType.Effect;
-    //    speedRune.Power = 2f;
-    //    speedRune.Duration = 5;
-
-    //    // ������ �ش� �������� �ִ��� �˻�
-    //    if (items.Find(x => x == item) != null)
-    //    {
-    //        // ������ ���� ����
-    //        int itemIdx = items.FindIndex(x => x == item);
-    //        Debug.Log($"�κ��丮�� �̹� '{item.itemName}' �������� �ֽ��ϴ�. ������ ������ŵ�ϴ�.");
-    //        // ������ ���� ����
-    //        slots[itemIdx].ItemQuantity++;
-    //        FreshSlot();
-    //        return true;
-    //    }
-
-    //    // ������ ������ �� ĭ ã�Ƽ� �߰�
-    //    int idx = items.FindIndex(x => x == null);
-    //    if (idx != -1)
-    //    {
-    //        items[idx] = item;
-    //        Debug.Log($"�κ��丮�� '{item.itemName}' �������� �߰��Ǿ����ϴ�.");
-    //        slots[idx].ItemQuantity++;
-    //        FreshSlot();
-    //        return true;
-    //    }
-    //    else
-    //    {
-    //        Debug.Log("������ ���� �� �ֽ��ϴ�.");
-    //        return false;
-    //    }
-    //}
-
-        //Item[] randomItems = new Item[] { speedRune, necklace };
-
-    // ���� �ε��� ��� ���� (����)
-    internal void RemoveItem(int idx)
-    {
-        if (idx >= 0 && idx < items.Count)
+        if (slots == null || items == null)
         {
-            items[idx] = null;
-            //FreshSlot();
-            Debug.Log($"�κ��丮 {idx + 1}��° �������� ���ŵǾ����ϴ�.");
+            InitializeSlots();
+            return;
+        }
+
+        for (int i = 0; i < slots.Length && i < items.Count; i++)
+        {
+            slots[i].Item = items[i];
         }
     }
 
-    /// <summary>
-    /// Item ��� ���� (������ ��� ȣ���)
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    internal void RemoveItem(Item item)
-    {
-        if (item == null) return;
+    #region Item Management
 
-        int idx = items.FindIndex(x => x == item);
-        if (idx != -1) {
-            items[idx] = null;
-            //FreshSlot();
-            Debug.Log($"�κ��丮 '{item.itemName}' �������� ���ŵǾ����ϴ�.");
-            return;
+    /// <summary>
+    /// 아이템을 인벤토리에 추가합니다.
+    /// </summary>
+    /// <param name="item">추가할 아이템</param>
+    /// <returns>추가 성공 여부</returns>
+    public bool AddItem(Item item)
+    {
+        if (item == null)
+        {
+            Debug.LogWarning("Inventory: null 아이템은 추가할 수 없습니다.");
+            return false;
+        }
+
+        if (slots == null || items == null)
+        { 
+            InitializeSlots();
+        }
+
+        // 같은 아이템이 이미 있으면 개수 증가
+        if (items.Find(x => x != null && x.name == item.name) != null)
+        {
+            int itemIdx = items.FindIndex(x => x != null && x.name == item.name);
+            Debug.Log($"인벤토리에 이미 '{item.itemName}' 아이템이 있습니다. 개수를 증가시킵니다.");
+            slots[itemIdx].ItemQuantity++;
+            RefreshSlots();
+            return true;
+        }
+
+        // 빈 슬롯 찾기
+        int idx = items.FindIndex(x => x == null);
+        if (idx != -1)
+        {
+            items[idx] = item;
+            slots[idx].ItemQuantity = 1;
+            RefreshSlots();
+            Debug.Log($"인벤토리에 '{item.itemName}' 아이템이 추가되었습니다.");
+            return true;
         }
         else
         {
-            Debug.LogWarning("RemoveItem: �ش� �������� �κ��丮�� �����ϴ�.");
+            Debug.LogWarning("인벤토리가 가득 찼습니다. 아이템을 추가할 수 없습니다.");
+            return false;
         }
     }
 
-    // ����׿�: �κ��丮 ������ ���
-    //public void PrintItems()
-    //{
-    //    Debug.Log("=== Inventory Items ===");
-    //    String logs = "";
-    //    for (int i = 0; i < items.Count; i++)
-    //    {
-    //        var item = items[i];
-    //        if (item != null)
-    //        {
-    //            logs += $"Slot {i}: {item.itemName}({slots[i].ItemQuantity})\n";
-    //        }
-    //        else
-    //        {
-    //            logs += $"Slot {i}: (empty)\n";
-    //        }
-    //    }
-    //    Debug.Log(logs+"\n=======================");
-    //}
+    /// <summary>
+    /// 아이템을 인벤토리에서 제거합니다 (인덱스).
+    /// </summary>
+    /// <param name="idx">슬롯 인덱스</param>
+    public void RemoveItem(int idx)
+    {
+        if (idx < 0 || idx >= items.Count)
+        {
+            Debug.LogWarning($"Inventory: 잘못된 인덱스 {idx}");
+            return;
+        }
+
+            items[idx] = null;
+        if (slots != null && idx < slots.Length)
+            slots[idx].ItemQuantity = 0;
+        
+        RefreshSlots();
+        Debug.Log($"인벤토리 {idx + 1}번째 아이템이 제거되었습니다.");
+    }
+
+    /// <summary>
+    /// 아이템을 인벤토리에서 제거합니다 (아이템 오브젝트).
+    /// </summary>
+    /// <param name="item">제거할 아이템</param>
+    public void RemoveItem(Item item)
+    {
+        if (item == null)
+        {
+            Debug.LogWarning("Inventory: null 아이템은 제거할 수 없습니다.");
+            return;
+        }
+
+        int idx = items.FindIndex(x => x == item);
+        if (idx != -1)
+        {
+            items[idx] = null;
+            if (slots != null && idx < slots.Length)
+                slots[idx].ItemQuantity = 0;
+            
+            RefreshSlots();
+            Debug.Log($"인벤토리에서 '{item.itemName}' 아이템이 제거되었습니다.");
+        }
+        else
+        {
+            Debug.LogWarning("RemoveItem: 해당 아이템이 인벤토리에 없습니다.");
+        }
+    }
+
+    /// <summary>
+    /// 두 슬롯의 아이템을 교환합니다.
+    /// </summary>
+    /// <param name="fromIdx">교환할 슬롯 인덱스 1</param>
+    /// <param name="toIdx">교환할 슬롯 인덱스 2</param>
+    public void SwapItems(int fromIdx, int toIdx)
+    {
+        if (fromIdx < 0 || fromIdx >= items.Count || toIdx < 0 || toIdx >= items.Count)
+        {
+            Debug.LogWarning("Inventory: 잘못된 인덱스입니다.");
+            return;
+        }
+
+        var tempItem = items[fromIdx];
+        var tempQuantity = 0u;
+        
+        if (slots != null && fromIdx < slots.Length)
+        {
+            tempQuantity = slots[fromIdx].ItemQuantity;
+        }
+
+        items[fromIdx] = items[toIdx];
+        items[toIdx] = tempItem;
+
+        if (slots != null)
+        {
+            if (fromIdx < slots.Length)
+                slots[fromIdx].ItemQuantity = toIdx < slots.Length ? slots[toIdx].ItemQuantity : 0;
+            if (toIdx < slots.Length)
+                slots[toIdx].ItemQuantity = tempQuantity;
+        }
+
+        RefreshSlots();
+        Debug.Log($"슬롯 {fromIdx + 1}과 {toIdx + 1}의 아이템을 교환했습니다.");
+    }
+
+    /// <summary>
+    /// 특정 인덱스의 아이템을 반환합니다.
+    /// </summary>
+    /// <param name="idx">슬롯 인덱스</param>
+    /// <returns>아이템 또는 null</returns>
+    public Item GetItem(int idx)
+    {
+        if (idx < 0 || idx >= items.Count)
+            return null;
+        
+        return items[idx];
+    }
+
+    /// <summary>
+    /// 인벤토리에 빈 공간이 있는지 확인합니다.
+    /// </summary>
+    /// <returns>빈 공간이 있으면 true</returns>
+    public bool HasSpace()
+    {
+        return items.FindIndex(x => x == null) != -1;
+    }
+
+    /// <summary>
+    /// 특정 아이템을 보유하고 있는지 확인합니다.
+    /// </summary>
+    /// <param name="item">확인할 아이템</param>
+    /// <returns>보유하고 있으면 true</returns>
+    public bool HasItem(Item item)
+    {
+        if (item == null) return false;
+        return items.Contains(item);
+    }
+
+    #endregion
+
+    #region Debug
+
+    /// <summary>
+    /// 디버그: 인벤토리 아이템 목록을 출력합니다.
+    /// </summary>
+    public void PrintItems()
+    {
+        Debug.Log("=== Inventory Items ===");
+        string logs = "";
+        for (int i = 0; i < items.Count; i++)
+        {
+            var item = items[i];
+            uint quantity = 0;
+            if (slots != null && i < slots.Length)
+                quantity = slots[i].ItemQuantity;
+
+            if (item != null)
+            {
+                logs += $"Slot {i}: {item.itemName} (x{quantity})\n";
+            }
+            else
+            {
+                logs += $"Slot {i}: (empty)\n";
+            }
+        }
+        Debug.Log(logs + "=======================");
+    }
+
+    #endregion
 }
