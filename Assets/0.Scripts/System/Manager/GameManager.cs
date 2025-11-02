@@ -86,18 +86,21 @@ public class GameManager : Singleton<GameManager>
     #region 플레이어 스탯 업그레이드 관련 메서드
     public void HPUpgrade()
     {
+        Gold -= HpUpgradeData.datas[HpLevel + 1].price;
         HpLevel = Mathf.Clamp(++HpLevel, 0, HpUpgradeData.datas.Count - 1);
         Player_Controller.Instance.SetPlayerStat(StatType.HP, HpUpgradeData.datas[HpLevel].amount);
     }
 
     public void SpeedUpgrade()
     {
+        Gold -= SpeedUpgradeData.datas[SpeedLevel + 1].price;
         SpeedLevel = Mathf.Clamp(++SpeedLevel, 0, SpeedUpgradeData.datas.Count - 1);
         Player_Controller.Instance.SetPlayerStat(StatType.MoveSpeed, SpeedUpgradeData.datas[SpeedLevel].amount);
     }
 
     public void ViewAngleUpgrade()
     {
+        Gold -= ViewAngleUpgradeData.datas[ViewAngleLevel + 1].price;
         ViewAngleLevel = Mathf.Clamp(++ViewAngleLevel, 0, ViewAngleUpgradeData.datas.Count - 1);
         Player_Controller.Instance.fieldOfView.SetViewAngle(ViewAngleUpgradeData.datas[ViewAngleLevel].amount);
     }

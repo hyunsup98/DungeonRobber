@@ -18,8 +18,8 @@ public class CameraController : MonoBehaviour
     {
         if(Player_Controller.Instance != null && quadTrans != null)
         {
-            target = Player_Controller.Instance.transform;
             Player_Controller.Instance.fieldOfView.SetFovQuad(quadTrans);
+            target = Player_Controller.Instance.transform;
         }
     }
 

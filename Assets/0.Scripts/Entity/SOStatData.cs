@@ -5,7 +5,7 @@ using UnityEngine;
 public struct StatData
 {
     public float amount;
-    public float price;
+    public int price;
 }
 
 [CreateAssetMenu]

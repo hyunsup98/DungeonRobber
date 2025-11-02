@@ -21,14 +21,6 @@ public class FieldOfView : MonoBehaviour
 
     Vector3 lookDir = Vector3.zero;                         //시야각이 바라보고 있는 방향 벡터
 
-    private void Start()
-    {
-        if (GameManager.Instance.CurrentGameState != GameState.Dungeon) return;
-
-        InitFOVShader();
-        SetFOVShader();
-    }
-
     private void Update()
     {
         if (GameManager.Instance.CurrentGameState != GameState.Dungeon) return;
@@ -80,6 +72,8 @@ public class FieldOfView : MonoBehaviour
 
     private void InitFOVShader()
     {
+        if (fovQuad == null) return;
+
         maskMaterial.SetFloat("_InnerRadius", viewInnerRadius);
         maskMaterial.SetFloat("_OuterRadius", viewDistance);
         maskMaterial.SetFloat("_FOV", viewAngle);
