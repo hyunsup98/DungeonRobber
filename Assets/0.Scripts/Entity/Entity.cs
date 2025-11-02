@@ -23,14 +23,14 @@ public abstract class Entity : MonoBehaviour
     protected abstract void Attack();
 
     //피격 메서드
-    protected abstract void GetDamage(float damage);
+    public abstract void GetDamage(float damage);
 
     //버프 적용 메서드
-    protected void ApplyBuffToEntity(BaseStat stat, params BaseBuff[] buffs)
+    public void ApplyBuffToEntity(params BaseBuff[] buffs)
     {
         foreach (var buff in buffs)
         {
-            buffManager.ApplyBuff(buff, stat);
+            buffManager.ApplyBuff(buff, stats);
         }
     }
 }

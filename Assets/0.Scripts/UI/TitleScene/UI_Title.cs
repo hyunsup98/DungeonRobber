@@ -25,6 +25,6 @@ public class UI_Title : MonoBehaviour
     //게임 나가기 버튼을 클릭했을 때 호출
     public void OnClickExit()
     {
-
+        Application.Quit();
     }
 }

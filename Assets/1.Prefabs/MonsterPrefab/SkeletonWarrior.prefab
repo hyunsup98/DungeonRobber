@@ -9,12 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2153847135603497240}
-  - component: {fileID: 1311017699481238877}
   - component: {fileID: 3780790520304856486}
   - component: {fileID: 4835899557752365805}
   - component: {fileID: -4544868021683638809}
   - component: {fileID: -3117642547060124320}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: SkeletonWarrior
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,33 +36,6 @@ Transform:
   - {fileID: 1816609679568405002}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &1311017699481238877
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7553524762178184995}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!195 &3780790520304856486
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -73,7 +45,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 7553524762178184995}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.4
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -110,22 +82,27 @@ MonoBehaviour:
       <Value>k__BackingField: 2
     - type: 4
       <Value>k__BackingField: 1.5
-  target: {fileID: 0}
-  targetDistance: 0
-  detectedRangeRadius: 0
-  detectlayer:
+  playerDetectedRange: 15
+  detectDestinationRadius: 50
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 768
+  destinationLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  targetLayer:
     serializedVersion: 2
     m_Bits: 128
   agent: {fileID: 3780790520304856486}
-  monsterrib: {fileID: 1311017699481238877}
+  monsterAnimator: {fileID: -4544868021683638809}
+  target: {fileID: 0}
+  targetDistance: 0
   previousWaypoint: {fileID: 0}
   targetWaypoint: {fileID: 0}
-  monsterAnimator: {fileID: -4544868021683638809}
   colliders: []
-  Waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  isDetective: 0
+  waypoints: []
+  detectSeconds: 1
+  animeSeconds: 0.5
 --- !u!95 &-4544868021683638809
 Animator:
   serializedVersion: 5
@@ -167,9 +144,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 1
+  m_Height: 2.8102202
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.89116096, z: 0}
 --- !u!1001 &520428599578863856
 PrefabInstance:
   m_ObjectHideFlags: 0

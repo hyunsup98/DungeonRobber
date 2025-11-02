@@ -3,48 +3,42 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// ´Ù¾çÇÑ È¿°ú¿¡ °ü·ÃµÈ ±â´ÉÀ» ¼öÇàÇÏ´Â Å¬·¡½º,
-/// ÀÌ·Î¿î È¿°ú»Ó¸¸ ¾Æ´Ï¶ó, ÀÌµ¿ ¼Óµµ °¨¼Ò, ÃâÇ÷µô µîÀÇ ÇØ·Î¿î È¿°úµµ Æ÷ÇÔ
+/// ë‹¤ì–‘í•œ íš¨ê³¼ì— ê´€ë ¨ëœ ê¸°ëŠ¥ì„ ìˆ˜í–‰í•˜ëŠ” í´ë˜ìŠ¤,
+/// ì´ë¡œìš´ íš¨ê³¼ë¿ë§Œ ì•„ë‹ˆë¼, ì´ë™ ì†ë„ ê°ì†Œ, ì¶œí˜ˆë”œ ë“±ì˜ í•´ë¡œìš´ íš¨ê³¼ë„ í¬í•¨
 /// </summary>
 public abstract class BaseBuff : MonoBehaviour
 {
-    [Header("Áõ°¨½ÃÅ³ ½ºÅÈ Å¸ÀÔ")]
-    [SerializeField] protected StatType statType;           //¾î¶² Å¸ÀÔÀÇ ½ºÅÈÀ» Á¶Á¤ÇÒ°ÇÁö
+    [Header("ì¦ê°ì‹œí‚¬ ìŠ¤íƒ¯ íƒ€ì…")]
+    [SerializeField] protected StatType statType;           //ì–´ë–¤ íƒ€ì…ì˜ ìŠ¤íƒ¯ì„ ì¡°ì •í• ê±´ì§€
 
-    [Header("Áõ°¨½ÃÅ³ ¾ç")]
-    [SerializeField] protected float amount;                //¾ó¸¶¸¸Å­ÀÇ ¼öÄ¡¸¦ ¹Ù²Ü°ÇÁö
+    [Header("ì¦ê°ì‹œí‚¬ ì–‘")]
+    [SerializeField] protected float amount;                //ì–¼ë§ˆë§Œí¼ì˜ ìˆ˜ì¹˜ë¥¼ ë°”ê¿€ê±´ì§€
 
-    [Header("Áö¼Ó½Ã°£(ÃÊ)")]
-    [SerializeField] protected float duration;              //¸î ÃÊ µ¿¾È Áö¼ÓµÉ È¿°úÀÎÁö
+    [Header("ì§€ì†ì‹œê°„(ì´ˆ)")]
+    [SerializeField] protected float duration;              //ëª‡ ì´ˆ ë™ì•ˆ ì§€ì†ë  íš¨ê³¼ì¸ì§€
 
-    [Header("ÁÖ±â¸¶´Ù °è¼Ó ¹ßµ¿½ÃÅ³ °ÍÀÎÁö")]
-    [SerializeField] protected bool isTick;                 //ÇÑ ¹øÀÌ ¾Æ´Ñ Æ¯Á¤ ÁÖ±â¸¶´Ù °è¼Ó ½ÇÇàµÇ´Â È¿°úÀÎÁö
+    [Header("ì£¼ê¸°ë§ˆë‹¤ ê³„ì† ë°œë™ì‹œí‚¬ ê²ƒì¸ì§€")]
+    [SerializeField] protected bool isTick;                 //í•œ ë²ˆì´ ì•„ë‹Œ íŠ¹ì • ì£¼ê¸°ë§ˆë‹¤ ê³„ì† ì‹¤í–‰ë˜ëŠ” íš¨ê³¼ì¸ì§€
 
-    [Header("¸î ÃÊ ÁÖ±â·Î ¹ßµ¿½ÃÅ³ °ÍÀÎÁö")]
-    [SerializeField] protected float tickTime;              //¸î ÃÊ¸¶´Ù ½ÇÇàµÉ°ÇÁö
+    [Header("ëª‡ ì´ˆ ì£¼ê¸°ë¡œ ë°œë™ì‹œí‚¬ ê²ƒì¸ì§€")]
+    [SerializeField] protected float tickTime;              //ëª‡ ì´ˆë§ˆë‹¤ ì‹¤í–‰ë ê±´ì§€
 
-    [Header("È¿°ú°¡ ³¡³ª¸é ¿ø·¡ °ªÀ» ´Ù½Ã µÇµ¹¸± °ÍÀÎÁö")]
-    [SerializeField] protected bool isRestoreValue;         //È¿°ú°¡ ³¡³¯ ¶§ ´Ù½Ã ¿ø·¡ °ªÀ» µÇµ¹¸± °ÍÀÎÁö
+    [Header("íš¨ê³¼ê°€ ëë‚˜ë©´ ì›ë˜ ê°’ì„ ë‹¤ì‹œ ë˜ëŒë¦´ ê²ƒì¸ì§€")]
+    [SerializeField] protected bool isRestoreValue;         //íš¨ê³¼ê°€ ëë‚  ë•Œ ë‹¤ì‹œ ì›ë˜ ê°’ì„ ë˜ëŒë¦´ ê²ƒì¸ì§€
 
-    private float restoreValue = 0f;                        //È¿°ú°¡ ³¡³­ ÈÄ ¼öÄ¡¸¦ µÇµ¹¸± °æ¿ì ÀúÀåÇØ³õÀ» ±âÁ¸ ¼öÄ¡°ª
+    private float restoreValue = 0f;                        //íš¨ê³¼ê°€ ëë‚œ í›„ ìˆ˜ì¹˜ë¥¼ ë˜ëŒë¦´ ê²½ìš° ì €ì¥í•´ë†“ì„ ê¸°ì¡´ ìˆ˜ì¹˜ê°’
 
     private Coroutine buffCoroutine;
-    private WaitForSeconds seconds;                         //WaitForSeconds Ä³½Ì
 
-    private void Awake()
-    {
-        seconds = isTick ? new WaitForSeconds(tickTime) : new WaitForSeconds(duration);
-    }
-
-    //¹öÇÁ°¡ È°¼ºÈ­µÇ¾úÀ» ¶§ È£ÃâÇÒ ¸Ş¼­µå
+    //ë²„í”„ê°€ í™œì„±í™”ë˜ì—ˆì„ ë•Œ í˜¸ì¶œí•  ë©”ì„œë“œ
     public virtual void OnActivate(List<BaseBuff> list, BaseStat stat)
     {
-        //ÀÌ¹Ì ¹öÇÁ È¿°ú°¡ ½ÇÇàµÇ°í ÀÖ´Â °æ¿ì ¡æ ÁßÃ¸µÇÁö ¾ÊÀ¸¹Ç·Î ÁßÁö
+        //ì´ë¯¸ ë²„í”„ íš¨ê³¼ê°€ ì‹¤í–‰ë˜ê³  ìˆëŠ” ê²½ìš° â†’ ì¤‘ì²©ë˜ì§€ ì•Šìœ¼ë¯€ë¡œ ì¤‘ì§€
         if (buffCoroutine != null)
         {
             StopCoroutine(buffCoroutine);
 
-            //´Ù½Ã ¼öÄ¡¸¦ µÇµ¹·Á¾ß ÇÏ´Â ¹öÇÁÀÇ °æ¿ì ´Ù½Ã µÇµ¹¸² ¡æ ÁßÃ¸µÇÁö ¾Êµµ·Ï
+            //ë‹¤ì‹œ ìˆ˜ì¹˜ë¥¼ ë˜ëŒë ¤ì•¼ í•˜ëŠ” ë²„í”„ì˜ ê²½ìš° ë‹¤ì‹œ ë˜ëŒë¦¼ â†’ ì¤‘ì²©ë˜ì§€ ì•Šë„ë¡
             if (isRestoreValue)
             {
                 stat.SetStat(statType, restoreValue);
@@ -59,26 +53,26 @@ public abstract class BaseBuff : MonoBehaviour
         buffCoroutine = StartCoroutine(Activating(list, stat));
     }
 
-    //¹öÇÁ°¡ È°¼ºÈ­µÇ¾î ÀÖ´Â Áß ¡æ isTickÀÌ TrueÀÏ °æ¿ì ¹İº¹¹®À» ÅëÇØ ÁÖ±âÀû ¼öÇà
+    //ë²„í”„ê°€ í™œì„±í™”ë˜ì–´ ìˆëŠ” ì¤‘ â†’ isTickì´ Trueì¼ ê²½ìš° ë°˜ë³µë¬¸ì„ í†µí•´ ì£¼ê¸°ì  ìˆ˜í–‰
     public IEnumerator Activating(List<BaseBuff> list, BaseStat stat)
     {
         if(isTick)
         {
-            //isTickÀÌ true¸é duration Å¸ÀÓµ¿¾È ÁÖ±âÀûÀ¸·Î(tickSeconds¸¶´Ù) OnTick¸Ş¼­µå È£Ãâ
+            //isTickì´ trueë©´ duration íƒ€ì„ë™ì•ˆ ì£¼ê¸°ì ìœ¼ë¡œ(tickSecondsë§ˆë‹¤) OnTickë©”ì„œë“œ í˜¸ì¶œ
             var timer = duration;
 
             while (timer > 0)
             {
                 OnTick(stat);
-                yield return seconds;
+                yield return CoroutineManager.waitForSeconds(tickTime);
                 timer -= tickTime;
             }
         }
         else
         {
-            //isTickÀÌ false¸é duration¸¸Å­ ±â´Ù¸²
+            //isTickì´ falseë©´ durationë§Œí¼ ê¸°ë‹¤ë¦¼
             OnTick(stat);
-            yield return seconds;
+            yield return CoroutineManager.waitForSeconds(duration);
         }
 
         OnDeActivate(list, stat);
@@ -89,10 +83,10 @@ public abstract class BaseBuff : MonoBehaviour
         stat.ModifyStat(statType, amount);
     }
 
-    //È¿°ú°¡ ³¡³¯ ¶§ È£ÃâÇÒ ¸Ş¼­µå
+    //íš¨ê³¼ê°€ ëë‚  ë•Œ í˜¸ì¶œí•  ë©”ì„œë“œ
     public virtual void OnDeActivate(List<BaseBuff> list, BaseStat stat)
     {
-        //¸®½ºÆ®¿¡ ÇöÀç ¹öÇÁ °´Ã¼°¡ Á¸ÀçÇÏ¸é Áö¿öÁÜ ¡æ ÇÒ ÀÏ ³¡
+        //ë¦¬ìŠ¤íŠ¸ì— í˜„ì¬ ë²„í”„ ê°ì²´ê°€ ì¡´ì¬í•˜ë©´ ì§€ì›Œì¤Œ â†’ í•  ì¼ ë
         if (list != null && list.Exists(b => b == this))
         {
             list.Remove(this);
@@ -103,7 +97,7 @@ public abstract class BaseBuff : MonoBehaviour
             stat.SetStat(statType, restoreValue);
         }
 
-        //Ç® ¾È¿¡ Áı¾î³Ö±â
+        //í’€ ì•ˆì— ì§‘ì–´ë„£ê¸°
         BuffPool.Instance.TakeObjects(this);
     }
 }

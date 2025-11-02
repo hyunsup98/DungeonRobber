@@ -29,6 +29,20 @@ public class SoundManager : Singleton<SoundManager>
         soundEffectAudioSource.PlayOneShot(clip);
     }
 
+    public void SetBGMVolume(float volume)
+    {
+        if (bgmAudioSource == null) return;
+
+        bgmAudioSource.volume = volume;
+    }
+
+    public void SetSoundEffectVolume(float volume)
+    {
+        if (soundEffectAudioSource == null) return;
+
+        soundEffectAudioSource.volume = volume;
+    }
+
     //씬이 로드될 때 실행할 메서드
     public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {

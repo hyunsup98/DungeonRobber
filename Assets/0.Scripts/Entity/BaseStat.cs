@@ -35,13 +35,19 @@ public class Stat
     //수치를 조정하는 메서드
     public void AddValue(float amount)
     {
-        Value += amount;
+        if (Value + amount < 0)
+            Value = 0;
+        else
+            Value += amount;
     }
 
     //수치를 세팅하는 메서드
     public void SetValue(float value)
     {
-        Value = value;
+        if (value < 0)
+            Value = 0;
+        else
+            Value = value;
     }
 }
 #endregion
@@ -66,7 +72,8 @@ public class BaseStat
 
         foreach (var stat in baseStats)
         {
-            stats.Add(stat);
+            Stat s = new Stat(stat.Type, stat.Value);
+            stats.Add(s);
         }
     }
 

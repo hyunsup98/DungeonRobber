@@ -5,7 +5,8 @@ public class FieldOfView : MonoBehaviour
     [Header("시야각 적 탐지 변수")]
     [SerializeField] private float viewAngle = 90f;         //시야각
     [SerializeField] private float viewInnerRadius = 3f;    //플레이어 주변 시야 범위
-    [SerializeField] private float viewDistance = 22f;      //부채꼴 시야각의 최대 시야 거리
+    [SerializeField] private float viewDistance = 30f;      //부채꼴 시야각의 최대 시야 거리
+    [SerializeField] private float offsetY = 0.5f;          //레이캐스트를 쏠 때 y 좌표 위치(캐릭터 position이 바닥에 있기 때문에 감지를 못할 때가 있어서 올려줌)
     [SerializeField] private LayerMask targetMask;          //적(Enemy) 레이어마스크
     [SerializeField] private LayerMask obstacleMask;        //장애물, 벽 레이어마스크
 
@@ -23,6 +24,7 @@ public class FieldOfView : MonoBehaviour
     private void Start()
     {
         InitFOVShader();
+        SetFOVShader();
     }
 
     private void Update()
@@ -42,13 +44,15 @@ public class FieldOfView : MonoBehaviour
 
         foreach (var target in targetCol)
         {
-            Vector3 dirToMousePoint = Camera.main.GetWorldPosToMouse(transform) - transform.position;
             Vector3 dirToTarget = target.transform.position - transform.position;
-            float angleBetween = Vector3.Angle(dirToMousePoint.normalized, dirToTarget.normalized);
+            dirToTarget.y = 0f;
 
-            if (angleBetween < viewAngle * 0.5f || dirToTarget.sqrMagnitude <= viewInnerRadius * viewInnerRadius)
+            float angleBetween = Vector3.Angle(lookDir, dirToTarget);
+
+            if (angleBetween <= viewAngle * 0.5f || dirToTarget.sqrMagnitude <= viewInnerRadius * viewInnerRadius)
             {
-                if (!Physics.Raycast(transform.position, dirToTarget, viewDistance, obstacleMask))
+                dirToTarget.y = offsetY;
+                if (!Physics.Raycast(new Vector3(transform.position.x, offsetY, transform.position.z), dirToTarget, Vector3.Distance(transform.position, target.transform.position), obstacleMask))
                 {
                     SetVisible(target.transform, true);
                     continue;
@@ -82,9 +86,17 @@ public class FieldOfView : MonoBehaviour
     {
         if (player == null || maskMaterial == null) return;
 
-        lookDir = Vector3.Slerp(lookDir, (Camera.main.GetWorldPosToMouse(transform) - transform.position).normalized, fovRotateSpeed * Time.deltaTime);
+        lookDir = Vector3.Slerp(lookDir.normalized, (Camera.main.GetWorldPosToMouse(transform) - transform.position).normalized, fovRotateSpeed * Time.deltaTime);
+        lookDir.y = 0f;
 
         maskMaterial.SetVector("_PlayerPos", player.position);
         maskMaterial.SetVector("_PlayerForward", lookDir);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(0f, 1f, 0f, 0.25f); // 연한 초록색 반투명
+        Gizmos.DrawWireSphere(transform.position, viewDistance); // 외곽선 원
+        Gizmos.DrawSphere(transform.position, viewInnerRadius);  // 내부 근거리 감지 영역
     }
 }

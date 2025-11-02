@@ -1,9 +1,24 @@
+using System.Collections;
 using UnityEngine;
 
 public sealed partial class Player_Controller
 {
     protected override void Attack()
     {
+        if (CheckPlayerBehaviorState(PlayerBehaviorState.IsAttack) || CheckPlayerBehaviorState(PlayerBehaviorState.IsDodge)) return;
+
+        StartCoroutine(DoAttack());
+    }
+
+    /// <summary>
+    /// ì‹¤ì§ˆì ì¸ ê³µê²© ë©”ì„œë“œ
+    /// ê³µê²© ì†ë„(AttackDelay) ë§Œí¼ IsAttackì„ Trueë¡œ ë°”ê¿ˆ
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator DoAttack()
+    {
+        AddPlayerBehaviorState(PlayerBehaviorState.IsAttack);
+
         playerAnimator.SetTrigger("attack");
 
         Vector3 dir = transform.forward;
@@ -11,23 +26,30 @@ public sealed partial class Player_Controller
 
         RaycastHit[] hits = Physics.BoxCastAll(atkPos, new Vector3(0.5f, 0.4f, stats.GetStat(StatType.AttackRange) * 0.5f), dir, transform.rotation, 0f, attackMask);
 
-        foreach(var hit in hits)
+        foreach (var hit in hits)
         {
-            //todo °ø°İ ·ÎÁ÷ ³Ö±â
-            Debug.Log("°ø°İ!");
+            if(hit.collider.TryGetComponent<Monster>(out var enemy))
+            {
+                enemy.GetDamage(stats.GetStat(StatType.AttackDamage));
+                Debug.Log($"ëŒ€ë¯¸ì§€: {stats.GetStat(StatType.AttackDamage)}");
+            }
         }
+
+        yield return CoroutineManager.waitForSeconds(stats.GetStat(StatType.AttackDelay));
+        RemovePlayerBehaviorState(PlayerBehaviorState.IsAttack);
     }
 
     /// <summary>
-    /// ´ë¹ÌÁö ÇÇ°İ ¸Ş¼­µå
-    /// ÇÃ·¹ÀÌ¾îÀÇ Ã¼·ÂÀ» ±ğ¾ÆÁÜ, ÇÇ°İ °ü·Ã ¸ğ¼Ç, »ç¿îµå µîÀ» ÀÔÀ½
+    /// ëŒ€ë¯¸ì§€ í”¼ê²© ë©”ì„œë“œ
+    /// í”Œë ˆì´ì–´ì˜ ì²´ë ¥ì„ ê¹ì•„ì¤Œ, í”¼ê²© ê´€ë ¨ ëª¨ì…˜, ì‚¬ìš´ë“œ ë“±ì„ ì…ìŒ
     /// </summary>
-    /// <param name="damage"> ÇÃ·¹ÀÌ¾î°¡ ÀÔÀ» ´ë¹ÌÁöÀÇ ¼öÄ¡ </param>
-    protected override void GetDamage(float damage)
+    /// <param name="damage"> í”Œë ˆì´ì–´ê°€ ì…ì„ ëŒ€ë¯¸ì§€ì˜ ìˆ˜ì¹˜ </param>
+    public override void GetDamage(float damage)
     {
         stats.ModifyStat(StatType.HP, -damage);
+        onPlayerStatChanged?.Invoke();
 
-        if(stats.GetStat(StatType.HP) <= 0)
+        if (stats.GetStat(StatType.HP) <= 0)
         {
             playerDeadAction?.Invoke();
         }
@@ -40,13 +62,4 @@ public sealed partial class Player_Controller
         RemovePlayerBehaviorState(PlayerBehaviorState.Alive);
         AddPlayerBehaviorState(PlayerBehaviorState.Dead);
     }
-
-    //private void OnDrawGizmos()
-    //{
-    //    Vector3 dir = transform.forward;
-    //    Vector3 atkPos = attackPos.position + (transform.forward * (attackRange * 0.5f));
-
-    //    Gizmos.color = Color.green;
-    //    Gizmos.DrawCube(atkPos, new Vector3(1f, 0.8f, attackRange));
-    //}
 }

@@ -1,0 +1,119 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2055020695032533865
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8253456734322936203}
+  - component: {fileID: 7625713682982165177}
+  m_Layer: 0
+  m_Name: ZoneManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8253456734322936203
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2055020695032533865}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7625713682982165177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2055020695032533865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0769e343f808c62439012a806d7986a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  zones:
+  - zoneName: 1
+    areaRootObject: {fileID: 0}
+    autoSizeFromBounds: 1
+    areaSizeXZ: {x: 0, y: 0}
+    effectSizeXZ: {x: 8000, y: 8000}
+    effectHeightOffset: -20
+    effectThicknessY: 100
+    state: 0
+    lockedEffectInstance: {fileID: 0}
+  - zoneName: 2
+    areaRootObject: {fileID: 0}
+    autoSizeFromBounds: 1
+    areaSizeXZ: {x: 0, y: 0}
+    effectSizeXZ: {x: 8000, y: 8000}
+    effectHeightOffset: -20
+    effectThicknessY: 100
+    state: 0
+    lockedEffectInstance: {fileID: 0}
+  - zoneName: 3
+    areaRootObject: {fileID: 0}
+    autoSizeFromBounds: 1
+    areaSizeXZ: {x: 0, y: 0}
+    effectSizeXZ: {x: 8000, y: 8000}
+    effectHeightOffset: -20
+    effectThicknessY: 100
+    state: 0
+    lockedEffectInstance: {fileID: 0}
+  - zoneName: 4
+    areaRootObject: {fileID: 0}
+    autoSizeFromBounds: 1
+    areaSizeXZ: {x: 0, y: 0}
+    effectSizeXZ: {x: 8000, y: 8000}
+    effectHeightOffset: -20
+    effectThicknessY: 100
+    state: 0
+    lockedEffectInstance: {fileID: 0}
+  - zoneName: 5
+    areaRootObject: {fileID: 0}
+    autoSizeFromBounds: 1
+    areaSizeXZ: {x: 0, y: 0}
+    effectSizeXZ: {x: 8000, y: 8000}
+    effectHeightOffset: -20
+    effectThicknessY: 100
+    state: 0
+    lockedEffectInstance: {fileID: 0}
+  - zoneName: 6
+    areaRootObject: {fileID: 0}
+    autoSizeFromBounds: 1
+    areaSizeXZ: {x: 0, y: 0}
+    effectSizeXZ: {x: 8000, y: 8000}
+    effectHeightOffset: -20
+    effectThicknessY: 100
+    state: 0
+    lockedEffectInstance: {fileID: 0}
+  - zoneName: 7
+    areaRootObject: {fileID: 0}
+    autoSizeFromBounds: 1
+    areaSizeXZ: {x: 0, y: 0}
+    effectSizeXZ: {x: 8000, y: 8000}
+    effectHeightOffset: -20
+    effectThicknessY: 100
+    state: 0
+    lockedEffectInstance: {fileID: 0}
+  timeBetweenLocks: 3
+  warningDuration: 3
+  lockedEffectPrefab: {fileID: 7251879486380165639, guid: c2f6a8962aac3814aa56cb9647c93470, type: 3}
+  floorMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  warningColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  lockedColor: {r: 1, g: 0.35, b: 0.35, a: 1}
+  infoColor: {r: 1, g: 1, b: 1, a: 1}
