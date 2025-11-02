@@ -39,7 +39,7 @@ public class FieldOfView : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (GameManager.Instance.CurrentGameState == GameState.Title || GameManager.Instance.CurrentGameState == GameState.Pause) return;
+        if (GameManager.Instance.CurrentGameState == GameState.Title) return;
 
         FindVisibleTargets();
     }
@@ -99,10 +99,13 @@ public class FieldOfView : MonoBehaviour
         maskMaterial.SetVector("_PlayerForward", lookDir);
     }
 
-    private void OnDrawGizmosSelected()
+    public void SetViewAngle(float angle)
     {
-        Gizmos.color = new Color(0f, 1f, 0f, 0.25f); // 연한 초록색 반투명
-        Gizmos.DrawWireSphere(transform.position, viewDistance); // 외곽선 원
-        Gizmos.DrawSphere(transform.position, viewInnerRadius);  // 내부 근거리 감지 영역
+        viewAngle = angle;
+    }
+
+    public void SetFovQuad(Transform trans)
+    {
+        fovQuad = trans;
     }
 }

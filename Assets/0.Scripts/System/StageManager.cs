@@ -8,6 +8,7 @@ public class StageManager : MonoBehaviour
     private void Start()
     {
         PlayBGM();
+
         if(Player_Controller.Instance != null && spawnPos != null)
         {
             Player_Controller.Instance.transform.position = spawnPos.position;

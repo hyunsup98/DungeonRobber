@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class NPC_Upgrade : NPC
 {
+    [SerializeField] private GameObject upgradeUI;
+
     private void Update()
     {
         if(isCanInteractive)
         {
             if(Input.GetKeyDown(KeyCode.F))
             {
+                UIManager.Instance.OnOffUI(UIManager.Instance.textInteractive.gameObject, false);
                 DoInteractive();
             }
         }
@@ -17,6 +20,16 @@ public class NPC_Upgrade : NPC
 
     protected override void DoInteractive()
     {
+        upgradeUI.SetActive(true);
+    }
 
+    protected override void OnTriggerExit(Collider other)
+    {
+        base.OnTriggerExit(other);
+
+        if (other.CompareTag("Player"))
+        {
+            upgradeUI.SetActive(false);
+        }
     }
 }

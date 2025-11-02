@@ -2,14 +2,26 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    //¹Ù¶óº¼ Å¸°Ù
+    //ë°”ë¼ë³¼ íƒ€ê²Ÿ
     [SerializeField] private Transform target;
 
-    //Ä«¸Ş¶ó°¡ ¶° ÀÖÀ» yÁÂÇ¥ °ª
+    //ì‰ì´ë”ë¡œ ì¹ í•´ì¤„ ì¿¼ë“œ íŠ¸ëœìŠ¤í¼
+    [SerializeField] private Transform quadTrans;
+
+    //ì¹´ë©”ë¼ê°€ ë–  ìˆì„ yì¢Œí‘œ ê°’
     [SerializeField] private float yOffset = 20f;
 
-    //ÄõÅÍºä¸¦ À§ÇØ ÇÃ·¹ÀÌ¾î À§Ä¡¿¡¼­ zÁÂÇ¥°¡ ¾ó¸¶³ª ¾Æ·¡¿¡ ÀÖÀ»Áö¿¡ ´ëÇÑ °ª
+    //ì¿¼í„°ë·°ë¥¼ ìœ„í•´ í”Œë ˆì´ì–´ ìœ„ì¹˜ì—ì„œ zì¢Œí‘œê°€ ì–¼ë§ˆë‚˜ ì•„ë˜ì— ìˆì„ì§€ì— ëŒ€í•œ ê°’
     [SerializeField] private float zOffset = -10f;
+
+    private void Awake()
+    {
+        if(Player_Controller.Instance != null && quadTrans != null)
+        {
+            target = Player_Controller.Instance.transform;
+            Player_Controller.Instance.fieldOfView.SetFovQuad(quadTrans);
+        }
+    }
 
     private void LateUpdate()
     {
@@ -17,7 +29,7 @@ public class CameraController : MonoBehaviour
         RotateToTarget();
     }
 
-    //Å¸°ÙÀ» µû¶ó´Ù´Ï´Â ¸Ş¼­µå
+    //íƒ€ê²Ÿì„ ë”°ë¼ë‹¤ë‹ˆëŠ” ë©”ì„œë“œ
     private void FollowToTarget()
     {
         if (target == null) return;
@@ -26,7 +38,7 @@ public class CameraController : MonoBehaviour
         transform.position = followPos;
     }
 
-    //Å¸°ÙÀ» ¹Ù¶óº¸´Â ¸Ş¼­µå
+    //íƒ€ê²Ÿì„ ë°”ë¼ë³´ëŠ” ë©”ì„œë“œ
     private void RotateToTarget()
     {
         if (target == null) return;
