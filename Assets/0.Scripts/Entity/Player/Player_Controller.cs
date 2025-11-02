@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [System.Flags]
 public enum PlayerBehaviorState : int
@@ -30,6 +31,7 @@ public sealed partial class Player_Controller : Entity
     [SerializeField] private Rigidbody playerRigid;         //플레이어 Rigidbody
     [SerializeField] private Animator playerAnimator;       //플레이어 애니메이터
     [SerializeField] private Transform attackPos;           //플레이어가 공격할 때 공격 탐지를 시작할 위치
+    [field: SerializeField] public FieldOfView fieldOfView { get; private set; }       //시야각 구하는 클래스
 
     [Header("이동 관련 변수")]
     [SerializeField] private float runSpeed;                //플레이어 달리기 속도
@@ -100,10 +102,12 @@ public sealed partial class Player_Controller : Entity
     private void Start()
     {
         playerDeadAction += Dead;
+        GameManager.Instance.onSceneChanged += Init;
     }
 
     private void Update()
     {
+        if (GameManager.Instance.CurrentGameState == GameState.Title) return;
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
 
@@ -121,15 +125,11 @@ public sealed partial class Player_Controller : Entity
 
         //스태미너 회복
         RecoveryStamina();
-
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            GetDamage(5f);
-        }
     }
 
     private void FixedUpdate()
     {
+        if (GameManager.Instance.CurrentGameState == GameState.Title) return;
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
         //이동
@@ -150,6 +150,12 @@ public sealed partial class Player_Controller : Entity
         stamina = MaxStamina;
 
         playerBehaviorState = PlayerBehaviorState.Alive | PlayerBehaviorState.IsCanMove;
+    }
+
+    public void SetPlayerStat(StatType type, float value)
+    {
+        stats.SetBaseStat(type, value);
+        stats.InitStat(type);
     }
 
     #region 플레이어의 행동 상태 제어

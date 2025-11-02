@@ -4,8 +4,8 @@ using UnityEngine.SceneManagement;
 
 public enum SoundType
 {
-    BGM,            //¹è°æÀ½
-    SoundEffect,    //È¿°úÀ½
+    BGM,            //ë°°ê²½ìŒ
+    SoundEffect,    //íš¨ê³¼ìŒ
 }
 
 public class SoundManager : Singleton<SoundManager>
@@ -21,20 +21,18 @@ public class SoundManager : Singleton<SoundManager>
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    public void PlayBGM(AudioClip clip, float volume)
+    public void PlayBGM(AudioClip clip)
     {
         if (bgmAudioSource == null || clip == null) return;
 
         bgmAudioSource.clip = clip;
-        SetSoundVolume(SoundType.BGM, volume);
         bgmAudioSource.Play();
     }
 
-    public void PlaySoundEffect(AudioClip clip, float volume)
+    public void PlaySoundEffect(AudioClip clip)
     {
         if (soundEffectAudioSource == null || clip == null) return;
 
-        SetSoundVolume(SoundType.SoundEffect, volume);
         soundEffectAudioSource.PlayOneShot(clip);
     }
 
@@ -53,7 +51,7 @@ public class SoundManager : Singleton<SoundManager>
         }
     }
 
-    //¾ÀÀÌ ·ÎµåµÉ ¶§ ½ÇÇàÇÒ ¸Ş¼­µå
+    //ì”¬ì´ ë¡œë“œë  ë•Œ ì‹¤í–‰í•  ë©”ì„œë“œ
     public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         StopAudioSource(bgmAudioSource);

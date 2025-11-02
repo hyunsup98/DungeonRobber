@@ -3,23 +3,20 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// UI ¿ÀºêÁ§Æ®¿¡ ÀÌ ½ºÅ©¸³Æ®¸¦ ³ÖÀ¸¸é ÁöÁ¤ÇÑ AudioClipÀ» Àç»ıÇÏ°í TextÀÇ Bold¸¦ ²°´Ù Å°´Â È¿°ú¸¦ ÁÙ ¼ö ÀÖ½À´Ï´Ù.
+/// UI ì˜¤ë¸Œì íŠ¸ì— ì´ ìŠ¤í¬ë¦½íŠ¸ë¥¼ ë„£ìœ¼ë©´ ì§€ì •í•œ AudioClipì„ ì¬ìƒí•˜ê³  Textì˜ Boldë¥¼ ê»ë‹¤ í‚¤ëŠ” íš¨ê³¼ë¥¼ ì¤„ ìˆ˜ ìˆìŠµë‹ˆë‹¤.
 /// </summary>
 public class UI_MouseOnEffect : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private AudioClip clip;
     [SerializeField] private TMP_Text text;
-    [SerializeField] private bool isTextEffect;     //¸¶¿ì½º¸¦ ¿Ã·ÈÀ» ¶§ ÅØ½ºÆ®ÀÇ Å©±â°¡ Ä¿Áö´Â È¿°ú¸¦ ³ÖÀ» °ÍÀÎÁö
+    [SerializeField] private bool isTextEffect;     //ë§ˆìš°ìŠ¤ë¥¼ ì˜¬ë ¸ì„ ë•Œ í…ìŠ¤íŠ¸ì˜ í¬ê¸°ê°€ ì»¤ì§€ëŠ” íš¨ê³¼ë¥¼ ë„£ì„ ê²ƒì¸ì§€
 
-    [Range(0, 1)]
-    [SerializeField] private float soundVolume;     //¸¶¿ì½º ¿Ã·ÈÀ» ¶§ clip ¼Ò¸® Å©±â
-
-    //ÇöÀç UI ¿ÀºêÁ§Æ®¿¡ ¸¶¿ì½º Æ÷ÀÎÅÍ¸¦ ¿Ã·ÈÀ» ¶§ È£Ãâ
+    //í˜„ì¬ UI ì˜¤ë¸Œì íŠ¸ì— ë§ˆìš°ìŠ¤ í¬ì¸í„°ë¥¼ ì˜¬ë ¸ì„ ë•Œ í˜¸ì¶œ
     public void OnPointerEnter(PointerEventData eventData)
     {
         if(clip != null)
         {
-            SoundManager.Instance.PlaySoundEffect(clip, soundVolume);
+            SoundManager.Instance.PlaySoundEffect(clip);
         }
 
         if(isTextEffect)
@@ -31,7 +28,7 @@ public class UI_MouseOnEffect : MonoBehaviour, IPointerEnterHandler, IPointerExi
         }
     }
 
-    //ÇöÀç UI ¿ÀºêÁ§Æ®¿¡¼­ ¸¶¿ì½º Æ÷ÀÎÅÍ¸¦ ³»·ÈÀ» ¶§ È£Ãâ
+    //í˜„ì¬ UI ì˜¤ë¸Œì íŠ¸ì—ì„œ ë§ˆìš°ìŠ¤ í¬ì¸í„°ë¥¼ ë‚´ë ¸ì„ ë•Œ í˜¸ì¶œ
     public void OnPointerExit(PointerEventData eventData)
     {
         if(isTextEffect)
