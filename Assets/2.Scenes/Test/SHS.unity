@@ -760,6 +760,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1107888528}
+  quadTrans: {fileID: 0}
   yOffset: 30
   zOffset: -10
 --- !u!4 &1405820081
