@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class RushTurtle : Monster
 {
-    [SerializeField] WaitForSeconds detectDelay = new WaitForSeconds(1f);//감지 딜레이 
-    [SerializeField] WaitForSeconds animeDelay = new WaitForSeconds(0.5f);//애니메이션 딜레이 
+    [SerializeField] float detectDelay = 1f;//감지 딜레이 
+    [SerializeField] float animeDelay = 0.5f;//애니메이션 딜레이 
     [SerializeField] BaseBuff stunned; //스턴  
     int playerLayer;
     int WaypointLayer;   
@@ -21,6 +21,10 @@ public class RushTurtle : Monster
     {
         Init();
         StartCoroutine(WaitAnimationEnd("Spawn")); //스폰 애니메이션 종료까지 대기     
+    }
+    private void Start()
+    {
+        attackDelaytime = stats.GetBaseStat(StatType.AttackDelay);
     }
     private void FixedUpdate()
     {
@@ -216,7 +220,7 @@ public class RushTurtle : Monster
             {
                 isDetectTarget = false;
             }
-            yield return detectDelay;
+            yield return CoroutineManager.waitForSeconds(detectDelay);
         }
     }
 
@@ -237,14 +241,14 @@ public class RushTurtle : Monster
             yield return null;
         }
         agent.isStopped = false; //애니메이션 재생 끝나면 다시 이동 가능
-        yield return animeDelay;
+        yield return CoroutineManager.waitForSeconds(animeDelay);
     } 
 
     private IEnumerator AttackDelay()
     {
         isAttackCooltime = true;
 
-        yield return attackDelaytime;
+        yield return CoroutineManager.waitForSeconds(attackDelaytime);
 
         isAttackCooltime = false;
     }
