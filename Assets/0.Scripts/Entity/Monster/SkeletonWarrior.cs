@@ -1,11 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.Android.Types;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Animations;
 
 public class SkeletonWarrior : Monster
 {
@@ -106,7 +100,7 @@ public class SkeletonWarrior : Monster
 
         if (targetDistance <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange)) //공격 사거리안에 들어오면 공격시작 
         {
-            RaycastHit[] hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0.5f, 0.5f), transform.forward, transform.rotation, stats.GetStat(StatType.AttackRange), obstacleLayer | targetLayer);
+            RaycastHit[] hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0.5f, 0.5f), transform.forward, transform.rotation, stats.GetStat(StatType.AttackRange), obstacleLayerMask | targetLayer);
             //▼ 플레이어가 장애물 뒤에 숨어있지 않고 공격범위 내라면 
             foreach (var hit in hits)
             {
@@ -167,7 +161,7 @@ public class SkeletonWarrior : Monster
             SetMoveBool(false); //일단 멈춤
             previousWaypoint = targetWaypoint; //이전 목적지에 현재 목적지 저장                        
 
-            while (true && isDetectTarget == false)
+            while (isDetectTarget == false)
             {     
                 if (waypoints.Count <= 1) //목적지가 하나밖에 없으면
                     break;

@@ -9,8 +9,8 @@ public class BigBear : Monster
     Vector3 homePosition;
     bool isHome;//집인지 확인하는 변수
     int playerLayer;
+    bool isAlive = true;
     Coroutine detectPlayerCoroutine; //감지 코루틴 변수
-    bool isAlive = true; //생존여부 확인 
     private void Awake()
     {
         awakeinit();
@@ -76,6 +76,7 @@ public class BigBear : Monster
         if(!isAttackCooltime)//공격 쿨타임이 아닐때 
         {
             SetMoveBool(false); //이동 멈춤
+            monsterAnimator.SetTrigger("Attack");
             StartCoroutine(AttackDelay());              
         }
     }
@@ -102,7 +103,7 @@ public class BigBear : Monster
 
         if (targetDistance <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange)) //공격 사거리안에 들어오면 공격시작 
         {
-            RaycastHit[] hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0.5f, 0.5f), transform.forward, transform.rotation, stats.GetStat(StatType.AttackRange), obstacleLayer | targetLayer);
+            RaycastHit[] hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0.5f, 0.5f), transform.forward, transform.rotation, stats.GetStat(StatType.AttackRange), obstacleLayerMask | targetLayer);
             //▼ 플레이어가 장애물 뒤에 숨어있지 않고 공격범위 내라면 
             foreach (var hit in hits)
             {
@@ -133,14 +134,19 @@ public class BigBear : Monster
     /// <param name="damage"> 해당 몬스터가 입을 피해 </param>
     public override void GetDamage(float damage)
     {
-        
+        monsterAnimator.SetTrigger("GetDamage");
         stats.ModifyStat(StatType.HP, -damage);
 
         if (stats.GetStat(StatType.HP) <= 0)
         {
             isAlive = false;
-            Destroy(this);
+            monsterAnimator.SetBool("isDead", true);
+
         }
+    }
+     public void DestroyMonster()
+    {
+        Destroy(gameObject);
     }
 
     /// <summary>
@@ -170,6 +176,7 @@ public class BigBear : Monster
     void SetMoveBool(bool toSetBool)
     {
         agent.isStopped = !toSetBool;
+        monsterAnimator.SetBool("isWalk", toSetBool);
         
     }
 
