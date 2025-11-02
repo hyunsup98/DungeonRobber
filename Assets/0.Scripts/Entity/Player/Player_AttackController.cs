@@ -19,7 +19,6 @@ public sealed partial class Player_Controller
     {
         AddPlayerBehaviorState(PlayerBehaviorState.IsAttack);
 
-        SoundManager.Instance.PlaySoundEffect(attackClip);
         playerAnimator.SetTrigger("attack");
 
         Vector3 dir = transform.forward;
@@ -32,6 +31,7 @@ public sealed partial class Player_Controller
             if(hit.collider.TryGetComponent<Monster>(out var enemy))
             {
                 enemy.GetDamage(stats.GetStat(StatType.AttackDamage));
+                Debug.Log($"대미지: {stats.GetStat(StatType.AttackDamage)}");
             }
         }
 
@@ -47,7 +47,6 @@ public sealed partial class Player_Controller
     public override void GetDamage(float damage)
     {
         stats.ModifyStat(StatType.HP, -damage);
-        SoundManager.Instance.PlaySoundEffect(hitClip);
         onPlayerStatChanged?.Invoke();
 
         if (stats.GetStat(StatType.HP) <= 0)

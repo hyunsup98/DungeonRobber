@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [System.Flags]
 public enum PlayerBehaviorState : int
@@ -37,8 +38,6 @@ public sealed partial class Player_Controller : Entity
     [SerializeField] private float dodgeForce;              //구르기 힘
 
     [Header("공격 관련 변수")]
-    [SerializeField] private AudioClip attackClip;          //어택 사운드
-    [SerializeField] private AudioClip hitClip;             //대미지 입을 때 사운드
     [SerializeField] private LayerMask attackMask;          //공격할 대상 레이어
     public event Action playerDeadAction;                   //플레이어가 죽었을 때 발생할 이벤트
 

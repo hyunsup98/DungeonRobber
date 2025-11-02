@@ -897,10 +897,8 @@ MonoBehaviour:
   playerRigid: {fileID: 8428292921748122077}
   playerAnimator: {fileID: 1940434297746332841}
   attackPos: {fileID: 6957798011387079052}
-  <fieldOfView>k__BackingField: {fileID: 2465718992621701338}
   runSpeed: 7.5
   dodgeForce: 15
-  attackClip: {fileID: 8300000, guid: 486ca38b75e534f41855339d2ac5f4c4, type: 3}
   attackMask:
     serializedVersion: 2
     m_Bits: 8
@@ -930,10 +928,10 @@ MonoBehaviour:
     m_Bits: 8
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 768
+    m_Bits: 0
   player: {fileID: 239602216742993422}
   maskMaterial: {fileID: 2100000, guid: 3387d0b3ee076744cb507436295b4af0, type: 2}
-  fovRotateSpeed: 15
+  fovRotateSpeed: 10
   fovQuad: {fileID: 0}
 --- !u!136 &2182541610228615590
 CapsuleCollider:

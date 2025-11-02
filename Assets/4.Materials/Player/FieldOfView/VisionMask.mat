@@ -81,9 +81,10 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - <noninit>: {r: 0, g: 0, b: 0, a: 1}
     - _Color: {r: 0, g: 0, b: 0, a: 0.47058824}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _PlayerForward: {r: 0.6257536, g: 0, b: 0.77625674, a: 0}
-    - _PlayerPos: {r: 14, g: -2.440927, b: -47.76, a: 0}
+
+    - _PlayerForward: {r: -0.096796125, g: 0, b: 0.9950972, a: 0}
+    - _PlayerPos: {r: -3.5766459, g: -2.470872, b: 18.182573, a: 0}
+
   m_BuildTextureStacks: []

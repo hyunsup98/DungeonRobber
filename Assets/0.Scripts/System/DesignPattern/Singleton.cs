@@ -7,22 +7,32 @@ using UnityEngine;
 public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
     private static T instance;
+    private static object _lock = new object();
+    private static bool applicationQuit = false;
 
     public static T Instance
     {
         get
         {
-            if (instance == null)
+            if(applicationQuit)
             {
-                instance = FindAnyObjectByType<T>();
+                return null;
+            }
 
+            lock(_lock)
+            {
                 if (instance == null)
                 {
-                    GameObject obj = new GameObject(typeof(T).Name, typeof(T));
-                    instance = obj.AddComponent<T>();
+                    instance = FindAnyObjectByType<T>();
+
+                    if (instance == null)
+                    {
+                        GameObject obj = new GameObject(typeof(T).Name, typeof(T));
+                        instance = obj.AddComponent<T>();
+                    }
                 }
+                return instance;
             }
-            return instance;
         }
     }
 
@@ -46,4 +56,15 @@ public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
     }
+
+    protected virtual void OnApplicationQuit()
+    {
+        applicationQuit = true;
+    }
+
+    protected virtual void OnDestroy()
+    {
+        applicationQuit = true;
+    }
+
 }
