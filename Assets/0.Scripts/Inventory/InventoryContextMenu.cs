@@ -16,7 +16,6 @@ public class InventoryContextMenu : MonoBehaviour
     [SerializeField] private Button addToQuickButton;
     [SerializeField] private Button discardButton;
 
-    [Tooltip("옵션: 에디터에서 할당하면 자동으로 찾을 필요가 없습니다. 할당하지 않으면 씬에서 Find합니다.")]
     [SerializeField] private QuickSlot_Controller quickSlots;
     [SerializeField] private Shop shop;
 
@@ -29,8 +28,16 @@ public class InventoryContextMenu : MonoBehaviour
 
     void Awake()
     {
-        if (Instance == null) Instance = this;
-        else { Destroy(gameObject); return; }
+        // Instance가 null이 아니지만 자기 자신인 경우 (GetOrFind에서 이미 설정됨)
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        
+        // Instance가 null이면 자기 자신으로 설정
+        if (Instance == null)
+            Instance = this;
 
         if (menuRoot != null) menuRoot.gameObject.SetActive(false);
         parentCanvas = GetComponentInParent<Canvas>();
@@ -81,6 +88,10 @@ public class InventoryContextMenu : MonoBehaviour
 
         if (menuRoot != null)
         {
+            // 자기 자신을 활성화 먼저 (가끔 메뉴가 열리지 않는 경우가 있어서 추가... 더 나은 보완 방식을 찾으면 수정 예정)
+            if (!this.gameObject.activeSelf)
+                this.gameObject.SetActive(true);
+            
             menuRoot.gameObject.SetActive(true);
             SetPosition(screenPosition);
         }
@@ -152,13 +163,56 @@ public class InventoryContextMenu : MonoBehaviour
             sellButton.gameObject.SetActive(shop != null && shop.IsOpen);
         }
 
-        // 퀵슬롯: Consumable 타입만
+        // 퀵슬롯: Consumable 타입이고 이미 등록되지 않은 아이템만
         if (addToQuickButton != null)
-            addToQuickButton.gameObject.SetActive(currentItem.itemType == Item.ItemType.Consumable);
+        {
+            if (quickSlots == null) quickSlots = FindObjectOfType<QuickSlot_Controller>();
+            bool canAddToQuick = currentItem.itemType == Item.ItemType.Consumable && 
+                                 quickSlots != null && 
+                                 !quickSlots.IsItemRegistered(currentItem);
+            addToQuickButton.gameObject.SetActive(canAddToQuick);
+        }
 
         // 버리기: 항상 표시
         if (discardButton != null)
             discardButton.gameObject.SetActive(true);
+        
+        // 높이 자동 조정
+        AdjustMenuHeight();
+    }
+    
+    /// <summary>
+    /// 활성화된 버튼 개수에 맞춰 메뉴 높이 자동 조정
+    /// </summary>
+    private void AdjustMenuHeight()
+    {
+        if (menuRoot == null) return;
+        
+        // 활성화된 버튼 개수 계산
+        int activeButtonCount = 0;
+        if (useButton != null && useButton.gameObject.activeSelf) activeButtonCount++;
+        if (equipButton != null && equipButton.gameObject.activeSelf) activeButtonCount++;
+        if (sellButton != null && sellButton.gameObject.activeSelf) activeButtonCount++;
+        if (addToQuickButton != null && addToQuickButton.gameObject.activeSelf) activeButtonCount++;
+        if (discardButton != null && discardButton.gameObject.activeSelf) activeButtonCount++;
+        
+        // 버튼이 없으면 기본 높이로
+        if (activeButtonCount == 0)
+        {
+            activeButtonCount = 1; // 최소 높이 보장
+        }
+        
+        // VerticalLayoutGroup이 있는지 확인하여 버튼 높이 + 간격 계산
+        UnityEngine.UI.VerticalLayoutGroup layoutGroup = menuRoot.GetComponent<UnityEngine.UI.VerticalLayoutGroup>();
+        float buttonHeight = layoutGroup != null ? layoutGroup.preferredHeight : 50f; // 기본값 50
+        float spacing = layoutGroup != null ? layoutGroup.spacing : 10f; // 기본값 10
+        float padding = layoutGroup != null ? layoutGroup.padding.top + layoutGroup.padding.bottom : 40f; // 기본값 40
+        
+        // 총 높이 = (버튼 개수 * 버튼 높이) + ((버튼 개수 - 1) * 간격) + 패딩
+        float totalHeight = (activeButtonCount * buttonHeight) + ((activeButtonCount - 1) * spacing) + padding;
+        
+        // 메뉴 높이 적용
+        menuRoot.sizeDelta = new Vector2(menuRoot.sizeDelta.x, totalHeight);
     }
 
     private void OnUse()

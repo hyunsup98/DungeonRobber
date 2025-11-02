@@ -26,8 +26,16 @@ public class QuickSlotsContextMenu : MonoBehaviour
 
     void Awake()
     {
-        if (Instance == null) Instance = this;
-        else { Destroy(gameObject); return; }
+        // Instance가 null이 아니지만 자기 자신인 경우 (GetOrFind에서 이미 설정됨)
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        
+        // Instance가 null이면 자기 자신으로 설정
+        if (Instance == null)
+            Instance = this;
 
         if (menuRoot != null) menuRoot.gameObject.SetActive(false);
         parentCanvas = GetComponentInParent<Canvas>();
@@ -141,6 +149,41 @@ public class QuickSlotsContextMenu : MonoBehaviour
         // 버리기: 항상 표시
         if (discardButton != null)
             discardButton.gameObject.SetActive(true);
+        
+        // 높이 자동 조정
+        AdjustMenuHeight();
+    }
+    
+    /// <summary>
+    /// 활성화된 버튼 개수에 맞춰 메뉴 높이 자동 조정
+    /// </summary>
+    private void AdjustMenuHeight()
+    {
+        if (menuRoot == null) return;
+        
+        // 활성화된 버튼 개수 계산
+        int activeButtonCount = 0;
+        if (useButton != null && useButton.gameObject.activeSelf) activeButtonCount++;
+        if (removeFromQuickButton != null && removeFromQuickButton.gameObject.activeSelf) activeButtonCount++;
+        if (discardButton != null && discardButton.gameObject.activeSelf) activeButtonCount++;
+        
+        // 버튼이 없으면 기본 높이로
+        if (activeButtonCount == 0)
+        {
+            activeButtonCount = 1; // 최소 높이 보장
+        }
+        
+        // VerticalLayoutGroup이 있는지 확인하여 버튼 높이 + 간격 계산
+        UnityEngine.UI.VerticalLayoutGroup layoutGroup = menuRoot.GetComponent<UnityEngine.UI.VerticalLayoutGroup>();
+        float buttonHeight = layoutGroup != null ? layoutGroup.preferredHeight : 50f; // 기본값 50
+        float spacing = layoutGroup != null ? layoutGroup.spacing : 10f; // 기본값 10
+        float padding = layoutGroup != null ? layoutGroup.padding.top + layoutGroup.padding.bottom : 40f; // 기본값 40
+        
+        // 총 높이 = (버튼 개수 * 버튼 높이) + ((버튼 개수 - 1) * 간격) + 패딩
+        float totalHeight = (activeButtonCount * buttonHeight) + ((activeButtonCount - 1) * spacing) + padding;
+        
+        // 메뉴 높이 적용
+        menuRoot.sizeDelta = new Vector2(menuRoot.sizeDelta.x, totalHeight);
     }
 
     private void OnUse()

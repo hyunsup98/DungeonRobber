@@ -359,6 +359,8 @@ public class Inventory : MonoBehaviour
         int idx = items.FindIndex(x => x == item);
         if (idx != -1)
         {
+            bool itemRemoved = false;
+            
             // 수량 감소
             if (slots != null && idx < slots.Length)
             {
@@ -372,6 +374,7 @@ public class Inventory : MonoBehaviour
                     if (slots[idx].ItemQuantity == 0)
                     {
                         items[idx] = null;
+                        itemRemoved = true;
                         Debug.Log($"인벤토리 '{item.itemName}' 수량이 0이 되어 제거되었습니다.");
                     }
                 }
@@ -380,9 +383,26 @@ public class Inventory : MonoBehaviour
             {
                 // 슬롯 정보가 없으면 직접 제거
                 items[idx] = null;
+                itemRemoved = true;
             }
             
             RefreshSlots();
+            
+            // 퀵슬롯도 갱신
+            QuickSlot_Controller quickSlots = FindObjectOfType<QuickSlot_Controller>();
+            if (quickSlots != null)
+            {
+                // 아이템이 제거된 경우 퀵슬롯에서도 제거
+                if (itemRemoved)
+                {
+                    quickSlots.RemoveItem(item);
+                }
+                else
+                {
+                    // 수량만 변경된 경우 수량 동기화
+                    quickSlots.RefreshSlots();
+                }
+            }
         }
         else
         {

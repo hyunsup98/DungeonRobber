@@ -208,6 +208,13 @@ public class ItemDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                     return;
                 }
                 
+                // 이미 등록된 아이템인지 확인
+                if (toSlot.ownerQuickSlots.IsItemRegistered(fromItem))
+                {
+                    Debug.LogWarning($"인벤토리 -> 퀵슬롯: '{fromItem?.itemName}' 아이템은 이미 퀵슬롯에 등록되어 있습니다.");
+                    return;
+                }
+                
                 // 기존 퀵슬롯 아이템 처리
                 if (toItem != null)
                 {

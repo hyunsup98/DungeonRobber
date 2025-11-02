@@ -21,8 +21,16 @@ public class EquipContextMenu : MonoBehaviour
 
     void Awake()
     {
-        if (Instance == null) Instance = this;
-        else { Destroy(gameObject); return; }
+        // Instance가 null이 아니지만 자기 자신인 경우 (GetOrFind에서 이미 설정됨)
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        
+        // Instance가 null이면 자기 자신으로 설정
+        if (Instance == null)
+            Instance = this;
 
         if (menuRoot != null) menuRoot.gameObject.SetActive(false);
         parentCanvas = GetComponentInParent<Canvas>();

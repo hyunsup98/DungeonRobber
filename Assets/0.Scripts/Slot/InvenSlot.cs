@@ -17,7 +17,8 @@ public class InvenSlot : Slot
         // 우클릭: 컨텍스트 메뉴 표시
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            if (_item == null) return;
+            if (_item == null)
+                return;
 
             var menu = InventoryContextMenu.GetOrFind();
             if (menu != null)

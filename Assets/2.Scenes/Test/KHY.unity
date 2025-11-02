@@ -4026,7 +4026,6 @@ MonoBehaviour:
   removeFromQuickButton: {fileID: 590305877}
   discardButton: {fileID: 459773987}
   quickSlots: {fileID: 14946411}
-  quickSlots: {fileID: 14946411}
 --- !u!114 &699374610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5926,11 +5925,9 @@ MonoBehaviour:
   attackPos: {fileID: 1106848101}
   runSpeed: 10
   dodgeForce: 0
-  dodgeForce: 0
   attackMask:
     serializedVersion: 2
     m_Bits: 0
-  maxStamina: 100
   maxStamina: 100
 --- !u!114 &1106848106
 MonoBehaviour:
@@ -5947,7 +5944,6 @@ MonoBehaviour:
   viewAngle: 90
   viewInnerRadius: 3
   viewDistance: 22
-  offsetY: 0.5
   offsetY: 0.5
   targetMask:
     serializedVersion: 2

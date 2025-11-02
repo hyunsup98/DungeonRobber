@@ -65,6 +65,11 @@ public class QuickSlot_Controller : MonoBehaviour
             {
                 slots[i].ItemQuantity = inventory.GetItemQuantity(items[i]);
             }
+            else if (items[i] == null)
+            {
+                // 빈 슬롯인 경우 수량 초기화
+                slots[i].ItemQuantity = 0;
+            }
         }
     }
 
@@ -88,7 +93,25 @@ public class QuickSlot_Controller : MonoBehaviour
             {
                 slots[i].ItemQuantity = inventory.GetItemQuantity(items[i]);
             }
+            else if (items[i] == null)
+            {
+                // 빈 슬롯인 경우 수량 초기화
+                slots[i].ItemQuantity = 0;
+            }
         }
+    }
+
+    /// <summary>
+    /// 특정 아이템이 이미 퀵 슬롯에 등록되어 있는지 확인합니다.
+    /// </summary>
+    /// <param name="item">확인할 아이템</param>
+    /// <returns>등록되어 있으면 true, 아니면 false</returns>
+    public bool IsItemRegistered(Item item)
+    {
+        if (item == null || items == null)
+            return false;
+        
+        return items.Contains(item);
     }
 
     /// <summary>
@@ -99,6 +122,13 @@ public class QuickSlot_Controller : MonoBehaviour
         if (item == null)
         {
             Debug.LogWarning("QuickSlot_Controller: null 아이템은 추가할 수 없습니다.");
+            return;
+        }
+
+        // 이미 등록된 아이템인지 확인
+        if (IsItemRegistered(item))
+        {
+            Debug.LogWarning($"'{item.itemName}' 아이템은 이미 퀵 슬롯에 등록되어 있습니다.");
             return;
         }
 
@@ -143,13 +173,19 @@ public class QuickSlot_Controller : MonoBehaviour
         Item removedItem = items[idx];
         items[idx] = null;
         RefreshSlots();
-        Debug.Log($"퀵 슬롯에서 {removedItem?.itemName ?? "아이템"}이 제거되었습니다.");
+        
+        string itemName = "아이템";
+        if (removedItem != null)
+        {
+            itemName = removedItem.itemName;
+        }
+        Debug.Log($"퀵 슬롯에서 {itemName}이 제거되었습니다.");
     }
 
     /// <summary>
     /// 아이템을 퀵 슬롯에서 제거합니다 (아이템 오브젝트).
     /// </summary>
-    internal void RemoveItem(Item item)
+    public void RemoveItem(Item item)
     {
         if (item == null)
         {

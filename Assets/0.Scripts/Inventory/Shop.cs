@@ -7,8 +7,8 @@ using UnityEngine.UI;
 /// </summary>
 public class Shop : MonoBehaviour
 {
-    [Header("Shop Settings")]
-    [SerializeField] private int shopSize = 20;
+    // [Header("Shop Settings")]
+    // [SerializeField] private int shopSize = 20;
     
     [Header("UI References")]
     [SerializeField] private GameObject shopRoot;
