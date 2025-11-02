@@ -33,7 +33,6 @@ public sealed partial class Player_Controller : Entity
     [Header("이동 관련 변수")]
     [SerializeField] private float runSpeed;            //플레이어 달리기 속도
     [SerializeField] private float dodgeForce;          //구르기 힘
-    private float currentSpeed;                         //플레이어의 현재 속도 (미니맵 아이콘이 플레이어와 같은 속도로 움직이게 하기 위함)
 
     [Header("공격 관련 변수")]
     [SerializeField] private LayerMask attackMask;      //공격할 대상 레이어

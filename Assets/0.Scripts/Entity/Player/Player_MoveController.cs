@@ -3,11 +3,6 @@ using UnityEngine;
 
 public sealed partial class Player_Controller
 {
-    public float GetPlayerCurrentSpeed()
-    {
-        return CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint) ? runSpeed : stats.GetStat(StatType.MoveSpeed);
-    }
-
     /// <summary>
     /// Rigidbody의 velocity를 이용한 이동 메서드
     /// W, A, S, D 키를 이용해 이동 구현, Left Shift를 이용해 달리기 구현
