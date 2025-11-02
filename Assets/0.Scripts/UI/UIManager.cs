@@ -3,23 +3,22 @@ using UnityEngine;
 
 public class UIManager : Singleton<UIManager>
 {
-    #region MVP ÆĞÅÏ¿¡ »ç¿ëÇÏ´Â º¯¼öµé
+    #region MVP íŒ¨í„´ì— ì‚¬ìš©í•˜ëŠ” ë³€ìˆ˜ë“¤
 
-    //ÇÃ·¹ÀÌ¾î hp¹Ù, ½ºÅÈÃ¢
-    [SerializeField] private UI_PlayerStat playerStat;      //Ã¼·Â¹Ù¿Í ½ºÅÈÃ¢À» ¸ğµÎ °ü¸®ÇÏ´Â Å¬·¡½º
-    [SerializeField] private GameObject playerStatUI;       //½ºÅÈÃ¢¸¸ °¡Áö´Â ¿ÀºêÁ§Æ®
+    //í”Œë ˆì´ì–´ hpë°”, ìŠ¤íƒ¯ì°½
+    [SerializeField] private UI_PlayerStat playerStat;      //ì²´ë ¥ë°”ì™€ ìŠ¤íƒ¯ì°½ì„ ëª¨ë‘ ê´€ë¦¬í•˜ëŠ” í´ë˜ìŠ¤
     private Presenter_PlayerStat presenter_PlayerStat;
 
-    //¼³Á¤Ã¢
-    [field: SerializeField] public UI_Settings settings { get; private set; }       //¼³Á¤Ã¢À» °ü¸®ÇÏ´Â Å¬·¡½º
+    //ì„¤ì •ì°½
+    [field: SerializeField] public UI_Settings settings { get; private set; }       //ì„¤ì •ì°½ì„ ê´€ë¦¬í•˜ëŠ” í´ë˜ìŠ¤
     private Presenter_Settings presenter_Settings;
 
     #endregion
 
-    #region ´Ü¼øÇÑ ±â´ÉÀÌ¶ó Á÷Á¢ °ü¸®ÇØÁÙ º¯¼öµé
+    #region ë‹¨ìˆœí•œ ê¸°ëŠ¥ì´ë¼ ì§ì ‘ ê´€ë¦¬í•´ì¤„ ë³€ìˆ˜ë“¤
 
-    [field : SerializeField] public UI_InteractiveMessage textInteractive { get; private set; } //»óÈ£ÀÛ¿ë Å° ÅØ½ºÆ® Å¬·¡½º
-    [field: SerializeField] public UI_PauseMenu pauseMenu { get; private set; }                 //ÀÏ½ÃÁ¤Áö ¸Ş´º
+    [field : SerializeField] public UI_InteractiveMessage textInteractive { get; private set; } //ìƒí˜¸ì‘ìš© í‚¤ í…ìŠ¤íŠ¸ í´ë˜ìŠ¤
+    [field: SerializeField] public UI_PauseMenu pauseMenu { get; private set; }                 //ì¼ì‹œì •ì§€ ë©”ë‰´
 
     #endregion
 
@@ -30,19 +29,13 @@ public class UIManager : Singleton<UIManager>
 
     private void Start()
     {
-        //ÇÃ·¹ÀÌ¾î ½ºÅÈ°ú ½ºÅÈ UI¸¦ ÀÌ¾îÁÖ´Â Presenter Å¬·¡½º »ı¼º, ÇÃ·¹ÀÌ¾î°¡ »ı±æ ¶§ ¸¸µé±â
-        //presenter_PlayerStat = new Presenter_PlayerStat(Player_Controller.Instance, playerStat);
-
+        //í”Œë ˆì´ì–´ ìŠ¤íƒ¯ê³¼ ìŠ¤íƒ¯ UIë¥¼ ì´ì–´ì£¼ëŠ” Presenter í´ë˜ìŠ¤ ìƒì„±, í”Œë ˆì´ì–´ê°€ ìƒê¸¸ ë•Œ ë§Œë“¤ê¸°
+        presenter_PlayerStat = new Presenter_PlayerStat(Player_Controller.Instance, playerStat);
         presenter_Settings = new Presenter_Settings(SoundManager.Instance, settings);
     }
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.J))
-        {
-            OnOffUI(playerStatUI.gameObject);
-        }
-
         if(Input.GetKeyDown(KeyCode.G))
         {
             OnOffUI(textInteractive.gameObject);
@@ -50,9 +43,9 @@ public class UIManager : Singleton<UIManager>
     }
 
     /// <summary>
-    /// °ÔÀÓ¿ÀºêÁ§Æ®ÀÇ È°¼ºÈ­/ºñÈ°¼ºÈ­ ¿©ºÎ¸¦ ¹Ù²ãÁÜ => ²°´Ù Å°´Â ±â´É
+    /// ê²Œì„ì˜¤ë¸Œì íŠ¸ì˜ í™œì„±í™”/ë¹„í™œì„±í™” ì—¬ë¶€ë¥¼ ë°”ê¿”ì¤Œ => ê»ë‹¤ í‚¤ëŠ” ê¸°ëŠ¥
     /// </summary>
-    /// <param name="obj"> È°¼ºÈ­, ºñÈ°¼ºÈ­ ½ÃÅ³ °ÔÀÓ¿ÀºêÁ§Æ® </param>
+    /// <param name="obj"> í™œì„±í™”, ë¹„í™œì„±í™” ì‹œí‚¬ ê²Œì„ì˜¤ë¸Œì íŠ¸ </param>
     public void OnOffUI(GameObject obj)
     {
         if (obj == null) return;

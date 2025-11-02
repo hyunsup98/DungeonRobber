@@ -3,11 +3,6 @@ using UnityEngine;
 
 public sealed partial class Player_Controller
 {
-    public float GetPlayerCurrentSpeed()
-    {
-        return CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint) ? runSpeed : stats.GetStat(StatType.MoveSpeed);
-    }
-
     /// <summary>
     /// Rigidbody의 velocity를 이용한 이동 메서드
     /// W, A, S, D 키를 이용해 이동 구현, Left Shift를 이용해 달리기 구현
@@ -15,7 +10,7 @@ public sealed partial class Player_Controller
     private void Move()
     {
         //이동이 가능한 상태라면
-        if(CheckPlayerBehaviorState(PlayerBehaviorState.IsCanMove))
+        if(CheckPlayerBehaviorState(PlayerBehaviorState.IsCanMove) && !CheckPlayerBehaviorState(PlayerBehaviorState.IsDodge))
         {
             float horizontal = Input.GetAxisRaw("Horizontal");
             float vertical = Input.GetAxisRaw("Vertical");
@@ -32,7 +27,7 @@ public sealed partial class Player_Controller
             }
 
             //구르기
-            if (Input.GetKey(KeyCode.Space))
+            if (Input.GetKey(KeyCode.Space) && Stamina > 0)
             {
                 if (!CheckPlayerBehaviorState(PlayerBehaviorState.IsDodge))
                 {
@@ -41,19 +36,17 @@ public sealed partial class Player_Controller
                 }
             }
 
-            if (CheckPlayerBehaviorState(PlayerBehaviorState.IsWalk))
+            if (Input.GetKey(KeyCode.LeftShift) && Stamina > 0)
             {
-                if (Input.GetKey(KeyCode.LeftShift))
-                {
-                    //왼쪽 쉬프트를 눌렀을 때 - 달리기
-                    AddPlayerBehaviorState(PlayerBehaviorState.IsSprint);
-                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(moveDir), 10 * Time.deltaTime);
-                }
-                else
-                {
-                    //왼쪽 쉬프트를 누르지 않았을 때 - 걷기
-                    RemovePlayerBehaviorState(PlayerBehaviorState.IsSprint);
-                }
+                //왼쪽 쉬프트를 눌렀을 때(스태미너 소모) - 달리기
+                AddPlayerBehaviorState(PlayerBehaviorState.IsSprint);
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(moveDir), 10 * Time.deltaTime);
+                UseStamina(runStamina * Time.deltaTime);
+            }
+            else
+            {
+                //왼쪽 쉬프트를 누르지 않았을 때 - 걷기
+                RemovePlayerBehaviorState(PlayerBehaviorState.IsSprint);
             }
 
             //입력받은 moveDir(월드좌표 기준)을 로컬좌표 기준 방향 벡터로 변환
@@ -100,9 +93,49 @@ public sealed partial class Player_Controller
         playerAnimator.SetFloat("speed", smoothZ);
     }
 
+    /// <summary>
+    /// 달리기, 구르기 등의 행동으로 스태미너를 소모하는 메서드
+    /// </summary>
+    /// <param name="amount"> 소모할 스태미너의 양 </param>
+    private void UseStamina(float amount)
+    {
+        if(Stamina >= 0)
+        {
+            Stamina -= amount;
+            AddPlayerBehaviorState(PlayerBehaviorState.IsUsingStamina);
+            staminaRecoveryTimer = 0f;
+        }
+    }
+
+    /// <summary>
+    /// 스태미너 회복 메서드 => staminaRecoveryDelay초 동안 스태미너를 사용하지 않으면 회복
+    /// </summary>
+    private void RecoveryStamina()
+    {
+        if(!CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint) && !CheckPlayerBehaviorState(PlayerBehaviorState.IsDodge))
+        {
+            RemovePlayerBehaviorState(PlayerBehaviorState.IsUsingStamina);
+        }
+
+        if(Stamina < MaxStamina && !CheckPlayerBehaviorState(PlayerBehaviorState.IsUsingStamina))
+        {
+            staminaRecoveryTimer += Time.deltaTime;
+            if(staminaRecoveryTimer >= staminaRecoveryDelay)
+            {
+                Stamina += staminaRecoverySpeed * Time.deltaTime;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 플레이어 구르기 행동 코루틴 메서드
+    /// </summary>
+    /// <param name="moveDir"> 구르기를 할 방향 </param>
+    /// <returns></returns>
     private IEnumerator Dive(Vector3 moveDir)
     {
-        //상태 플래그 변경 및 구르기 애니메이션 적용
+        //상태 플래그 변경 및 구르기 애니메이션 적용, 스태미너 소모
+        UseStamina(dodgeStamina);
         AddPlayerBehaviorState(PlayerBehaviorState.IsDodge);
         RemovePlayerBehaviorState(PlayerBehaviorState.IsCanMove);
         playerAnimator.SetTrigger("dodge");
@@ -123,7 +156,7 @@ public sealed partial class Player_Controller
             playerAnimator.GetCurrentAnimatorStateInfo(0).IsName("Dodge") && 
             playerAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f
             );
-        yield return CoroutineManager.waitForSeconds(0.1f);
+        yield return CoroutineManager.waitForSeconds(0.15f);
 
         RemovePlayerBehaviorState(PlayerBehaviorState.IsDodge);
         AddPlayerBehaviorState(PlayerBehaviorState.IsCanMove);

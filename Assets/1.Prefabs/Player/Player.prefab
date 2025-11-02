@@ -883,7 +883,7 @@ MonoBehaviour:
   stats:
     baseStats:
     - type: 0
-      <Value>k__BackingField: 9999
+      <Value>k__BackingField: 30
     - type: 1
       <Value>k__BackingField: 5
     - type: 2
@@ -892,6 +892,7 @@ MonoBehaviour:
       <Value>k__BackingField: 1.5
     - type: 4
       <Value>k__BackingField: 1
+    stats: []
   mainCamera: {fileID: 0}
   playerRigid: {fileID: 8428292921748122077}
   playerAnimator: {fileID: 1940434297746332841}
@@ -901,7 +902,11 @@ MonoBehaviour:
   attackMask:
     serializedVersion: 2
     m_Bits: 8
-  maxStamina: 100
+  runStamina: 5
+  dodgeStamina: 15
+  staminaRecoveryDelay: 3
+  staminaRecoverySpeed: 10
+  <MaxStamina>k__BackingField: 100
 --- !u!114 &2465718992621701338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -917,6 +922,7 @@ MonoBehaviour:
   viewAngle: 90
   viewInnerRadius: 3
   viewDistance: 22
+  offsetY: 0.5
   targetMask:
     serializedVersion: 2
     m_Bits: 8
