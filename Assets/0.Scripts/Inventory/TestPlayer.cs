@@ -189,7 +189,14 @@ public class TestPlayer : MonoBehaviour
         // 소비형 아이템 처리
         if (item.itemType == Item.ItemType.Consumable)
         {
-            // 아이템 버프 적용
+            // 빙결 수류탄 특별 처리
+            if (item.itemName == "빙결 수류탄")
+            {
+                ThrowFreezeGrenade(item, slotIndex);
+                return;
+            }
+
+            // 일반 아이템 버프 적용
             if (item.useBuff != null)
             {
                 buffManager.ApplyBuff(item.useBuff, stats);
@@ -229,6 +236,62 @@ public class TestPlayer : MonoBehaviour
         else
         {
             Debug.Log($"'{item.itemName}'는 사용할 수 없는 아이템입니다.");
+        }
+    }
+
+    /// <summary>
+    /// 빙결 수류탄 던지기
+    /// </summary>
+    private void ThrowFreezeGrenade(Item item, int slotIndex)
+    {
+        // 마우스 위치로 레이캐스트
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 100f))
+        {
+            Vector3 throwPosition = hit.point;
+            
+            // 범위 내의 적 찾기
+            Collider[] colliders = Physics.OverlapSphere(throwPosition, 3f); // 3미터 반경
+            
+            bool hitEnemy = false;
+            foreach (var col in colliders)
+            {
+                Monster enemy = col.GetComponent<Monster>();
+                if (enemy != null)
+                {
+                    // 빙결 버프 적용
+                    if (item.useBuff != null)
+                    {
+                        enemy.ApplyBuffToEntity(item.useBuff);
+                        hitEnemy = true;
+                        Debug.Log($"'{enemy.name}'에게 빙결 수류탄이 맞았습니다!");
+                    }
+                }
+            }
+
+            if (!hitEnemy)
+            {
+                Debug.Log("빙결 수류탄이 적에게 맞지 않았습니다.");
+            }
+
+            // 인벤토리 수량 감소
+            if (inventory != null)
+            {
+                inventory.DecreaseItemQuantity(item);
+                
+                uint remainingQuantity = inventory.GetItemQuantity(item);
+                
+                if (remainingQuantity == 0)
+                {
+                    quickSlots.RemoveItem(slotIndex);
+                }
+                else
+                {
+                    quickSlots.RefreshSlots();
+                }
+            }
         }
     }
 
