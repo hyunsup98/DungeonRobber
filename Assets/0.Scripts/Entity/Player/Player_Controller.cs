@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [System.Flags]
 public enum PlayerBehaviorState : int
@@ -30,6 +31,7 @@ public sealed partial class Player_Controller : Entity
     [SerializeField] private Rigidbody playerRigid;         //플레이어 Rigidbody
     [SerializeField] private Animator playerAnimator;       //플레이어 애니메이터
     [SerializeField] private Transform attackPos;           //플레이어가 공격할 때 공격 탐지를 시작할 위치
+    [field: SerializeField] public FieldOfView fieldOfView { get; private set; }       //시야각 구하는 클래스
 
     [Header("이동 관련 변수")]
     [SerializeField] private float runSpeed;                //플레이어 달리기 속도
@@ -116,10 +118,12 @@ public sealed partial class Player_Controller : Entity
     private void Start()
     {
         playerDeadAction += Dead;
+        GameManager.Instance.onSceneChanged += Init;
     }
 
     private void Update()
     {
+        if (GameManager.Instance.CurrentGameState == GameState.Title) return;
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
 
@@ -137,66 +141,11 @@ public sealed partial class Player_Controller : Entity
 
         //스태미너 회복
         RecoveryStamina();
-
-        // 퀵슬롯 아이템 사용 (1~6번 키)
-        HandleQuickSlotInput();
-        
-        // 마우스 우클릭 (아이템 획득)
-        if (Input.GetMouseButtonDown(1))
-        {
-            TryPickupItem();
-        }
-        
-        // Tab 키 (인벤토리 열기/닫기)
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            if (inventory != null)
-                inventory.ToggleInventory();
-        }
-        
-        // Q 키 (상점 열기/닫기)
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            if (currentNearbyShop != null && shop != null)
-            {
-                // 상점 열림/닫힘 토글
-                if (!shop.IsOpen)
-                {
-                    shop.ShowShop();
-                    if (inventory != null && !inventory.IsOpen)
-                        inventory.ShowInventory();
-                }
-                else
-                {
-                    shop.HideShop();
-                    // 인벤토리는 상점이 닫힐 때만 닫음 (Tab으로도 닫을 수 있음)
-                }
-            }
-            else if (shop != null && shop.IsOpen)
-            {
-                // 상점이 열려있고 NPC 근처가 아니면 상점만 닫기
-                shop.HideShop();
-            }
-        }
-        
-        // 상점 NPC 감지
-        CheckForNearbyShop();
-        
-        // 상자 감지 및 상호작용
-        CheckForNearbyChest();
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            TryInteractWithChest();
-        }
-
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            GetDamage(5f);
-        }
     }
 
     private void FixedUpdate()
     {
+        if (GameManager.Instance.CurrentGameState == GameState.Title) return;
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
         //이동
@@ -217,6 +166,12 @@ public sealed partial class Player_Controller : Entity
         stamina = MaxStamina;
 
         playerBehaviorState = PlayerBehaviorState.Alive | PlayerBehaviorState.IsCanMove;
+    }
+
+    public void SetPlayerStat(StatType type, float value)
+    {
+        stats.SetBaseStat(type, value);
+        stats.InitStat(type);
     }
 
     #region 플레이어의 행동 상태 제어

@@ -1,15 +1,20 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
-public class RushTurtle : Monster
+public class SpineTurtle : Monster
 {
     [SerializeField] float detectDelay = 1f;//감지 딜레이 
-    [SerializeField] float animeDelay = 0.5f;//애니메이션 딜레이 
-    [SerializeField] BaseBuff stunned; //스턴  
+    [SerializeField] float defendDelaytime = 3f; //방어 쿨타임 
+    [SerializeField] float armorPower = 2f; // 방어력 
+   
     int playerLayer;
-    int WaypointLayer;   
-    bool isCanMove;
+    int WaypointLayer;
+    int obstacleLayer;
+    bool isAlive = true;
+    bool isDefend = true;
+    bool isDefendCooltime = false;
     Coroutine detectPlayerCoroutine; //감지 코루틴  변수
 
     private void Awake()
@@ -19,8 +24,7 @@ public class RushTurtle : Monster
 
     private void OnEnable() //활성화 시점에서 초기화 
     {
-        Init();
-        StartCoroutine(WaitAnimationEnd("Spawn")); //스폰 애니메이션 종료까지 대기     
+        Init();   
     }
     private void Start()
     {
@@ -28,6 +32,8 @@ public class RushTurtle : Monster
     }
     private void FixedUpdate()
     {
+        if (!isAlive) return; //죽었다면 종료 
+
         agent.speed = stats.GetStat(StatType.MoveSpeed);
 
         if (isDetectTarget) //감지했을 때
@@ -38,6 +44,7 @@ public class RushTurtle : Monster
         {
             OverlookAction();
         }
+        
     }
 
     private void OnDisable() //비활성화시 코루틴 정지 
@@ -66,37 +73,38 @@ public class RushTurtle : Monster
         base.awakeinit();
         playerLayer = LayerMask.NameToLayer("Player");
         WaypointLayer = LayerMask.NameToLayer("Waypoint");
+      
     }
 
     protected override void Attack()
     {
-        isCanMove = true;
-        if (!isAttackCooltime && isCanMove)//공격 쿨타임이 아닐때 
+        if (!isAttackCooltime)//공격 쿨타임이 아니고 방어모드도 아닐때 
         {
+            SetMoveBool(false); //이동 멈춤
+            monsterAnimator.SetTrigger("Attack");
             StartCoroutine(AttackDelay());
         }
     }
-    
-
-    void OnTriggerEnter(Collider other)
+     public void AttackPlayer()
     {
-       
-
+       if(Vector3.SqrMagnitude(target.transform.position - transform.position) <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange))
+        {
+            target.GetComponentInParent<Entity>().GetDamage(stats.GetStat(StatType.AttackDamage)); 
+        }              
     }
-
-
 
     /// <summary>
     /// 감지했을 때 취하는 행동 메서드
     /// </summary>
     protected override void DetectAction()
-    {
+    {   
         SetMoveBool(false); //일단 멈춤
         Vector3 tempVector = target.transform.position - transform.position;
         targetDistance = Vector3.SqrMagnitude(tempVector); // 단순 비교이므로 sqrMagnitude 사용
         transform.LookAt(target.transform.position); //타겟 바라보기
         bool isPlayerinhit = false;
-
+        
+       
           if (targetDistance <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange)) //공격 사거리안에 들어오면 공격시작 
         {
             RaycastHit[] hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0.5f, 0.5f), transform.forward, transform.rotation, stats.GetStat(StatType.AttackRange), obstacleLayer | targetLayer);
@@ -130,14 +138,39 @@ public class RushTurtle : Monster
     /// <param name="damage"> 해당 몬스터가 입을 피해 </param>
     public override void GetDamage(float damage)
     {
-        
-        stats.ModifyStat(StatType.HP, -damage);
+
+        if (isDefendCooltime)
+        {
+            monsterAnimator.SetTrigger("GetDamage");
+            stats.ModifyStat(StatType.HP, -damage);
+        }
+        else
+        {
+            monsterAnimator.SetTrigger("Defend");
+            stats.ModifyStat(StatType.HP, -damage + armorPower);
+        }
 
         if (stats.GetStat(StatType.HP) <= 0)
         {
-            
-            Destroy(this);
+            isAlive = false;
+            monsterAnimator.SetBool("isDead", true);
         }
+    }
+
+
+    public void DefendModeOn()
+    {
+        isDefend = true;
+    }
+    public void DefendModeOff()
+    {
+        isDefend = false;
+        StartCoroutine(DefendDelay());
+    }
+
+    public void DestroyMonster()
+    {
+        Destroy(gameObject);
     }
 
     /// <summary>
@@ -145,18 +178,16 @@ public class RushTurtle : Monster
     /// </summary>
     protected override void OverlookAction()
     {
-       
         SetMoveBool(true); //이동 상태로 전환
         agent.SetDestination(targetWaypoint.position);//목적지로 이동  
-        
         if (Vector3.SqrMagnitude(transform.position - targetWaypoint.position) < 10f) //a목적지에 주변에 도달했을 때
         {
             SetMoveBool(false); //일단 멈춤
             previousWaypoint = targetWaypoint; //이전 목적지에 현재 목적지 저장                        
 
-            while (true && isDetectTarget == false)
+            while (isDetectTarget == false)
             {
-                Debug.Log(waypoints.Count);            
+                       
                 if (waypoints.Count <= 1) //목적지가 하나밖에 없으면
                     break;
 
@@ -176,7 +207,7 @@ public class RushTurtle : Monster
     void SetMoveBool(bool toSetBool)
     {
         agent.isStopped = !toSetBool;
-        
+        monsterAnimator.SetBool("isWalk", toSetBool);
     }
 
 
@@ -224,26 +255,12 @@ public class RushTurtle : Monster
         }
     }
 
-    /// <summary>
-    /// 애니메이션 종료 대기 코루틴
-    /// </summary>
-    /// <param name="animName">애니메이션 이름 </param>
-    /// <returns></returns>
-    private IEnumerator WaitAnimationEnd(string animName)
-    {
-        while (!monsterAnimator.GetCurrentAnimatorStateInfo(0).IsName(animName))
-        {
-            yield return null;
-        }
-        while (monsterAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
-        {
-            agent.isStopped = true; //애니메이션 재생되는 동안 멈춤
-            yield return null;
-        }
-        agent.isStopped = false; //애니메이션 재생 끝나면 다시 이동 가능
-        yield return CoroutineManager.waitForSeconds(animeDelay);
-    } 
 
+
+    /// <summary>
+    /// 공격 딜레이 넣어주는 메서드 
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator AttackDelay()
     {
         isAttackCooltime = true;
@@ -252,5 +269,25 @@ public class RushTurtle : Monster
 
         isAttackCooltime = false;
     }
-             
+
+    /// <summary>
+    /// 방어 쿨타임 너허주는 메서드
+    /// </summary>
+    /// <returns></returns>
+    /// 
+    private IEnumerator DefendDelay()
+    {
+        isDefendCooltime = true;
+
+        yield return CoroutineManager.waitForSeconds(defendDelaytime);
+
+        isDefendCooltime = false;
+    }
+
+
+
 }
+
+
+
+

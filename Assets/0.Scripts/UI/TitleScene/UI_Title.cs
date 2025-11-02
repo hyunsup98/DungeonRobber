@@ -2,27 +2,23 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Å¸ÀÌÆ² ¾À¿¡¼­ Á¸ÀçÇÏ´Â UI¸¦ °ü¸®ÇÏ´Â Å¬·¡½º
+/// íƒ€ì´í‹€ ì”¬ì—ì„œ ì¡´ì¬í•˜ëŠ” UIë¥¼ ê´€ë¦¬í•˜ëŠ” í´ë˜ìŠ¤
 /// </summary>
 public class UI_Title : MonoBehaviour
 {
-    [SerializeField] private string gameSceneName;
-
-    //°ÔÀÓ ½ÃÀÛ ¹öÆ°À» Å¬¸¯ÇßÀ» ¶§ È£Ãâ
+    //ê²Œì„ ì‹œì‘ ë²„íŠ¼ì„ í´ë¦­í–ˆì„ ë•Œ í˜¸ì¶œ
     public void OnClickGameStart()
     {
-        if (string.IsNullOrEmpty(gameSceneName)) return;
-
-        SceneManager.LoadScene(gameSceneName);
+        GameManager.Instance.CurrentGameState = GameState.Base;
     }
 
-    //¼¼ÆÃ ¹öÆ°À» Å¬¸¯ÇßÀ» ¶§ È£Ãâ
+    //ì„¸íŒ… ë²„íŠ¼ì„ í´ë¦­í–ˆì„ ë•Œ í˜¸ì¶œ
     public void OnClickSettings()
     {
         UIManager.Instance.settings.gameObject.SetActive(true);
     }
 
-    //°ÔÀÓ ³ª°¡±â ¹öÆ°À» Å¬¸¯ÇßÀ» ¶§ È£Ãâ
+    //ê²Œì„ ë‚˜ê°€ê¸° ë²„íŠ¼ì„ í´ë¦­í–ˆì„ ë•Œ í˜¸ì¶œ
     public void OnClickExit()
     {
         Application.Quit();

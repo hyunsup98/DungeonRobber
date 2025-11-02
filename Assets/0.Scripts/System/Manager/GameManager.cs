@@ -4,19 +4,18 @@ using UnityEngine.SceneManagement;
 
 public enum GameState
 {
-    Title,          //Å¸ÀÌÆ² ¾À »óÅÂ
-    Base,           //º£ÀÌ½º ¾À »óÅÂ
-    Dungeon,        //´øÀü(ÀÎ°ÔÀÓ) »óÅÂ
-    Pause           //ÀÏ½ÃÁ¤Áö »óÅÂ
+    Title,          //íƒ€ì´í‹€ ì”¬ ìƒíƒœ
+    Base,           //ë² ì´ìŠ¤ ì”¬ ìƒíƒœ
+    Dungeon,        //ë˜ì „(ì¸ê²Œì„) ìƒíƒœ
 }
 
 public class GameManager : Singleton<GameManager>
 {
-    #region °ÔÀÓ »óÅÂ °ü¸® µ¨¸®°ÔÀÌÆ® ¹× ÇÁ·ÎÆÛÆ¼
-    public event Action onGameStateTitle;       //GameState°¡ TitleÀÌ µÇ¾úÀ» ¶§ ½ÇÇàÇÒ ¾×¼Ç
-    public event Action onGameStateBase;        //GameState°¡ Base°¡ µÇ¾úÀ» ¶§ ½ÇÇàÇÒ ¾×¼Ç
-    public event Action onGameStateDungeon;     //GameState°¡ DungeonÀÌ µÇ¾úÀ» ¶§ ½ÇÇàÇÒ ¾×¼Ç
-    public event Action onGameStatePause;       //GameState°¡ Pause°¡ µÇ¾úÀ» ¶§ ½ÇÇàÇÒ ¾×¼Ç
+    #region ê²Œì„ ìƒíƒœ ê´€ë¦¬ ë¸ë¦¬ê²Œì´íŠ¸ ë° í”„ë¡œí¼í‹°
+    public event Action onSceneChanged;         //ì–´ë–¤ ì”¬ì´ë“  ë³€ê²½ë˜ì—ˆì„ ë•Œ ì‹¤í–‰í•  ì•¡ì…˜ ì´ë²¤íŠ¸
+    public event Action onGameStateTitle;       //GameStateê°€ Titleì´ ë˜ì—ˆì„ ë•Œ ì‹¤í–‰í•  ì•¡ì…˜ ì´ë²¤íŠ¸
+    public event Action onGameStateBase;        //GameStateê°€ Baseê°€ ë˜ì—ˆì„ ë•Œ ì‹¤í–‰í•  ì•¡ì…˜ ì´ë²¤íŠ¸
+    public event Action onGameStateDungeon;     //GameStateê°€ Dungeonì´ ë˜ì—ˆì„ ë•Œ ì‹¤í–‰í•  ì•¡ì…˜ ì´ë²¤íŠ¸
 
     private GameState currentGameState;
     public GameState CurrentGameState
@@ -26,25 +25,50 @@ public class GameManager : Singleton<GameManager>
         {
             if (value == currentGameState) return;
 
-            if(value == GameState.Title)
+            if (value == GameState.Title)
             {
+                SceneManager.LoadScene("TitleScene");
                 onGameStateTitle?.Invoke();
             }
-            else if(value == GameState.Base)
+            else if (value == GameState.Base)
             {
+                SceneManager.LoadScene("BaseScene");
                 onGameStateBase?.Invoke();
             }
-            else if(value == GameState.Dungeon)
+            else if (value == GameState.Dungeon)
             {
+                SceneManager.LoadScene("DungeonScene");
                 onGameStateDungeon?.Invoke();
             }
-            else if(value == GameState.Pause)
-            {
-                onGameStatePause?.Invoke();
-            }
+
+            currentGameState = value;
         }
     }
     #endregion
+
+    #region í”Œë ˆì´ì–´ ìŠ¤íƒ¯ ë ˆë²¨ ì—… ë°ì´í„°
+    [field: SerializeField] public SOStatData HpUpgradeData { get; private set; }
+    public int HpLevel { get; private set; } = 0;
+    [field: SerializeField] public SOStatData SpeedUpgradeData { get; private set; }
+    public int SpeedLevel { get; private set; } = 0;
+    [field: SerializeField] public SOStatData ViewAngleUpgradeData { get; private set; }
+    public int ViewAngleLevel { get; private set; } = 0;
+    #endregion
+
+    private int gold = 0;       //í”Œë ˆì´ì–´ ì†Œì§€ ê³¨ë“œ
+    public int Gold
+    {
+        get { return gold; }
+        set
+        {
+            if(value < 0)
+            {
+                value = 0;
+            }
+
+            gold = value;
+        }
+    }
 
     private void Awake()
     {
@@ -53,17 +77,32 @@ public class GameManager : Singleton<GameManager>
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.F1))
+        if(Input.GetKeyDown(KeyCode.K))
         {
-            SceneManager.LoadScene("TitleScene");
-        }
-        if (Input.GetKeyDown(KeyCode.F2))
-        {
-            SceneManager.LoadScene("BaseScene");
-        }
-        if (Input.GetKeyDown(KeyCode.F3))
-        {
-            SceneManager.LoadScene("DungeonScene");
+            Gold += 500000;
         }
     }
+
+    #region í”Œë ˆì´ì–´ ìŠ¤íƒ¯ ì—…ê·¸ë ˆì´ë“œ ê´€ë ¨ ë©”ì„œë“œ
+    public void HPUpgrade()
+    {
+        Gold -= HpUpgradeData.datas[HpLevel + 1].price;
+        HpLevel = Mathf.Clamp(++HpLevel, 0, HpUpgradeData.datas.Count - 1);
+        Player_Controller.Instance.SetPlayerStat(StatType.HP, HpUpgradeData.datas[HpLevel].amount);
+    }
+
+    public void SpeedUpgrade()
+    {
+        Gold -= SpeedUpgradeData.datas[SpeedLevel + 1].price;
+        SpeedLevel = Mathf.Clamp(++SpeedLevel, 0, SpeedUpgradeData.datas.Count - 1);
+        Player_Controller.Instance.SetPlayerStat(StatType.MoveSpeed, SpeedUpgradeData.datas[SpeedLevel].amount);
+    }
+
+    public void ViewAngleUpgrade()
+    {
+        Gold -= ViewAngleUpgradeData.datas[ViewAngleLevel + 1].price;
+        ViewAngleLevel = Mathf.Clamp(++ViewAngleLevel, 0, ViewAngleUpgradeData.datas.Count - 1);
+        Player_Controller.Instance.fieldOfView.SetViewAngle(ViewAngleUpgradeData.datas[ViewAngleLevel].amount);
+    }
+    #endregion
 }

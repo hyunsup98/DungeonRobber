@@ -11,14 +11,17 @@ public abstract class Monster : Entity
     [Tooltip("목적지 감지 거리 ")] 
     [SerializeField] protected float detectDestinationRadius; //목적지 감지 반지름
     [Tooltip("장애물 레이어")]
-    [SerializeField] protected LayerMask obstacleLayer; //감지할 물체 레이어
+    [SerializeField] protected LayerMask obstacleLayerMask; //감지할 물체 레이어
     [Tooltip("목적지 레이어")]
-    [SerializeField] protected LayerMask destinationLayer; //목적지 레이어   
+    [SerializeField] protected LayerMask destinationLayerMask; //목적지 레이어   
     [Tooltip("공격 또는 행동할 타겟 레이어")]
     [SerializeField] protected LayerMask targetLayer; //타겟 레이어
     [SerializeField] protected NavMeshAgent agent; //ai navigation 사용을 위한 변수
-    [SerializeField] protected Animator monsterAnimator; //에니메이션 관리   
-
+    [SerializeField] protected Animator monsterAnimator; //에니메이션 관리
+    //[SerializeField] protected SoundManager monsterSoundManager; //효과음 관리 
+    //[SerializeField] protected AudioClip[] monsterAudioClips; //효과음 모음
+    
+       
     [Header("테스트용 변수 플레이시 자동으로 변경됨")]
     [Space(15f)]
     [SerializeField] protected GameObject target; //감지할 타겟   
@@ -46,8 +49,8 @@ public abstract class Monster : Entity
 
     protected virtual void awakeinit() 
     {  
-        detectLayer |= obstacleLayer; //detectLayer에 obstacleTargetLayer속 레이어 추가
-        detectLayer |= destinationLayer; //detectLayer에 destinationLayer속 레이어 추가
+        detectLayer |= obstacleLayerMask; //detectLayer에 obstacleTargetLayer속 레이어 추가
+        detectLayer |= destinationLayerMask; //detectLayer에 destinationLayer속 레이어 추가
         detectLayer |= targetLayer;
         waypoints = new List<Transform>();
         

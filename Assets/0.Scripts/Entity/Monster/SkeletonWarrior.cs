@@ -1,11 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.Android.Types;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Animations;
 
 public class SkeletonWarrior : Monster
 {
@@ -32,7 +26,7 @@ public class SkeletonWarrior : Monster
     }
     private void FixedUpdate()
     {
-        if (!isAlive) return;
+        if (!isAlive) return; //죽었다면 종료
 
         agent.speed = stats.GetStat(StatType.MoveSpeed);
 
@@ -106,7 +100,7 @@ public class SkeletonWarrior : Monster
 
         if (targetDistance <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange)) //공격 사거리안에 들어오면 공격시작 
         {
-            RaycastHit[] hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0.5f, 0.5f), transform.forward, transform.rotation, stats.GetStat(StatType.AttackRange), obstacleLayer | targetLayer);
+            RaycastHit[] hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0.5f, 0.5f), transform.forward, transform.rotation, stats.GetStat(StatType.AttackRange), obstacleLayerMask | targetLayer);
             //▼ 플레이어가 장애물 뒤에 숨어있지 않고 공격범위 내라면 
             foreach (var hit in hits)
             {
@@ -121,8 +115,7 @@ public class SkeletonWarrior : Monster
             {
                 SetMoveBool(true); //이동 상태로 전환 
                 agent.SetDestination(target.transform.position); //타겟의 위치로 이동                   
-            }
-            
+            } 
         }
         else
         {
@@ -139,7 +132,7 @@ public class SkeletonWarrior : Monster
     {
         monsterAnimator.SetTrigger("GetDamage");
         stats.ModifyStat(StatType.HP, -damage);
-        Debug.Log($"적 hp: {stats.GetStat(StatType.HP)}");
+        
 
         if (stats.GetStat(StatType.HP) <= 0)
         {
@@ -158,17 +151,17 @@ public class SkeletonWarrior : Monster
     /// </summary>
     protected override void OverlookAction()
     {
-       
+
         SetMoveBool(true); //이동 상태로 전환
         agent.SetDestination(targetWaypoint.position);//목적지로 이동  
-        
+
         if (Vector3.SqrMagnitude(transform.position - targetWaypoint.position) < 10f) //a목적지에 주변에 도달했을 때
         {
             SetMoveBool(false); //일단 멈춤
             previousWaypoint = targetWaypoint; //이전 목적지에 현재 목적지 저장                        
 
-            while (true && isDetectTarget == false)
-            {     
+            while (isDetectTarget == false)
+            {
                 if (waypoints.Count <= 1) //목적지가 하나밖에 없으면
                     break;
 
@@ -177,7 +170,7 @@ public class SkeletonWarrior : Monster
                 if (targetWaypoint != previousWaypoint) //이전 목적지와 다르면
                     break;
             }
-           
+
         }
     }
 
@@ -185,12 +178,17 @@ public class SkeletonWarrior : Monster
     /// 움직임 관련 부울 변수 일괄 설정 메서드
     /// </summary>
     /// <param name="toSetBool">"움직이는 경우 true 아닐 경우 false"</param>
-    void SetMoveBool(bool toSetBool)
+    private void SetMoveBool(bool toSetBool)
     {
         agent.isStopped = !toSetBool;
         monsterAnimator.SetBool("isWalk", toSetBool);
     }
-
+    // private void playEffectSound()
+    // {
+    //     monsterSoundManager.PlayerSoundEffect(monsterAudioClips[Random.Range(0, monsterAudioClips.Length)],10f);
+    // }
+             
+   
 
     /// <summary>
     /// 감지를 위한 코루틴 함수
@@ -203,6 +201,7 @@ public class SkeletonWarrior : Monster
         while (true)
         {
             waypoints.Clear();
+            //detectLayer내에 있고 detactDestinationRadius반경 내에 있는 collider감지 
             colliders = Physics.OverlapSphere(transform.position, detectDestinationRadius, detectLayer);
             foundTarget = false;
 
@@ -223,7 +222,7 @@ public class SkeletonWarrior : Monster
                         waypoints.Add(collider.transform);
                     }
                 }              
-                if (!foundTarget)
+                if (!foundTarget) //Target을 찾지 못했으면 
                 {
                     isDetectTarget = false;
                 }
@@ -254,8 +253,12 @@ public class SkeletonWarrior : Monster
         }
         agent.isStopped = false; //애니메이션 재생 끝나면 다시 이동 가능
         yield return CoroutineManager.waitForSeconds(animeSeconds);
-    } 
+    }
 
+    /// <summary>
+    /// 공격 딜레이 넣어주는 메서드 
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator AttackDelay()
     {
         isAttackCooltime = true;
@@ -264,5 +267,6 @@ public class SkeletonWarrior : Monster
 
         isAttackCooltime = false;
     }
-             
+    
+    
 }

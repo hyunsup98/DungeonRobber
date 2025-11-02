@@ -82,12 +82,13 @@ MonoBehaviour:
       <Value>k__BackingField: 2
     - type: 4
       <Value>k__BackingField: 1.5
+    stats: []
   playerDetectedRange: 15
-  detectDestinationRadius: 50
-  obstacleLayer:
+  detectDestinationRadius: 100
+  obstacleLayerMask:
     serializedVersion: 2
     m_Bits: 768
-  destinationLayer:
+  destinationLayerMask:
     serializedVersion: 2
     m_Bits: 1024
   targetLayer:
@@ -139,7 +140,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2

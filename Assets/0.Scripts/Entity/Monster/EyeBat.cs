@@ -5,10 +5,10 @@ public class EyeBat : Monster
 {
     [SerializeField] BaseBuff slowbuff; //적용할 디버프  
     [SerializeField] float detectDelay = 1f;//감지 딜레이 
-    [SerializeField] float  animeDelay = 0.5f;//애니메이션 딜레이 
     
     int playerLayer;
     int WaypointLayer;
+    bool isAlive = true;
     Coroutine detectPlayerCoroutine; //감지 코루틴 변수
     
     private void Awake()
@@ -27,6 +27,7 @@ public class EyeBat : Monster
     }
     private void FixedUpdate()
     {
+        if (!isAlive) return;
         agent.speed = stats.GetStat(StatType.MoveSpeed);
 
         if (isDetectTarget) //감지했을 때
@@ -73,6 +74,7 @@ public class EyeBat : Monster
         if (!isAttackCooltime) //공격 쿨타임이 아닐때 
         {
             SetMoveBool(false); //이동 멈춤
+            monsterAnimator.SetTrigger("Attack");
             StartCoroutine(AttackDelay());
         }
         //테스트 코드 
@@ -104,7 +106,7 @@ public class EyeBat : Monster
 
         if (targetDistance <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange)) //공격 사거리안에 들어오면 공격시작 
         {
-            RaycastHit[] hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0.5f, 0.5f), transform.forward, transform.rotation, stats.GetStat(StatType.AttackRange), obstacleLayer | targetLayer);
+            RaycastHit[] hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0.5f, 0.5f), transform.forward, transform.rotation, stats.GetStat(StatType.AttackRange), obstacleLayerMask | targetLayer);
             //▼ 플레이어가 장애물 뒤에 숨어있지 않고 공격범위 내라면 
             foreach (var hit in hits)
             {
@@ -135,13 +137,20 @@ public class EyeBat : Monster
     /// <param name="damage"> 해당 몬스터가 입을 피해 </param>
     public override void GetDamage(float damage)
     {
-        
+        Debug.Log("데미지 받음");
+        monsterAnimator.SetTrigger("GetDamage");
         stats.ModifyStat(StatType.HP, -damage);
 
         if (stats.GetStat(StatType.HP) <= 0)
         {
-            Destroy(this);
+            isAlive = false;
+            monsterAnimator.SetBool("isDead", true);
         }
+    }
+    
+    public void DestroyMonster()
+    {
+        Destroy(gameObject);
     }
 
     /// <summary>
@@ -158,7 +167,7 @@ public class EyeBat : Monster
             SetMoveBool(false); //일단 멈춤
             previousWaypoint = targetWaypoint; //이전 목적지에 현재 목적지 저장                        
 
-            while (true && isDetectTarget == false)
+            while (isDetectTarget == false)
             {
                 Debug.Log(waypoints.Count);            
                 if (waypoints.Count <= 1) //목적지가 하나밖에 없으면
@@ -180,6 +189,7 @@ public class EyeBat : Monster
     void SetMoveBool(bool toSetBool)
     {
         agent.isStopped = !toSetBool;
+        monsterAnimator.SetBool("isWalk", toSetBool);
         
     }
 
@@ -229,25 +239,11 @@ public class EyeBat : Monster
     }
 
     /// <summary>
-    /// 애니메이션 종료 대기 코루틴
+    /// 공격 딜레이 넣어주는 메서드 
     /// </summary>
     /// <param name="animName">애니메이션 이름 </param>
     /// <returns></returns>
-    private IEnumerator WaitAnimationEnd(string animName)
-    {
-        while (!monsterAnimator.GetCurrentAnimatorStateInfo(0).IsName(animName))
-        {
-            yield return null;
-        }
-        while (monsterAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
-        {
-            agent.isStopped = true; //애니메이션 재생되는 동안 멈춤
-            yield return null;
-        }
-        agent.isStopped = false; //애니메이션 재생 끝나면 다시 이동 가능
-        yield return CoroutineManager.waitForSeconds(animeDelay);
-    }
-
+   
     private IEnumerator AttackDelay()
     {
         isAttackCooltime = true;

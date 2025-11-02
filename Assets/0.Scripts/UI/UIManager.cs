@@ -1,10 +1,9 @@
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class UIManager : Singleton<UIManager>
 {
     #region MVP 패턴에 사용하는 변수들
-
     //플레이어 hp바, 스탯창
     [SerializeField] private UI_PlayerStat playerStat;      //체력바와 스탯창을 모두 관리하는 클래스
     private Presenter_PlayerStat presenter_PlayerStat;
@@ -58,5 +57,43 @@ public class UIManager : Singleton<UIManager>
         if (obj == null) return;
 
         obj.SetActive(activeSelf);
+    }
+
+    //타이틀 씬으로 이동할 때 키고 꺼줄 UI
+    private void UpdateUIByTitleScene()
+    {
+        OnOffUI(playerStat.gameObject, false);
+    }
+
+    //베이스 씬으로 이동할 때 키고 꺼줄 UI
+    private void UpdateUIByBaseScene()
+    {
+        OnOffUI(playerStat.gameObject, true);
+    }
+
+    //던전 씬으로 이동할 때 키고 꺼줄 UI
+    private void UpdateUIByDungeonScene()
+    {
+        OnOffUI(playerStat.gameObject, true);
+    }
+
+    private void OnEnable()
+    {
+        if(GameManager.Instance != null)
+        {
+            GameManager.Instance.onGameStateTitle += UpdateUIByTitleScene;
+            GameManager.Instance.onGameStateBase += UpdateUIByBaseScene;
+            GameManager.Instance.onGameStateDungeon += UpdateUIByDungeonScene;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if(GameManager.Instance != null)
+        {
+            GameManager.Instance.onGameStateTitle -= UpdateUIByTitleScene;
+            GameManager.Instance.onGameStateBase -= UpdateUIByBaseScene;
+            GameManager.Instance.onGameStateDungeon -= UpdateUIByDungeonScene;
+        }
     }
 }

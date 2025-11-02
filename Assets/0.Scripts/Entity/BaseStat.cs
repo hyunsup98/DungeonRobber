@@ -80,7 +80,7 @@ public class BaseStat
     //특정 타입의 능력치를 base 값으로 초기화
     public void InitStat(StatType type)
     {
-        ModifyStat(type, GetBaseStat(type));
+        SetStat(type, GetBaseStat(type));
     }
 
     #region BaseStats 값 관련 메서드
