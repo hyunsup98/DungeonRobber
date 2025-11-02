@@ -59,6 +59,12 @@ public class QuickSlot_Controller : MonoBehaviour
             slots[i].ownerInventory = inventory;
             slots[i].ownerQuickSlots = this;
             slots[i].Item = items[i];
+            
+            // 퀵슬롯 수량을 인벤토리 수량과 동기화
+            if (items[i] != null && inventory != null)
+            {
+                slots[i].ItemQuantity = inventory.GetItemQuantity(items[i]);
+            }
         }
     }
 
@@ -76,6 +82,12 @@ public class QuickSlot_Controller : MonoBehaviour
         for (int i = 0; i < slots.Length && i < items.Count; i++)
         {
             slots[i].Item = items[i];
+            
+            // 퀵슬롯 수량을 인벤토리 수량과 동기화
+            if (items[i] != null && inventory != null)
+            {
+                slots[i].ItemQuantity = inventory.GetItemQuantity(items[i]);
+            }
         }
     }
 

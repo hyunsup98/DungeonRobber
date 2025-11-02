@@ -12,21 +12,69 @@ public class ItemDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     private Image dragImage;
     private Slot slot;
 
+    private static Image cachedDragImage;
+    private static bool dragImageFound = false;
+
     void Start()
     {
         // 현재 슬롯의 컨트롤러를 가져옵니다 (자식에서도 찾기)
         slot = GetComponent<Slot>() ?? GetComponentInChildren<Slot>();
         
-        // 드래그 이미지를 태그를 활용해서 찾습니다
+        // DragImage 캐싱 (한 번만 찾기)
+        if (!dragImageFound)
+        {
+            FindDragImage();
+        }
+        
+        dragImage = cachedDragImage;
+    }
+
+    /// <summary>
+    /// DragImage 찾기 (비활성화된 오브젝트 포함)
+    /// </summary>
+    private static void FindDragImage()
+    {
+        // 먼저 활성화된 오브젝트에서 찾기
         GameObject dragImageObj = GameObject.FindGameObjectWithTag("DragImage");
+        
+        // 찾지 못하면 Canvas 자식에서 재귀적으로 검색
+        if (dragImageObj == null)
+        {
+            Canvas[] allCanvases = FindObjectsOfType<Canvas>(true); // 비활성화 포함
+            foreach (Canvas canvas in allCanvases)
+            {
+                dragImageObj = FindDragImageInChildren(canvas.transform, "DragImage");
+                if (dragImageObj != null)
+                    break;
+            }
+        }
+        
         if (dragImageObj != null)
         {
-            dragImage = dragImageObj.GetComponent<Image>();
+            cachedDragImage = dragImageObj.GetComponent<Image>();
+            dragImageFound = true;
         }
         else
         {
             Debug.LogWarning("DragImage를 찾을 수 없습니다! 'DragImage' 태그가 설정되어 있는지 확인하세요.");
         }
+    }
+
+    /// <summary>
+    /// 자식 Transform에서 태그로 GameObject 찾기
+    /// </summary>
+    private static GameObject FindDragImageInChildren(Transform parent, string tag)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.CompareTag(tag))
+                return child.gameObject;
+            
+            GameObject found = FindDragImageInChildren(child, tag);
+            if (found != null)
+                return found;
+        }
+        return null;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -122,45 +170,69 @@ public class ItemDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         Item fromItem = fromSlot.Item;
         Item toItem = toSlot.Item;
 
-        // 같은 소유자의 슬롯들 간 교환 (인벤토리 <-> 인벤토리 또는 퀵슬롯 <-> 퀵슬롯)
-        if (fromSlot.ownerInventory != null && toSlot.ownerInventory != null && 
-            fromSlot.ownerInventory == toSlot.ownerInventory)
+        // 같은 타입의 슬롯들 간 교환 (인벤토리 <-> 인벤토리 또는 퀵슬롯 <-> 퀵슬롯)
+        if (fromSlot.Type == toSlot.Type)
         {
-            // 인벤토리 내부 교환
-            fromSlot.ownerInventory.SwapItems(fromSlot.Index, toSlot.Index);
-            return;
-        }
-        
-        if (fromSlot.ownerQuickSlots != null && toSlot.ownerQuickSlots != null &&
-            fromSlot.ownerQuickSlots == toSlot.ownerQuickSlots)
-        {
-            // 퀵슬롯 내부 교환
-            fromSlot.ownerQuickSlots.SwapItems(fromSlot.Index, toSlot.Index);
-            return;
+            if (fromSlot.Type == Slot.SlotType.Inventory && 
+                fromSlot.ownerInventory != null && toSlot.ownerInventory != null && 
+                fromSlot.ownerInventory == toSlot.ownerInventory)
+            {
+                // 인벤토리 내부 교환
+                fromSlot.ownerInventory.SwapItems(fromSlot.Index, toSlot.Index);
+                Debug.Log($"인벤토리 내부 교환: {fromSlot.Index} <-> {toSlot.Index}");
+                return;
+            }
+            
+            if (fromSlot.Type == Slot.SlotType.QuickSlot && 
+                fromSlot.ownerQuickSlots != null && toSlot.ownerQuickSlots != null &&
+                fromSlot.ownerQuickSlots == toSlot.ownerQuickSlots)
+            {
+                // 퀵슬롯 내부 교환
+                fromSlot.ownerQuickSlots.SwapItems(fromSlot.Index, toSlot.Index);
+                Debug.Log($"퀵슬롯 내부 교환: {fromSlot.Index} <-> {toSlot.Index}");
+                return;
+            }
         }
 
         // 서로 다른 시스템 간 교환 (인벤토리 <-> 퀵슬롯)
         // 퀵슬롯은 인벤토리의 링크/참조 역할
-        if ((fromSlot.ownerInventory != null && toSlot.ownerQuickSlots != null) ||
-            (fromSlot.ownerQuickSlots != null && toSlot.ownerInventory != null))
+        if ((fromSlot.Type == Slot.SlotType.Inventory && toSlot.Type == Slot.SlotType.QuickSlot) ||
+            (fromSlot.Type == Slot.SlotType.QuickSlot && toSlot.Type == Slot.SlotType.Inventory))
         {
             // 인벤토리 -> 퀵슬롯
-            if (fromSlot.ownerInventory != null && toSlot.ownerQuickSlots != null)
+            if (fromSlot.Type == Slot.SlotType.Inventory && toSlot.Type == Slot.SlotType.QuickSlot)
             {
+                if (fromSlot.ownerInventory == null || toSlot.ownerQuickSlots == null)
+                {
+                    Debug.LogWarning($"인벤토리 -> 퀵슬롯: 소유자가 없습니다. from={fromSlot.ownerInventory}, to={toSlot.ownerQuickSlots}");
+                    return;
+                }
+                
                 // 기존 퀵슬롯 아이템 처리
                 if (toItem != null)
                 {
                     // 퀵슬롯에 있던 아이템은 그냥 클리어
-                    fromSlot.ownerQuickSlots.items[toSlot.Index] = null;
+                    toSlot.ownerQuickSlots.items[toSlot.Index] = null;
                 }
                 // 퀵슬롯에 인벤토리 아이템 링크 설정
-                fromSlot.ownerQuickSlots.items[toSlot.Index] = fromItem;
-                fromSlot.ownerQuickSlots.RefreshSlots();
-                Debug.Log($"인벤토리 -> 퀵슬롯: '{fromItem?.itemName}' 등록");
+                toSlot.ownerQuickSlots.items[toSlot.Index] = fromItem;
+                toSlot.ownerQuickSlots.RefreshSlots();
+                
+                // 퀵슬롯 수량을 인벤토리 수량과 동기화
+                toSlot.ItemQuantity = fromSlot.ItemQuantity;
+                
+                Debug.Log($"인벤토리 -> 퀵슬롯: '{fromItem?.itemName}' 등록 (슬롯 {toSlot.Index}, 수량: {fromSlot.ItemQuantity})");
+                return;
             }
             // 퀵슬롯 -> 인벤토리
-            else if (fromSlot.ownerQuickSlots != null && toSlot.ownerInventory != null)
+            else if (fromSlot.Type == Slot.SlotType.QuickSlot && toSlot.Type == Slot.SlotType.Inventory)
             {
+                if (fromSlot.ownerQuickSlots == null || toSlot.ownerInventory == null)
+                {
+                    Debug.LogWarning($"퀵슬롯 -> 인벤토리: 소유자가 없습니다. from={fromSlot.ownerQuickSlots}, to={toSlot.ownerInventory}");
+                    return;
+                }
+                
                 // 퀵슬롯 등록 해제
                 fromSlot.ownerQuickSlots.items[fromSlot.Index] = null;
                 fromSlot.ownerQuickSlots.RefreshSlots();
@@ -172,14 +244,12 @@ public class ItemDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                     fromSlot.ownerQuickSlots.items[fromSlot.Index] = toItem;
                     fromSlot.ownerQuickSlots.RefreshSlots();
                 }
-                Debug.Log($"퀵슬롯 -> 인벤토리: '{fromItem?.itemName}' 등록 해제");
+                Debug.Log($"퀵슬롯 -> 인벤토리: '{fromItem?.itemName}' 등록 해제 (슬롯 {fromSlot.Index})");
+                return;
             }
-            
-            Debug.Log($"인벤토리 <-> 퀵슬롯 교환: {fromItem?.itemName ?? "빈 슬롯"} <-> {toItem?.itemName ?? "빈 슬롯"}");
-            return;
         }
 
-        Debug.LogWarning("슬롯 교환 실패: 호환되지 않는 슬롯 타입");
+        Debug.LogWarning($"슬롯 교환 실패: 호환되지 않는 슬롯 타입. from={fromSlot.Type}, to={toSlot.Type}");
     }
 
     /// <summary>

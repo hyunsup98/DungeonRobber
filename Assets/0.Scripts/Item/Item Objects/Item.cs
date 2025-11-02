@@ -30,4 +30,8 @@ public class Item : ScriptableObject
     public GameObject itemPrefab;
 
     public string weaponType;
+    
+    [Header("아이템 사용 효과")]
+    [Tooltip("이 아이템 사용 시 적용될 버프 (소비 아이템용)")]
+    public BaseBuff useBuff;
 }

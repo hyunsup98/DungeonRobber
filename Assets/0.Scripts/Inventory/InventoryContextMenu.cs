@@ -165,11 +165,31 @@ public class InventoryContextMenu : MonoBehaviour
     {
         if (currentItem == null) return;
         
-        // TODO: 실제 효과 구현 (HP 회복, 버프 등)
-        Debug.Log($"'{currentItem.itemName}' 아이템을 사용했습니다!");
+        // 아이템 버프 적용
+        if (currentItem.useBuff != null)
+        {
+            // TestPlayer 찾아서 버프 적용
+            TestPlayer player = FindObjectOfType<TestPlayer>();
+            if (player != null)
+            {
+                player.ApplyItemBuff(currentItem.useBuff);
+                Debug.Log($"'{currentItem.itemName}' 버프 효과가 적용되었습니다!");
+            }
+            else
+            {
+                Debug.LogWarning("TestPlayer를 찾을 수 없습니다!");
+            }
+        }
+        else
+        {
+            Debug.Log($"'{currentItem.itemName}' 아이템을 사용했습니다! (버프 효과 없음)");
+        }
         
         // 소비 아이템은 개수 감소 또는 제거
-        currentInventory?.RemoveItem(currentSlot.Index);
+        if (currentInventory != null && currentItem != null)
+        {
+            currentInventory.DecreaseItemQuantity(currentItem);
+        }
         Hide();
     }
 
@@ -187,12 +207,35 @@ public class InventoryContextMenu : MonoBehaviour
         if (currentItem == null) return;
         
         if (shop == null) shop = FindObjectOfType<Shop>();
-        if (shop != null)
-        {
-            shop.SellItem(currentItem, 1);
-            currentInventory?.RemoveItem(currentSlot.Index);
-        }
+        if (shop == null) return;
+
+        // 컨텍스트 메뉴 닫기 전에 값 저장
+        Item itemToSell = currentItem;
+        uint maxQuantity = currentSlot?.ItemQuantity ?? 1;
+        Inventory invToUse = currentInventory;
+        Shop shopToUse = shop;
+
+        // 컨텍스트 메뉴 닫기
         Hide();
+
+        // 수량 선택 다이얼로그 표시
+        var dialog = SellQuantityDialog.GetOrFind();
+        if (dialog != null)
+        {
+            dialog.Show(itemToSell, maxQuantity, Input.mousePosition, (quantity) => OnSellConfirmed(quantity, itemToSell, shopToUse, invToUse));
+        }
+        else
+        {
+            Debug.LogWarning("SellQuantityDialog를 찾을 수 없습니다!");
+        }
+    }
+
+    private void OnSellConfirmed(int quantity, Item item, Shop shopRef, Inventory invRef)
+    {
+        if (item == null || shopRef == null) return;
+        
+        shopRef.SellItem(item, quantity);
+        Debug.Log($"'{item.itemName}' {quantity}개 판매 완료!");
     }
 
     private void OnAddToQuick()

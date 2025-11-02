@@ -18,6 +18,16 @@ public class TestPlayer : MonoBehaviour
     [SerializeField] private float interactionRange = 3f;
     
     private GameObject currentNearbyShop = null;
+    
+    [Header("버프 시스템")]
+    [SerializeField] private BaseStat stats = new BaseStat();
+    private BuffManager buffManager = new BuffManager();
+
+    void Awake()
+    {
+        // 스탯 초기화
+        stats.Init();
+    }
 
     void Update()
     {
@@ -179,11 +189,37 @@ public class TestPlayer : MonoBehaviour
         // 소비형 아이템 처리
         if (item.itemType == Item.ItemType.Consumable)
         {
-            // TODO: 실제 효과 구현 (HP 회복, 버프 등)
-            Debug.Log($"'{item.itemName}' 아이템을 사용했습니다!");
+            // 아이템 버프 적용
+            if (item.useBuff != null)
+            {
+                buffManager.ApplyBuff(item.useBuff, stats);
+                Debug.Log($"'{item.itemName}' 버프 효과가 적용되었습니다!");
+            }
+            else
+            {
+                // 버프 미구현이어도 일단 로그 확인할 수 있도록 출력
+                Debug.Log($"'{item.itemName}' 아이템을 사용했습니다! (버프 효과 없음)");
+            }
             
-            // 사용 후 소비
-            quickSlots.RemoveItem(slotIndex);
+            // 인벤토리 수량 감소
+            if (inventory != null)
+            {
+                inventory.DecreaseItemQuantity(item);
+                
+                // 인벤토리 수량 확인
+                uint remainingQuantity = inventory.GetItemQuantity(item);
+                
+                if (remainingQuantity == 0)
+                {
+                    // 수량이 0이 되면 퀵슬롯에서도 제거
+                    quickSlots.RemoveItem(slotIndex);
+                }
+                else
+                {
+                    // 수량이 남아있으면 퀵슬롯 수량 동기화
+                    quickSlots.RefreshSlots();
+                }
+            }
         }
         else if (item.itemType == Item.ItemType.Equipment)
         {
@@ -193,6 +229,18 @@ public class TestPlayer : MonoBehaviour
         else
         {
             Debug.Log($"'{item.itemName}'는 사용할 수 없는 아이템입니다.");
+        }
+    }
+
+    /// <summary>
+    /// 아이템 버프 적용 (컨텍스트 메뉴에서 호출)
+    /// </summary>
+    /// <param name="buff">적용할 버프</param>
+    public void ApplyItemBuff(BaseBuff buff)
+    {
+        if (buff != null)
+        {
+            buffManager.ApplyBuff(buff, stats);
         }
     }
 

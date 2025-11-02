@@ -165,8 +165,13 @@ public class Shop : MonoBehaviour
             return;
         }
 
-        // TODO: 골드 확인 및 차감
-        // 여기서는 일단 구매 성공으로 간주
+        // 골드 확인 및 차감
+        int totalCost = item.buyPrice * quantity;
+        if (playerInventory.Gold < totalCost)
+        {
+            Debug.LogWarning($"골드가 부족합니다. (보유: {playerInventory.Gold}G, 필요: {totalCost}G)");
+            return;
+        }
 
         // 인벤토리에 아이템 추가
         bool added = false;
@@ -185,7 +190,9 @@ public class Shop : MonoBehaviour
 
         if (added)
         {
-            Debug.Log($"'{item.itemName}' 아이템을 {quantity}개 구매했습니다.");
+            // 골드 차감
+            playerInventory.Gold -= totalCost;
+            Debug.Log($"'{item.itemName}' 아이템을 {quantity}개 구매했습니다. (-{totalCost}G)");
         }
         else
         {
@@ -206,15 +213,17 @@ public class Shop : MonoBehaviour
             return;
         }
 
-        // 인벤토리에서 아이템 제거
+        // 인벤토리에서 아이템 수량 감소
         for (int i = 0; i < quantity; i++)
         {
-            playerInventory.RemoveItem(item);
+            playerInventory.DecreaseItemQuantity(item);
         }
 
-        // TODO: 골드 지급
+        // 골드 지급
+        int sellPrice = item.sellPrice * quantity;
+        playerInventory.Gold += sellPrice;
 
-        Debug.Log($"'{item.itemName}' 아이템을 {quantity}개 판매했습니다. (+{item.sellPrice * quantity}G)");
+        Debug.Log($"'{item.itemName}' 아이템을 {quantity}개 판매했습니다. (+{sellPrice}G)");
     }
 
     /// <summary>

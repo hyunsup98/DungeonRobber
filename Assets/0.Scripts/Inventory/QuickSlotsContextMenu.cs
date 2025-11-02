@@ -66,6 +66,10 @@ public class QuickSlotsContextMenu : MonoBehaviour
         currentInventory = slot.ownerInventory ?? slot.GetComponentInParent<Inventory>();
         if (quickSlots == null)
             quickSlots = FindObjectOfType<QuickSlot_Controller>();
+        
+        // 퀵슬롯인 경우 Inventory 참조 가져오기
+        if (currentInventory == null && quickSlots != null)
+            currentInventory = quickSlots.inventory;
 
         // 버튼 표시/숨김 처리
         UpdateButtonVisibility();
@@ -143,11 +147,46 @@ public class QuickSlotsContextMenu : MonoBehaviour
     {
         if (currentItem == null) return;
         
-        // TODO: 실제 효과 구현 (HP 회복, 버프 등)
-        Debug.Log($"'{currentItem.itemName}' 아이템을 사용했습니다!");
+        // 아이템 버프 적용
+        if (currentItem.useBuff != null)
+        {
+            // TestPlayer 찾아서 버프 적용
+            TestPlayer player = FindObjectOfType<TestPlayer>();
+            if (player != null)
+            {
+                player.ApplyItemBuff(currentItem.useBuff);
+                Debug.Log($"'{currentItem.itemName}' 버프 효과가 적용되었습니다!");
+            }
+            else
+            {
+                Debug.LogWarning("TestPlayer를 찾을 수 없습니다!");
+            }
+        }
+        else
+        {
+            Debug.Log($"'{currentItem.itemName}' 아이템을 사용했습니다! (버프 효과 없음)");
+        }
         
         // 사용 후 소비
-        quickSlots?.RemoveItem(currentSlot.Index);
+        // 인벤토리 수량 감소
+        if (currentInventory != null && currentItem != null)
+        {
+            currentInventory.DecreaseItemQuantity(currentItem);
+            
+            // 인벤토리 수량 확인
+            uint remainingQuantity = currentInventory.GetItemQuantity(currentItem);
+            
+            if (remainingQuantity == 0)
+            {
+                // 수량이 0이 되면 퀵슬롯에서도 제거
+                quickSlots?.RemoveItem(currentSlot.Index);
+            }
+            else
+            {
+                // 수량이 남아있으면 퀵슬롯 수량 동기화
+                quickSlots?.RefreshSlots();
+            }
+        }
         Hide();
     }
 
