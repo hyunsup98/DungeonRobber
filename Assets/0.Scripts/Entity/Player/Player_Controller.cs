@@ -5,40 +5,41 @@ using UnityEngine;
 public enum PlayerBehaviorState : int
 {
     None        = 0,
-    Alive       = 1 << 0,       //ÇÃ·¹ÀÌ¾î°¡ »ì¾ÆÀÖ´Â »óÅÂ = Ã¼·ÂÀÌ 0º¸´Ù Å­
-    Dead        = 1 << 1,       //ÇÃ·¹ÀÌ¾î°¡ Á×Àº »óÅÂ = Ã¼·ÂÀÌ 0 ÀÌÇÏ
-    IsCanMove   = 1 << 2,       //ÇÃ·¹ÀÌ¾î°¡ ¿òÁ÷ÀÏ ¼ö ÀÖ´Â »óÅÂ
-    IsWalk      = 1 << 3,       //ÇÃ·¹ÀÌ¾î°¡ °È°í ÀÖ´Â »óÅÂ
-    IsSprint    = 1 << 4,       //ÇÃ·¹ÀÌ¾î°¡ ´Ş¸®°í ÀÖ´Â »óÅÂ
-    IsAttack    = 1 << 5,       //ÇÃ·¹ÀÌ¾î°¡ °ø°İÇÏ°í ÀÖ´Â »óÅÂ
-    IsDodge      = 1 << 6,      //ÇÃ·¹ÀÌ¾î°¡ ´ÙÀÌºù(±¸¸£±â) ÇÏ´Â »óÅÂ
+    Alive       = 1 << 0,       //í”Œë ˆì´ì–´ê°€ ì‚´ì•„ìˆëŠ” ìƒíƒœ = ì²´ë ¥ì´ 0ë³´ë‹¤ í¼
+    Dead        = 1 << 1,       //í”Œë ˆì´ì–´ê°€ ì£½ì€ ìƒíƒœ = ì²´ë ¥ì´ 0 ì´í•˜
+    IsCanMove   = 1 << 2,       //í”Œë ˆì´ì–´ê°€ ì›€ì§ì¼ ìˆ˜ ìˆëŠ” ìƒíƒœ
+    IsWalk      = 1 << 3,       //í”Œë ˆì´ì–´ê°€ ê±·ê³  ìˆëŠ” ìƒíƒœ
+    IsSprint    = 1 << 4,       //í”Œë ˆì´ì–´ê°€ ë‹¬ë¦¬ê³  ìˆëŠ” ìƒíƒœ
+    IsAttack    = 1 << 5,       //í”Œë ˆì´ì–´ê°€ ê³µê²©í•˜ê³  ìˆëŠ” ìƒíƒœ
+    IsDodge      = 1 << 6,      //í”Œë ˆì´ì–´ê°€ ë‹¤ì´ë¹™(êµ¬ë¥´ê¸°) í•˜ëŠ” ìƒíƒœ
 }
 
 /// <summary>
-/// ÇÃ·¹ÀÌ¾î¿¡ °ü·ÃµÈ ±â´ÉµéÀ» ´ã´çÇÏ´Â Å¬·¡½º
-/// ÀÌµ¿, °ø°İ, ¾Ö´Ï¸ŞÀÌ¼Ç µîÀÇ ¿ä¼Ò¸¦ ´ã´ç
+/// í”Œë ˆì´ì–´ì— ê´€ë ¨ëœ ê¸°ëŠ¥ë“¤ì„ ë‹´ë‹¹í•˜ëŠ” í´ë˜ìŠ¤
+/// ì´ë™, ê³µê²©, ì• ë‹ˆë©”ì´ì…˜ ë“±ì˜ ìš”ì†Œë¥¼ ë‹´ë‹¹
 /// </summary>
 public sealed partial class Player_Controller : Entity
 {
-    public static Player_Controller Instance { get; private set; }  //ÀÌ¹Ì Entity Å¬·¡½º¸¦ »ó¼Ó¹Ş°í ÀÖ±â¿¡ µû·Î ¸¸µé¾îÁÜ
+    public static Player_Controller Instance { get; private set; }  //ì´ë¯¸ Entity í´ë˜ìŠ¤ë¥¼ ìƒì†ë°›ê³  ìˆê¸°ì— ë”°ë¡œ ë§Œë“¤ì–´ì¤Œ
 
     public event Action onPlayerStatChanged;
 
-    [Header("ÄÄÆ÷³ÍÆ® º¯¼ö")]
-    [SerializeField] private Camera mainCamera;         //¸ŞÀÎ Ä«¸Ş¶ó
-    [SerializeField] private Rigidbody playerRigid;     //ÇÃ·¹ÀÌ¾î Rigidbody
-    [SerializeField] private Animator playerAnimator;   //ÇÃ·¹ÀÌ¾î ¾Ö´Ï¸ŞÀÌÅÍ
-    [SerializeField] private Transform attackPos;       //ÇÃ·¹ÀÌ¾î°¡ °ø°İÇÒ ¶§ °ø°İ Å½Áö¸¦ ½ÃÀÛÇÒ À§Ä¡
+    [Header("ì»´í¬ë„ŒíŠ¸ ë³€ìˆ˜")]
+    [SerializeField] private Camera mainCamera;         //ë©”ì¸ ì¹´ë©”ë¼
+    [SerializeField] private Rigidbody playerRigid;     //í”Œë ˆì´ì–´ Rigidbody
+    [SerializeField] private Animator playerAnimator;   //í”Œë ˆì´ì–´ ì• ë‹ˆë©”ì´í„°
+    [SerializeField] private Transform attackPos;       //í”Œë ˆì´ì–´ê°€ ê³µê²©í•  ë•Œ ê³µê²© íƒì§€ë¥¼ ì‹œì‘í•  ìœ„ì¹˜
 
-    [Header("ÀÌµ¿ °ü·Ã º¯¼ö")]
-    [SerializeField] private float runSpeed;            //ÇÃ·¹ÀÌ¾î ´Ş¸®±â ¼Óµµ
-    [SerializeField] private float dodgeForce;          //±¸¸£±â Èû
+    [Header("ì´ë™ ê´€ë ¨ ë³€ìˆ˜")]
+    [SerializeField] private float runSpeed;            //í”Œë ˆì´ì–´ ë‹¬ë¦¬ê¸° ì†ë„
+    [SerializeField] private float dodgeForce;          //êµ¬ë¥´ê¸° í˜
+    private float currentSpeed;                         //í”Œë ˆì´ì–´ì˜ í˜„ì¬ ì†ë„ (ë¯¸ë‹ˆë§µ ì•„ì´ì½˜ì´ í”Œë ˆì´ì–´ì™€ ê°™ì€ ì†ë„ë¡œ ì›€ì§ì´ê²Œ í•˜ê¸° ìœ„í•¨)
 
-    [Header("°ø°İ °ü·Ã º¯¼ö")]
-    [SerializeField] private LayerMask attackMask;      //°ø°İÇÒ ´ë»ó ·¹ÀÌ¾î
-    public event Action playerDeadAction;               //ÇÃ·¹ÀÌ¾î°¡ Á×¾úÀ» ¶§ ¹ß»ıÇÒ ÀÌº¥Æ®
+    [Header("ê³µê²© ê´€ë ¨ ë³€ìˆ˜")]
+    [SerializeField] private LayerMask attackMask;      //ê³µê²©í•  ëŒ€ìƒ ë ˆì´ì–´
+    public event Action playerDeadAction;               //í”Œë ˆì´ì–´ê°€ ì£½ì—ˆì„ ë•Œ ë°œìƒí•  ì´ë²¤íŠ¸
 
-    [Header("½ºÅÂ¹Ì³Ê °ü·Ã º¯¼ö")]
+    [Header("ìŠ¤íƒœë¯¸ë„ˆ ê´€ë ¨ ë³€ìˆ˜")]
     [SerializeField] private float maxStamina = 100f;
     private float stamina;
     public float Stamina
@@ -59,14 +60,14 @@ public sealed partial class Player_Controller : Entity
         }
     }
 
-    private PlayerBehaviorState playerBehaviorState;    //ÇÃ·¹ÀÌ¾î Çàµ¿¿¡ °ü·ÃµÈ »óÅÂ ÇÃ·¡±×
+    private PlayerBehaviorState playerBehaviorState;    //í”Œë ˆì´ì–´ í–‰ë™ì— ê´€ë ¨ëœ ìƒíƒœ í”Œë˜ê·¸
 
-    //ÇÃ·¹ÀÌ¾îÀÇ ½ºÅÈÀ» ¿ÜºÎ¿¡¼­ ¹Ş¾Æ¿À´Â ¸Ş¼­µå
+    //í”Œë ˆì´ì–´ì˜ ìŠ¤íƒ¯ì„ ì™¸ë¶€ì—ì„œ ë°›ì•„ì˜¤ëŠ” ë©”ì„œë“œ
     public BaseStat GetPlayerStat() => stats;
 
     private void Awake()
     {
-        #region ½Ì±ÛÅÏ
+        #region ì‹±ê¸€í„´
         if(Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -99,21 +100,16 @@ public sealed partial class Player_Controller : Entity
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
 
-        //°ø°İ
+        //ê³µê²©
         if (Input.GetMouseButtonDown(0))
         {
             Attack();
         }
 
-        //¸¶¿ì½º Ä¿¼­ ¹Ù¶óº¸±â
+        //ë§ˆìš°ìŠ¤ ì»¤ì„œ ë°”ë¼ë³´ê¸°
         if (!CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint) && !CheckPlayerBehaviorState(PlayerBehaviorState.IsDodge))
         {
             LookAtMousePoint();
-        }
-
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            GetDamage(5f);
         }
     }
 
@@ -121,13 +117,13 @@ public sealed partial class Player_Controller : Entity
     {
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
-        //ÀÌµ¿
+        //ì´ë™
         Move();
     }
 
     /// <summary>
-    /// ÃÊ±âÈ­ ¸Ş¼­µå
-    /// ÇÃ·¹ÀÌ¾î ÀÌµ¿¼Óµµ µî ÃÊ±âÈ­
+    /// ì´ˆê¸°í™” ë©”ì„œë“œ
+    /// í”Œë ˆì´ì–´ ì´ë™ì†ë„ ë“± ì´ˆê¸°í™”
     /// </summary>
     protected override void Init()
     {
@@ -141,30 +137,30 @@ public sealed partial class Player_Controller : Entity
         playerBehaviorState = PlayerBehaviorState.Alive | PlayerBehaviorState.IsCanMove;
     }
 
-    #region ÇÃ·¹ÀÌ¾îÀÇ Çàµ¿ »óÅÂ Á¦¾î
+    #region í”Œë ˆì´ì–´ì˜ í–‰ë™ ìƒíƒœ ì œì–´
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î Çàµ¿ »óÅÂ ÇÃ·¡±×¿¡ »õ·Î¿î »óÅÂ Ãß°¡
+    /// í”Œë ˆì´ì–´ í–‰ë™ ìƒíƒœ í”Œë˜ê·¸ì— ìƒˆë¡œìš´ ìƒíƒœ ì¶”ê°€
     /// </summary>
-    /// <param name="state"> Ãß°¡ÇÒ »óÅÂ </param>
+    /// <param name="state"> ì¶”ê°€í•  ìƒíƒœ </param>
     private void AddPlayerBehaviorState(PlayerBehaviorState state)
     {
         playerBehaviorState |= state;
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î Çàµ¿ »óÅÂ ÇÃ·¡±×¿¡ ÀÖ´Â »óÅÂ Á¦°Å
+    /// í”Œë ˆì´ì–´ í–‰ë™ ìƒíƒœ í”Œë˜ê·¸ì— ìˆëŠ” ìƒíƒœ ì œê±°
     /// </summary>
-    /// <param name="state"> »èÁ¦ÇÒ »óÅÂ </param>
+    /// <param name="state"> ì‚­ì œí•  ìƒíƒœ </param>
     private void RemovePlayerBehaviorState(PlayerBehaviorState state)
     {
         playerBehaviorState &= ~state;
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î Çàµ¿ »óÅÂ ÇÃ·¡±×¿¡ »óÅÂ°¡ È°¼ºÈ­µÇ¾î ÀÖ´ÂÁö Ã¼Å©
+    /// í”Œë ˆì´ì–´ í–‰ë™ ìƒíƒœ í”Œë˜ê·¸ì— ìƒíƒœê°€ í™œì„±í™”ë˜ì–´ ìˆëŠ”ì§€ ì²´í¬
     /// </summary>
-    /// <param name="states"> Ã¼Å©ÇÒ »óÅÂ ¸ñ·Ï </param>
-    /// <returns> True = ÇØ´ç ºñÆ® ÇÃ·¡±×°¡ 1ÀÏ °æ¿ì / False = ÇØ´ç ºñÆ® ÇÃ·¡±×°¡ 0ÀÏ °æ¿ì </returns>
+    /// <param name="states"> ì²´í¬í•  ìƒíƒœ ëª©ë¡ </param>
+    /// <returns> True = í•´ë‹¹ ë¹„íŠ¸ í”Œë˜ê·¸ê°€ 1ì¼ ê²½ìš° / False = í•´ë‹¹ ë¹„íŠ¸ í”Œë˜ê·¸ê°€ 0ì¼ ê²½ìš° </returns>
     private bool CheckPlayerBehaviorState(params PlayerBehaviorState[] states)
     {
         foreach(var state in states)

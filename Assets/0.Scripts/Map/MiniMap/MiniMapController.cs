@@ -4,66 +4,66 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-//¹Ì´Ï¸Ê ÄÁÆ®·Ñ·¯: ¸¶Ä¿/ÇÃ·¹ÀÌ¾î¾ÆÀÌÄÜ/¾È³»¹®±¸ Á¦¾î
+//ë¯¸ë‹ˆë§µ ì»¨íŠ¸ë¡¤ëŸ¬: ë§ˆì»¤/í”Œë ˆì´ì–´ì•„ì´ì½˜/ì•ˆë‚´ë¬¸êµ¬ ì œì–´
 public class MiniMapController : MonoBehaviour
 {
-    //Á¸ ¸Å´ÏÀú ÂüÁ¶
+    //ì¡´ ë§¤ë‹ˆì € ì°¸ì¡°
     [Header("References")]
     [SerializeField] private ZoneManager _zoneManager;
 
-    //ÇÃ·¹ÀÌ¾î Æ®·£½ºÆû
+    //í”Œë ˆì´ì–´ íŠ¸ëœìŠ¤í¼
     [SerializeField] private Transform _playerTransform;
 
-    //MiniMapCanvasHooks°¡ Æ÷ÇÔµÈ Äµ¹ö½º ÇÁ¸®ÆÕ
+    //MiniMapCanvasHooksê°€ í¬í•¨ëœ ìº”ë²„ìŠ¤ í”„ë¦¬íŒ¹
     [Header("Canvas(Hooks Prefab)")]
     [SerializeField] private GameObject _minimapCanvasPrefab;
 
-    //¿ùµå XZ¸¦ ¹è°æ Rect·Î º¯È¯ÇÏ±â À§ÇÑ ¹üÀ§
+    //ì›”ë“œ XZë¥¼ ë°°ê²½ Rectë¡œ ë³€í™˜í•˜ê¸° ìœ„í•œ ë²”ìœ„
     [Header("World To Rect Mapping")]
     [SerializeField] private Vector2 worldMin = new Vector2(-50f, -50f);
     [SerializeField] private Vector2 worldMax = new Vector2(50f, 50f);
 
 
-    //Á¸º° ½ºÇÁ¶óÀÌÆ® ¹× ¿À¹ö¶óÀÌµå UI
+    //ì¡´ë³„ ìŠ¤í”„ë¼ì´íŠ¸ ë° ì˜¤ë²„ë¼ì´ë“œ UI
     [System.Serializable]
     public class ZoneSpriteSet
     {
-        //Á¸ ÀÌ¸§(ZoneManagerÀÇ zoneName°ú ÀÏÄ¡)
+        //ì¡´ ì´ë¦„(ZoneManagerì˜ zoneNameê³¼ ì¼ì¹˜)
         public string zoneName;
 
-        //»óÅÂ ½ºÇÁ¶óÀÌÆ®
+        //ìƒíƒœ ìŠ¤í”„ë¼ì´íŠ¸
         public Sprite normal;
         public Sprite warning;
         public Sprite locked;
 
-        //¿À¹ö¶óÀÌµå ·çÆ®
+        //ì˜¤ë²„ë¼ì´ë“œ ë£¨íŠ¸
         public RectTransform overrideRoot;
 
-        //¿À¹ö¶óÀÌµå »óÅÂ ¾ÆÀÌÄÜ
+        //ì˜¤ë²„ë¼ì´ë“œ ìƒíƒœ ì•„ì´ì½˜
         public Image overrideStateIcon;
 
-        //¿À¹ö¶óÀÌµå ¶óº§
+        //ì˜¤ë²„ë¼ì´ë“œ ë¼ë²¨
         public TMP_Text overrideLabel;
     }
 
 
-    //Á¸º° ½ºÇÁ¶óÀÌÆ® ¼¼Æ®
+    //ì¡´ë³„ ìŠ¤í”„ë¼ì´íŠ¸ ì„¸íŠ¸
     [Header("Per Zone Sprites")]
     [SerializeField] private List<ZoneSpriteSet> zoneSpriteSets = new List<ZoneSpriteSet>();
 
 
-    //ÇÃ·¹ÀÌ¾î ¾ÆÀÌÄÜ º¸°£ ¼Óµµ
+    //í”Œë ˆì´ì–´ ì•„ì´ì½˜ ë³´ê°„ ì†ë„
     [Header("Player Icon")]
     [SerializeField] private float playerFollowSpeed = 10f;
 
 
-    //°æ°í »óÅÂ ±ôºıÀÓ ¼³Á¤
+    //ê²½ê³  ìƒíƒœ ê¹œë¹¡ì„ ì„¤ì •
     [Header("Warning Blink")]
     [SerializeField] private float blinkInterval = 0.5f;
     [SerializeField] private float warningDimAlpha = 0.35f;
 
 
-    //·±Å¸ÀÓ ÈÅ
+    //ëŸ°íƒ€ì„ í›…
     private GameObject panelGO;
     private RectTransform backgroundRT;
     private Transform markersParent;
@@ -71,15 +71,15 @@ public class MiniMapController : MonoBehaviour
     private TMP_Text messageText;
 
 
-    //¾È³»¹®±¸ ¼û±è ÄÚ·çÆ¾
+    //ì•ˆë‚´ë¬¸êµ¬ ìˆ¨ê¹€ ì½”ë£¨í‹´
     private Coroutine hideMessageRoutine;
 
 
-    //¹Ì´Ï¸Ê ¿­¸² »óÅÂ
+    //ë¯¸ë‹ˆë§µ ì—´ë¦¼ ìƒíƒœ
     private bool isOpen;
 
 
-    //¸¶Ä¿ UI º¸°ü ±¸Á¶Ã¼
+    //ë§ˆì»¤ UI ë³´ê´€ êµ¬ì¡°ì²´
     private class MarkerUI
     {
         public Image img;
@@ -92,11 +92,11 @@ public class MiniMapController : MonoBehaviour
     }
     
 
-    //Á¸ ÀÌ¸§ > ¸¶Ä¿ UI ¸ÅÇÎ
+    //ì¡´ ì´ë¦„ > ë§ˆì»¤ UI ë§¤í•‘
     private readonly Dictionary<string, MarkerUI> markers = new Dictionary<string, MarkerUI>();
 
 
-    //È°¼ºÈ­ ½Ã ÃÊ±âÈ­
+    //í™œì„±í™” ì‹œ ì´ˆê¸°í™”
     private void OnEnable()
     {
         InstantiateCanvasIfNeeded();
@@ -107,7 +107,7 @@ public class MiniMapController : MonoBehaviour
     }
 
 
-    //ºñÈ°¼ºÈ­ ½Ã Á¤¸®
+    //ë¹„í™œì„±í™” ì‹œ ì •ë¦¬
     private void OnDisable()
     {
         Subscribe(false);
@@ -121,7 +121,7 @@ public class MiniMapController : MonoBehaviour
     }
 
 
-    //ÀÔ·Â Ã³¸® ¹× ÇÁ·¹ÀÓ °»½Å
+    //ì…ë ¥ ì²˜ë¦¬ ë° í”„ë ˆì„ ê°±ì‹ 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Tab) == true)
@@ -144,7 +144,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //ÀÌº¥Æ® ±¸µ¶/ÇØÁ¦
+    //ì´ë²¤íŠ¸ êµ¬ë…/í•´ì œ
     private void Subscribe(bool onFlag)
     {
         if (_zoneManager == null)
@@ -166,7 +166,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //Á¸ °»½Å ÀÌº¥Æ®
+    //ì¡´ ê°±ì‹  ì´ë²¤íŠ¸
     private void OnZonesUpdated()
     {
         SyncMarkersToZones();
@@ -175,7 +175,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //¾È³»¹®±¸¸¦ ÆĞ³Î ¹ÛÀ¸·Î ºĞ¸®
+    //ì•ˆë‚´ë¬¸êµ¬ë¥¼ íŒ¨ë„ ë°–ìœ¼ë¡œ ë¶„ë¦¬
     private void EnsureMessageDetached()
     {
         if (panelGO == null)
@@ -199,7 +199,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //Äµ¹ö½º ÀÎ½ºÅÏ½º »ı¼º ¶Ç´Â ¾À¿¡¼­ Ã£±â
+    //ìº”ë²„ìŠ¤ ì¸ìŠ¤í„´ìŠ¤ ìƒì„± ë˜ëŠ” ì”¬ì—ì„œ ì°¾ê¸°
     private void InstantiateCanvasIfNeeded()
     {
         if (panelGO != null)
@@ -251,7 +251,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //Á¸ ¸ñ·Ï°ú ¸¶Ä¿ µ¿±âÈ­
+    //ì¡´ ëª©ë¡ê³¼ ë§ˆì»¤ ë™ê¸°í™”
     private void SyncMarkersToZones()
     {
         if (_zoneManager == null)
@@ -391,7 +391,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //½ºÇÁ¶óÀÌÆ® ¼¼Æ® À¯È¿¼º °Ë»ç
+    //ìŠ¤í”„ë¼ì´íŠ¸ ì„¸íŠ¸ ìœ íš¨ì„± ê²€ì‚¬
     private bool ValidateSet(ZoneSpriteSet s)
     {
         if (s == null)
@@ -415,7 +415,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //µ¿Àû ¸¶Ä¿ ÀÌ¹ÌÁö »ı¼º
+    //ë™ì  ë§ˆì»¤ ì´ë¯¸ì§€ ìƒì„±
     private Image CreateMarkerImage(string goName)
     {
         if (markersParent == null)
@@ -439,7 +439,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //¸ğµç ¸¶Ä¿ À§Ä¡ °»½Å
+    //ëª¨ë“  ë§ˆì»¤ ìœ„ì¹˜ ê°±ì‹ 
     private void UpdateAllMarkerPositions()
     {
         if (_zoneManager == null)
@@ -481,7 +481,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //¸ğµç ¸¶Ä¿ »óÅÂ °»½Å
+    //ëª¨ë“  ë§ˆì»¤ ìƒíƒœ ê°±ì‹ 
     private void RefreshAllStates()
     {
         if (_zoneManager == null)
@@ -510,7 +510,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //»óÅÂ Àû¿ë ¹× ±ôºıÀÓ Ã³¸®
+    //ìƒíƒœ ì ìš© ë° ê¹œë¹¡ì„ ì²˜ë¦¬
     private void ApplyState(MarkerUI ui, ZoneManager.ZoneState state)
     {
         if (ui == null)
@@ -549,7 +549,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //±ôºıÀÓ ½ÃÀÛ
+    //ê¹œë¹¡ì„ ì‹œì‘
     private void StartBlink(MarkerUI ui)
     {
         if (ui.blinker == null)
@@ -560,7 +560,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //±ôºıÀÓ Á¤Áö
+    //ê¹œë¹¡ì„ ì •ì§€
     private void StopBlink(MarkerUI ui)
     {
         if (ui.blinker == null)
@@ -573,7 +573,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //¾ËÆÄ ±ôºıÀÓ ·çÆ¾
+    //ì•ŒíŒŒ ê¹œë¹¡ì„ ë£¨í‹´
     private IEnumerator BlinkRoutine(Image img)
     {
         bool bright = true;
@@ -610,7 +610,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //¸ğµç ±ôºıÀÓ Á¤Áö
+    //ëª¨ë“  ê¹œë¹¡ì„ ì •ì§€
     private void StopAllBlinkers()
     {
         foreach (KeyValuePair<string, MarkerUI> kv in markers)
@@ -628,7 +628,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //¹Ì´Ï¸Ê ¿­±â/´İ±â(¾È³»¹®±¸´Â À¯Áö)
+    //ë¯¸ë‹ˆë§µ ì—´ê¸°/ë‹«ê¸°(ì•ˆë‚´ë¬¸êµ¬ëŠ” ìœ ì§€)
     private void ToggleOpen(bool openFlag)
     {
         isOpen = openFlag;
@@ -645,62 +645,53 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //ÇÃ·¹ÀÌ¾î ¾ÆÀÌÄÜ À§Ä¡ º¸°£
+    //í”Œë ˆì´ì–´ ì•„ì´ì½˜ ìœ„ì¹˜ ë³´ê°„
     private void UpdatePlayerIconPosition()
     {
-        if (_playerTransform == null)
-        {
-            return;
-        }
-        if (playerIcon == null)
+        if (_playerTransform == null || playerIcon == null)
         {
             return;
         }
 
+        //ìœ„ì¹˜ ë³´ê°„ ì´ë™
         Vector2 target = WorldToMini(_playerTransform.position);
-
         playerIcon.anchoredPosition = Vector2.Lerp(
             playerIcon.anchoredPosition,
             target,
             Time.deltaTime * playerFollowSpeed
         );
+
+        //íšŒì „ ì ìš© (í”Œë ˆì´ì–´ Y íšŒì „ê°’ ê¸°ì¤€)
+        float mInimapIconRotation = _playerTransform.eulerAngles.y;
+        playerIcon.localRotation = Quaternion.Euler(0f, 0f, -mInimapIconRotation);
     }
 
 
 
-    //¿ùµå ÁÂÇ¥¸¦ ¹è°æ ·ÎÄÃ ÁÂÇ¥·Î º¯È¯
+    //ì›”ë“œ ì¢Œí‘œë¥¼ ë°°ê²½ ë¡œì»¬ ì¢Œí‘œë¡œ ë³€í™˜
     private Vector2 WorldToMini(Vector3 world)
     {
-        float tx = 0.5f;
-        float tz = 0.5f;
-
-        float dx = Mathf.Abs(worldMax.x - worldMin.x);
-        if (dx > 0.00001f)
-        {
-            tx = Mathf.InverseLerp(worldMin.x, worldMax.x, world.x);
-        }
-
-        float dz = Mathf.Abs(worldMax.y - worldMin.y);
-        if (dz > 0.00001f)
-        {
-            tz = Mathf.InverseLerp(worldMin.y, worldMax.y, world.z);
-        }
-
         if (backgroundRT == null)
         {
             return Vector2.zero;
         }
 
-        Rect r = backgroundRT.rect;
-        float px = (tx - 0.5f) * r.width;
-        float pz = (tz - 0.5f) * r.height;
+        Rect rect = backgroundRT.rect;
 
-        return new Vector2(px, pz);
+        //ë¹„ìœ¨ ê³„ì‚°
+        float normalizedX = (world.x - worldMin.x) / (worldMax.x - worldMin.x);
+        float normalizedZ = (world.z - worldMin.y) / (worldMax.y - worldMin.y);
+
+        // ì¤‘ì‹¬ ê¸°ì¤€ ì˜¤í”„ì…‹ ê³„ì‚°
+        float localX = (normalizedX - 0.5f) * rect.width;
+        float localZ = (normalizedZ - 0.5f) * rect.height;
+
+        return new Vector2(localX, localZ);
     }
 
 
 
-    //¾È³»¹®±¸ Ã³¸®
+    //ì•ˆë‚´ë¬¸êµ¬ ì²˜ë¦¬
     private void HandleMessage(string msg, Color color, float seconds)
     {
         if (messageText == null)
@@ -727,7 +718,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //Áö¿¬ ÈÄ ¾È³»¹®±¸ ¼û±è
+    //ì§€ì—° í›„ ì•ˆë‚´ë¬¸êµ¬ ìˆ¨ê¹€
     private IEnumerator HideAfter(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -740,7 +731,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //Á¸ ÀÌ¸§À¸·Î ½ºÇÁ¶óÀÌÆ® ¼¼Æ® Ã£±â
+    //ì¡´ ì´ë¦„ìœ¼ë¡œ ìŠ¤í”„ë¼ì´íŠ¸ ì„¸íŠ¸ ì°¾ê¸°
     private ZoneSpriteSet FindSpriteSet(string zoneName)
     {
         for (int i = 0; i < zoneSpriteSets.Count; i++)
@@ -759,7 +750,7 @@ public class MiniMapController : MonoBehaviour
 
 
 
-    //Á¸ ¿ùµå À§Ä¡ ±¸ÇÏ±â
+    //ì¡´ ì›”ë“œ ìœ„ì¹˜ êµ¬í•˜ê¸°
     private Vector3 GetZoneWorldPos(ZoneManager.Zone z)
     {
         if (z == null)

@@ -143,7 +143,7 @@ public class ItemDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                 foreach (var res in results)
                 {
                     Slot targetSlot = res.gameObject.GetComponent<Slot>() ?? res.gameObject.GetComponentInParent<Slot>();
-                    
+
                     if (targetSlot != null && targetSlot != slot)
                     {
                         Debug.Log($"슬롯에 드롭: {slot.name} -> {targetSlot.name}");

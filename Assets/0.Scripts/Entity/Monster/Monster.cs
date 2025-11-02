@@ -34,7 +34,7 @@ public abstract class Monster : Entity
     protected RaycastHit rayhit; //레이캐스트 히트 정보 저장용 변수   
     protected bool isDetectTarget = false; //감지했는가를 나타내는 변수 
     protected bool isAttackCooltime = false; //공격 쿨타임인지를 나타내는 변수
-    protected WaitForSeconds attackDelaytime; //공격 딜레이 시간 
+    protected float attackDelaytime; //공격 딜레이 시간 
     protected LayerMask detectLayer;
     
 
