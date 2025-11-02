@@ -11,6 +11,8 @@ public class Inventory : MonoBehaviour
 {
     [Header("Inventory Settings")]
     [SerializeField] private int inventorySize = 9;
+    [Tooltip("슬롯 프리팹 (동적 생성 시 사용)")]
+    [SerializeField] private GameObject slotPrefab;
     
     [Header("UI References")]
     [SerializeField] private GameObject inventoryRoot;
@@ -21,6 +23,18 @@ public class Inventory : MonoBehaviour
 
     // UI 슬롯들
     private InvenSlot[] slots;
+    
+    /// <summary>
+    /// 인벤토리 크기 (읽기 전용)
+    /// </summary>
+    public int InvenSize
+    {
+        get => inventorySize;
+        private set
+        {
+            inventorySize = Mathf.Max(1, value); // 최소 1개
+        }
+    }
     
     // 골드 관리
     [Header("Gold")]
@@ -78,18 +92,95 @@ public class Inventory : MonoBehaviour
             return;
         }
 
-        slots = slotParent.GetComponentsInChildren<InvenSlot>();
-        if (slots == null || slots.Length == 0)
+        // 기존 슬롯들 찾기
+        InvenSlot[] existingSlots = slotParent.GetComponentsInChildren<InvenSlot>(true);
+        
+        // 필요한 슬롯 개수 확인
+        int requiredSlots = inventorySize;
+        int currentSlotCount = existingSlots != null ? existingSlots.Length : 0;
+        
+        // 슬롯이 부족하면 생성
+        if (currentSlotCount < requiredSlots && slotPrefab != null)
         {
-            Debug.LogWarning("Inventory: 슬롯을 찾을 수 없습니다.");
-            return;
+            for (int i = currentSlotCount; i < requiredSlots; i++)
+            {
+                GameObject slotObj = Instantiate(slotPrefab, slotParent);
+                slotObj.name = $"InvenSlot_{i}";
+            }
         }
-
-        // 슬롯에 인벤토리 참조 할당 및 초기화
-        for (int i = 0; i < slots.Length && i < items.Count; i++)
+        
+        // 모든 슬롯 가져오기 (새로 생성된 것 포함)
+        slots = slotParent.GetComponentsInChildren<InvenSlot>();
+        
+        // 슬롯 활성화/비활성화 처리
+        for (int i = 0; i < slots.Length; i++)
         {
-            slots[i].ownerInventory = this;
-            slots[i].Item = items[i];
+            if (i < requiredSlots)
+            {
+                slots[i].gameObject.SetActive(true);
+                slots[i].ownerInventory = this;
+                // items 리스트 범위 내에 있으면 아이템 할당
+                if (i < items.Count)
+                {
+                    slots[i].Item = items[i];
+                }
+                else
+                {
+                    slots[i].Item = null;
+                }
+            }
+            else
+            {
+                // 필요 없는 슬롯은 비활성화 (삭제하지 않고 보관)
+                slots[i].gameObject.SetActive(false);
+            }
+        }
+        
+        // items 리스트 크기 조정
+        ResizeItemsList(requiredSlots);
+    }
+    
+
+    
+    /// <summary>
+    /// items 리스트 크기를 조정합니다.
+    /// </summary>
+    private void ResizeItemsList(int newSize)
+    {
+        if (items == null)
+        {
+            items = new List<Item>();
+        }
+        
+        int currentSize = items.Count;
+        
+        if (newSize > currentSize)
+        {
+            // 리스트 확장 (null로 채움)
+            for (int i = currentSize; i < newSize; i++)
+            {
+                items.Add(null);
+            }
+        }
+        else if (newSize < currentSize)
+        {
+            // 리스트 축소 (뒤에서부터 제거, 아이템이 있는 슬롯은 보존)
+            // 아이템이 있는 슬롯은 건드리지 않고, null 슬롯만 제거
+            int nullCount = currentSize - newSize;
+            for (int i = items.Count - 1; i >= 0 && nullCount > 0; i--)
+            {
+                if (items[i] == null)
+                {
+                    items.RemoveAt(i);
+                    nullCount--;
+                }
+            }
+            
+            // 여전히 크기가 크면 강제로 축소 (뒤에서부터)
+            while (items.Count > newSize)
+            {
+                items.RemoveAt(items.Count - 1);
+            }
         }
     }
 
@@ -117,7 +208,38 @@ public class Inventory : MonoBehaviour
         if (inventoryRoot != null)
         {
             inventoryRoot.SetActive(true);
+            
+            // 인벤토리 크기를 확인하고 필요시 슬롯 재구성
+            ValidateAndRebuildSlots();
             RefreshSlots();
+        }
+    }
+    
+    /// <summary>
+    /// 인벤토리 크기를 확인하고 슬롯을 재구성합니다.
+    /// </summary>
+    private void ValidateAndRebuildSlots()
+    {
+        if (slotParent == null) return;
+        
+        // 현재 활성화된 슬롯 개수 확인
+        InvenSlot[] existingSlots = slotParent.GetComponentsInChildren<InvenSlot>(true);
+        int activeSlotCount = 0;
+        
+        if (existingSlots != null)
+        {
+            foreach (var slot in existingSlots)
+            {
+                if (slot.gameObject.activeSelf)
+                    activeSlotCount++;
+            }
+        }
+        
+        // 인벤토리 크기와 맞지 않으면 재구성
+        if (activeSlotCount != inventorySize)
+        {
+            Debug.Log($"Inventory: 슬롯 개수 불일치 감지 (활성: {activeSlotCount}, 필요: {inventorySize}). 슬롯을 재구성합니다.");
+            InitializeSlots();
         }
     }
 
@@ -140,15 +262,47 @@ public class Inventory : MonoBehaviour
     /// </summary>
     public void RefreshSlots()
     {
+        // 슬롯이 없거나 items가 없으면 초기화
         if (slots == null || items == null)
         {
             InitializeSlots();
             return;
         }
-
-        for (int i = 0; i < slots.Length && i < items.Count; i++)
+        
+        // 슬롯 배열 재확인 (동적 변경 대응)
+        InvenSlot[] currentSlots = slotParent.GetComponentsInChildren<InvenSlot>();
+        if (currentSlots != null && currentSlots.Length != slots.Length)
         {
-            slots[i].Item = items[i];
+            slots = currentSlots;
+        }
+
+        // 활성화된 슬롯에만 아이템 할당
+        int activeSlotCount = Mathf.Min(inventorySize, slots.Length);
+        
+        for (int i = 0; i < activeSlotCount; i++)
+        {
+            if (i < slots.Length && slots[i] != null)
+            {
+                bool wasActive = slots[i].gameObject.activeSelf;
+                bool shouldBeActive = i < inventorySize;
+                
+                // 활성화 상태 변경이 필요한 경우에만
+                if (wasActive != shouldBeActive)
+                {
+                    slots[i].gameObject.SetActive(shouldBeActive);
+                }
+                
+                if (shouldBeActive)
+                {
+                    slots[i].ownerInventory = this;
+                    // items 리스트 범위 내에 있으면 아이템 할당
+                    Item newItem = (i < items.Count) ? items[i] : null;
+                    if (slots[i].Item != newItem)
+                    {
+                        slots[i].Item = newItem;
+                    }
+                }
+            }
         }
     }
 
@@ -409,6 +563,82 @@ public class Inventory : MonoBehaviour
             Debug.LogWarning($"DecreaseItemQuantity: '{item.itemName}' 아이템이 인벤토리에 없습니다.");
         }
     }
+
+    #endregion
+
+    #region Inventory Size Management
+
+    /// <summary>
+    /// 인벤토리 크기를 변경합니다.
+    /// </summary>
+    /// <param name="newSize">새로운 인벤토리 크기 (최소 1)</param>
+    /// <returns>변경 성공 여부</returns>
+    public bool SetInventorySize(int newSize)
+    {
+        if (newSize < 1)
+        {
+            Debug.LogWarning($"Inventory: 인벤토리 크기는 최소 1이어야 합니다. (요청: {newSize})");
+            return false;
+        }
+        
+        int oldSize = inventorySize;
+        InvenSize = newSize;
+        
+        // 슬롯 재초기화
+        InitializeSlots();
+        
+        // UI 새로고침
+        RefreshSlots();
+        
+        Debug.Log($"Inventory: 인벤토리 크기가 {oldSize}에서 {inventorySize}로 변경되었습니다.");
+        
+        // 인벤토리 크기 변경 이벤트 호출
+        OnInventorySizeChanged?.Invoke(oldSize, inventorySize);
+        
+        return true;
+    }
+    
+    /// <summary>
+    /// 인벤토리 크기를 증가시킵니다.
+    /// </summary>
+    /// <param name="amount">증가할 크기 (기본 1)</param>
+    /// <returns>변경 성공 여부</returns>
+    public bool IncreaseInventorySize(int amount = 1)
+    {
+        return SetInventorySize(inventorySize + amount);
+    }
+    
+    /// <summary>
+    /// 인벤토리 크기를 감소시킵니다.
+    /// 주의: 아이템이 있는 슬롯은 최대한 보존합니다.
+    /// </summary>
+    /// <param name="amount">감소할 크기 (기본 1)</param>
+    /// <returns>변경 성공 여부</returns>
+    public bool DecreaseInventorySize(int amount = 1)
+    {
+        int newSize = inventorySize - amount;
+        
+        // 아이템이 있는 슬롯 개수 확인
+        int occupiedSlots = 0;
+        for (int i = 0; i < items.Count; i++)
+        {
+            if (items[i] != null)
+                occupiedSlots++;
+        }
+        
+        if (newSize < occupiedSlots)
+        {
+            Debug.LogWarning($"Inventory: 인벤토리 크기를 {newSize}로 줄일 수 없습니다. ({occupiedSlots}개의 슬롯에 아이템이 있음)");
+            return false;
+        }
+        
+        return SetInventorySize(newSize);
+    }
+    
+    /// <summary>
+    /// 인벤토리 크기 변경 이벤트
+    /// </summary>
+    public System.Action<int, int> OnInventorySizeChanged;
 
     #endregion
 

@@ -18,19 +18,37 @@ public class ShopSlot : Slot
         base.Awake(); // 부모의 Awake 호출 (FindOwner 포함)
     }
 
+    private float lastClickTime = 0f;
+    private const float doubleClickTime = 0.3f; // 더블클릭 감지 시간 (초)
+
     public override void OnPointerClick(PointerEventData eventData)
     {
-        // 우클릭: 아이템 구매
-        if (eventData.button == PointerEventData.InputButton.Right)
-        {
-            if (_item == null) return;
+        if (_item == null) return;
 
-            // 상점 구매 로직 호출
-            Shop shop = GetComponentInParent<Shop>();
-            if (shop != null)
+        Shop shop = GetComponentInParent<Shop>();
+        if (shop == null) return;
+
+        // 좌클릭: 아이템 구매
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            // 더블클릭 감지
+            float currentTime = Time.time;
+            if (currentTime - lastClickTime < doubleClickTime)
             {
+                // 더블클릭 - 즉시 구매
                 shop.TryBuyItem(_item, 1);
+                lastClickTime = 0f; // 더블클릭 후 리셋
             }
+            else
+            {
+                // 단일 클릭 - 첫 클릭만 기록 (UI 피드백용)
+                lastClickTime = currentTime;
+            }
+        }
+        // 우클릭: 아이템 구매 (기존 기능 유지)
+        else if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            shop.TryBuyItem(_item, 1);
         }
     }
 
