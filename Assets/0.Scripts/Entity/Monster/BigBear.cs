@@ -77,6 +77,7 @@ public class BigBear : Monster
         {
             SetMoveBool(false); //이동 멈춤
             monsterAnimator.SetTrigger("Attack");
+
             StartCoroutine(AttackDelay());              
         }
     }
@@ -173,13 +174,20 @@ public class BigBear : Monster
     /// 움직임 관련 부울 변수 일괄 설정 메서드
     /// </summary>
     /// <param name="toSetBool">"움직이는 경우 true 아닐 경우 false"</param>
-    void SetMoveBool(bool toSetBool)
+    public void SetMoveBool(bool toSetBool)
     {
         agent.isStopped = !toSetBool;
         monsterAnimator.SetBool("isWalk", toSetBool);
         
     }
-
+    public void StopMove() //애니메이션 이벤트용 이동정지 메서드
+    {
+        SetMoveBool(false);
+    }
+    public void StartMove() //애니메이션 이벤트용 이동 시작 메서드
+    {
+        SetMoveBool(true);
+    }
 
     /// <summary>
     /// 감지를 위한 코루틴 함수
@@ -189,11 +197,11 @@ public class BigBear : Monster
     protected override IEnumerator DetectTarget()
     {
         bool foundTarget;
-        
+
         while (true)
         {
-            
-            foundTarget = false;       
+
+            foundTarget = false;
             waypoints.Clear();
             colliders = Physics.OverlapSphere(transform.position, detectDestinationRadius, detectLayer);
 
@@ -203,18 +211,18 @@ public class BigBear : Monster
                 {
                     //▼ 레이어가 player고 플레이어 감지거리 내에 있다면 
                     if (collider.gameObject.layer == playerLayer && Vector3.SqrMagnitude(collider.transform.position - transform.position) < playerDetectedRange * playerDetectedRange)
-                    {                
+                    {
                         target = collider.gameObject; //타겟 설정
                         foundTarget = true;
-                        isDetectTarget = true;                    
+                        isDetectTarget = true;
                         break;
 
                     }
                 }
-                if(!foundTarget)
-                {                    
-                    isDetectTarget = false;                   
-                }               
+                if (!foundTarget)
+                {
+                    isDetectTarget = false;
+                }
             }
             else
             {
@@ -223,26 +231,11 @@ public class BigBear : Monster
             yield return detectDelay;
         }
     }
-
+    
     /// <summary>
-    /// 애니메이션 종료 대기 코루틴
+    /// 공격 딜레이 넣어주는 메서드 
     /// </summary>
-    /// <param name="animName">애니메이션 이름 </param>
     /// <returns></returns>
-    private IEnumerator WaitAnimationEnd(string animName)
-    {
-        while (!monsterAnimator.GetCurrentAnimatorStateInfo(0).IsName(animName))
-        {
-            yield return null;
-        }
-        while (monsterAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
-        {
-            agent.isStopped = true; //애니메이션 재생되는 동안 멈춤
-            yield return null;
-        }
-        agent.isStopped = false; //애니메이션 재생 끝나면 다시 이동 가능
-        yield return CoroutineManager.waitForSeconds(animeDelay);
-    }
     private IEnumerator AttackDelay()
     {
         isAttackCooltime = true;

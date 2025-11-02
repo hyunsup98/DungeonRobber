@@ -10,13 +10,13 @@ public class RushTurtle : Monster
     [SerializeField] BaseBuff stunned; //스턴  
     [SerializeField] float selfAttackDamage = 10f; //attack 후 반동 딜 
     [SerializeField] float addedSpeed = 10f; //돌진시 추가되는 이동속도 
-    
+    [SerializeField] float beforeAttackDelay = 1f; //동진 전 대기시간
+    [SerializeField] float rushColliderRadius = 0.05f; //돌진 충돌 감지 거리
     int playerLayer;
     int enemyLayer;
     int WaypointLayer;
     int obstacleLayer;
     int WallLayer;
-    bool isCanMove = true;
     bool isAttacking = false; 
     bool isAlive = true;
     Coroutine detectPlayerCoroutine; //감지 코루틴  변수
@@ -29,8 +29,7 @@ public class RushTurtle : Monster
 
     private void OnEnable() //활성화 시점에서 초기화 
     {
-        Init();
-        StartCoroutine(WaitAnimationEnd("Spawn")); //스폰 애니메이션 종료까지 대기     
+        Init();   
     }
     private void Start()
     {
@@ -48,6 +47,13 @@ public class RushTurtle : Monster
         {
             OverlookAction();
         }
+
+
+        Debug.Log($"isAttacking: {isAttacking}");
+        Debug.Log($"isDetectTarget: {isDetectTarget}");
+        Debug.Log($"moveSpeed: {stats.GetBaseStat(StatType.MoveSpeed)}");
+        Debug.Log($"agentSpeed: {agent.speed}");
+        
     }
 
     private void OnDisable() //비활성화시 코루틴 정지 
@@ -83,48 +89,11 @@ public class RushTurtle : Monster
 
     protected override void Attack()
     {
-        isAttacking = true;
         if (RushAttackCoroutine == null)
         {
             RushAttackCoroutine = StartCoroutine(nameof(RushAttack));
         }
         
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (!isAttacking) return;
-
-        Debug.Log(other);
-        SetMoveBool(false);
-
-        if (other.gameObject.layer == enemyLayer || other.gameObject.layer == playerLayer)
-        {
-            Debug.Log(other);
-            other.GetComponentInParent<Entity>()?.GetDamage(stats.GetBaseStat(StatType.AttackDamage));
-            isCanMove = false;
-            isAttacking = false;
-            GetDamage(selfAttackDamage);
-            Debug.Log(other);
-            Debug.Log("데미지 받음");
-            ApplyBuffToEntity(stunned);
-        }
-        else if (other.gameObject.layer == obstacleLayer || other.gameObject.layer == WallLayer)
-        {
-            Debug.Log(other);
-            isCanMove = false;
-            isAttacking = false;
-            GetDamage(selfAttackDamage);
-            Debug.Log(other);
-            Debug.Log("데미지 받음");
-            ApplyBuffToEntity(stunned);
-        }
-        else return;
-    }
-    void OnTriggerExit(Collider other)
-    {
-        if (!isAttacking) return;
-
     }
 
 
@@ -134,8 +103,6 @@ public class RushTurtle : Monster
     /// </summary>
     protected override void DetectAction()
     {   
-        if (isAttacking) return; //공격중이라면 수행 안함
-
         SetMoveBool(false); //일단 멈춤
         Vector3 tempVector = target.transform.position - transform.position;
         targetDistance = Vector3.SqrMagnitude(tempVector); // 단순 비교이므로 sqrMagnitude 사용
@@ -177,13 +144,11 @@ public class RushTurtle : Monster
     /// <param name="damage"> 해당 몬스터가 입을 피해 </param>
     public override void GetDamage(float damage)
     {
-
         stats.ModifyStat(StatType.HP, -damage);
         Debug.Log(stats.GetStat(StatType.HP));
         
         if (stats.GetStat(StatType.HP) <= 0)
         {
-            
             Destroy(this);
         }
     }
@@ -193,10 +158,8 @@ public class RushTurtle : Monster
     /// </summary>
     protected override void OverlookAction()
     {
-        Debug.Log("여기로 오긴 했다");
         SetMoveBool(true); //이동 상태로 전환
         agent.SetDestination(targetWaypoint.position);//목적지로 이동  
-        Debug.Log("목적지로 이동");
         if (Vector3.SqrMagnitude(transform.position - targetWaypoint.position) < 10f) //a목적지에 주변에 도달했을 때
         {
             SetMoveBool(false); //일단 멈춤
@@ -224,6 +187,7 @@ public class RushTurtle : Monster
     void SetMoveBool(bool toSetBool)
     {
         agent.isStopped = !toSetBool;
+        Debug.Log($"toSetBool : {toSetBool}");
     }
 
 
@@ -271,26 +235,7 @@ public class RushTurtle : Monster
         }
     }
 
-    /// <summary>
-    /// 애니메이션 종료 대기 코루틴
-    /// </summary>
-    /// <param name="animName">애니메이션 이름 </param>
-    /// <returns></returns>
-    private IEnumerator WaitAnimationEnd(string animName)
-    {
-        while (!monsterAnimator.GetCurrentAnimatorStateInfo(0).IsName(animName))
-        {
-            yield return null;
-        }
-        while (monsterAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
-        {
-            agent.isStopped = true; //애니메이션 재생되는 동안 멈춤
-            yield return null;
-        }
-        agent.isStopped = false; //애니메이션 재생 끝나면 다시 이동 가능
-        yield return CoroutineManager.waitForSeconds(animeDelay);
-    }
-
+    
     private IEnumerator AttackDelay()
     {
         isAttackCooltime = true;
@@ -303,32 +248,53 @@ public class RushTurtle : Monster
 
     private IEnumerator RushAttack()
     {
+        Debug.Log("공격 시작");
+        SetMoveBool(false);
 
-        if (!isAttackCooltime && isCanMove)//공격 쿨타임이 아니고 움직일 수 있을 때
+        agent.ResetPath(); //멈추기
+        transform.LookAt(target.transform.position); //타겟 바라보기
+        yield return CoroutineManager.waitForSeconds(beforeAttackDelay);//잠깐 대기하여 바라보기 
+        SetMoveBool(true);
+
+        Vector3 rushDirection = transform.forward.normalized;
+
+        Collider[] rushColliders;
+        stats.ModifyBaseStat(StatType.MoveSpeed, addedSpeed);
+        while (true)
         {
-            Vector3 rushDirection = transform.forward.normalized;
+            rushColliders = Physics.OverlapSphere(transform.position + transform.forward * rushColliderRadius, rushColliderRadius, detectLayer);
 
-            stats.ModifyBaseStat(StatType.MoveSpeed, addedSpeed);
-
-            agent.speed = stats.GetBaseStat(StatType.MoveSpeed);
-
-            transform.LookAt(target.transform.position); //타겟 바라보기
-
-            //todo 회전속도를 높이는 듯한 모션 추가 
-            while (isCanMove)
-            {   //todo attack 애니메이션 재생
-                agent.Move(rushDirection * agent.speed * Time.deltaTime);
-                yield return null;
+            if (rushColliders.Length > 0)
+            {
+                break;
             }
-            Debug.Log("while문 나감");
-            stats.ModifyBaseStat(StatType.MoveSpeed, -addedSpeed);
-
-            StartCoroutine(AttackDelay());
-
+            agent.Move(rushDirection * stats.GetBaseStat(StatType.MoveSpeed) * Time.deltaTime);
+            yield return null;
         }
 
+        if (rushColliders[0].gameObject.layer == enemyLayer || rushColliders[0].gameObject.layer == playerLayer)
+        {
+            rushColliders[0].GetComponentInParent<Entity>()?.GetDamage(stats.GetBaseStat(StatType.AttackDamage));
+            GetDamage(selfAttackDamage);
+            agent.SetDestination(transform.position);
+            yield return CoroutineManager.waitForSeconds(5f);
+        }
+        else if (rushColliders[0].gameObject.layer == obstacleLayer || rushColliders[0].gameObject.layer == WallLayer)
+        {
+            GetDamage(selfAttackDamage);
+            agent.SetDestination(transform.position);
+            yield return CoroutineManager.waitForSeconds(5f);
+        }
+        //등껍질 애니메이션 하다가 플레이어가 범위 밖으로 나가면 다시 시작
+        stats.ModifyBaseStat(StatType.MoveSpeed, -addedSpeed);
+        isAttacking = false;
+        Debug.Log("공격끝");
+        RushAttackCoroutine = null;
+
     }
-    
-    
-             
+
 }
+
+
+
+

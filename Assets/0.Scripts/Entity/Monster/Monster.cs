@@ -18,8 +18,10 @@ public abstract class Monster : Entity
     [SerializeField] protected LayerMask targetLayer; //타겟 레이어
     [SerializeField] protected NavMeshAgent agent; //ai navigation 사용을 위한 변수
     [SerializeField] protected Animator monsterAnimator; //에니메이션 관리
-    //[SerializeField] protected SoundManager monsterSoundManager; //효과음 관리    
-
+    //[SerializeField] protected SoundManager monsterSoundManager; //효과음 관리 
+    //[SerializeField] protected AudioClip[] monsterAudioClips; //효과음 모음
+    
+       
     [Header("테스트용 변수 플레이시 자동으로 변경됨")]
     [Space(15f)]
     [SerializeField] protected GameObject target; //감지할 타겟   

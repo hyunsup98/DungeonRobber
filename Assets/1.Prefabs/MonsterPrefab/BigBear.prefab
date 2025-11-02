@@ -73,11 +73,11 @@ MonoBehaviour:
   stats:
     baseStats:
     - type: 0
-      <Value>k__BackingField: 300
+      <Value>k__BackingField: 10
     - type: 3
       <Value>k__BackingField: 10
     - type: 1
-      <Value>k__BackingField: 1
+      <Value>k__BackingField: 10
     - type: 2
       <Value>k__BackingField: 30
     - type: 4
@@ -89,7 +89,7 @@ MonoBehaviour:
     m_Bits: 768
   destinationLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
   targetLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -113,7 +113,7 @@ Animator:
   m_GameObject: {fileID: 5985572590114019074}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 65c47ba8ff62ca0499873b889f10183e, type: 3}
-  m_Controller: {fileID: 9100000, guid: 60ff7be155d61aa42803ec8c22c2e03f, type: 2}
+  m_Controller: {fileID: 9100000, guid: 2e54c4c268c72b34c88033074cbe081d, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

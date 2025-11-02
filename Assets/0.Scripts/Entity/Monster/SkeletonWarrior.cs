@@ -115,8 +115,7 @@ public class SkeletonWarrior : Monster
             {
                 SetMoveBool(true); //이동 상태로 전환 
                 agent.SetDestination(target.transform.position); //타겟의 위치로 이동                   
-            }
-            
+            } 
         }
         else
         {
@@ -152,17 +151,17 @@ public class SkeletonWarrior : Monster
     /// </summary>
     protected override void OverlookAction()
     {
-       
+
         SetMoveBool(true); //이동 상태로 전환
         agent.SetDestination(targetWaypoint.position);//목적지로 이동  
-        
+
         if (Vector3.SqrMagnitude(transform.position - targetWaypoint.position) < 10f) //a목적지에 주변에 도달했을 때
         {
             SetMoveBool(false); //일단 멈춤
             previousWaypoint = targetWaypoint; //이전 목적지에 현재 목적지 저장                        
 
             while (isDetectTarget == false)
-            {     
+            {
                 if (waypoints.Count <= 1) //목적지가 하나밖에 없으면
                     break;
 
@@ -171,7 +170,7 @@ public class SkeletonWarrior : Monster
                 if (targetWaypoint != previousWaypoint) //이전 목적지와 다르면
                     break;
             }
-           
+
         }
     }
 
@@ -179,12 +178,17 @@ public class SkeletonWarrior : Monster
     /// 움직임 관련 부울 변수 일괄 설정 메서드
     /// </summary>
     /// <param name="toSetBool">"움직이는 경우 true 아닐 경우 false"</param>
-    void SetMoveBool(bool toSetBool)
+    private void SetMoveBool(bool toSetBool)
     {
         agent.isStopped = !toSetBool;
         monsterAnimator.SetBool("isWalk", toSetBool);
     }
-
+    // private void playEffectSound()
+    // {
+    //     monsterSoundManager.PlayerSoundEffect(monsterAudioClips[Random.Range(0, monsterAudioClips.Length)],10f);
+    // }
+             
+   
 
     /// <summary>
     /// 감지를 위한 코루틴 함수
@@ -248,7 +252,7 @@ public class SkeletonWarrior : Monster
         }
         agent.isStopped = false; //애니메이션 재생 끝나면 다시 이동 가능
         yield return CoroutineManager.waitForSeconds(animeSeconds);
-    } 
+    }
 
     private IEnumerator AttackDelay()
     {
@@ -258,5 +262,6 @@ public class SkeletonWarrior : Monster
 
         isAttackCooltime = false;
     }
-             
+    
+    
 }
