@@ -9,8 +9,8 @@ public class BigBear : Monster
     Vector3 homePosition;
     bool isHome;//집인지 확인하는 변수
     int playerLayer;
+    bool isAlive = true;
     Coroutine detectPlayerCoroutine; //감지 코루틴 변수
-    bool isAlive = true; //생존여부 확인 
     private void Awake()
     {
         awakeinit();
@@ -76,6 +76,8 @@ public class BigBear : Monster
         if(!isAttackCooltime)//공격 쿨타임이 아닐때 
         {
             SetMoveBool(false); //이동 멈춤
+            monsterAnimator.SetTrigger("Attack");
+
             StartCoroutine(AttackDelay());              
         }
     }
@@ -102,7 +104,7 @@ public class BigBear : Monster
 
         if (targetDistance <= stats.GetStat(StatType.AttackRange) * stats.GetStat(StatType.AttackRange)) //공격 사거리안에 들어오면 공격시작 
         {
-            RaycastHit[] hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0.5f, 0.5f), transform.forward, transform.rotation, stats.GetStat(StatType.AttackRange), obstacleLayer | targetLayer);
+            RaycastHit[] hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0.5f, 0.5f), transform.forward, transform.rotation, stats.GetStat(StatType.AttackRange), obstacleLayerMask | targetLayer);
             //▼ 플레이어가 장애물 뒤에 숨어있지 않고 공격범위 내라면 
             foreach (var hit in hits)
             {
@@ -133,14 +135,19 @@ public class BigBear : Monster
     /// <param name="damage"> 해당 몬스터가 입을 피해 </param>
     public override void GetDamage(float damage)
     {
-        
+        monsterAnimator.SetTrigger("GetDamage");
         stats.ModifyStat(StatType.HP, -damage);
 
         if (stats.GetStat(StatType.HP) <= 0)
         {
             isAlive = false;
-            Destroy(this);
+            monsterAnimator.SetBool("isDead", true);
+
         }
+    }
+     public void DestroyMonster()
+    {
+        Destroy(gameObject);
     }
 
     /// <summary>
@@ -167,12 +174,20 @@ public class BigBear : Monster
     /// 움직임 관련 부울 변수 일괄 설정 메서드
     /// </summary>
     /// <param name="toSetBool">"움직이는 경우 true 아닐 경우 false"</param>
-    void SetMoveBool(bool toSetBool)
+    public void SetMoveBool(bool toSetBool)
     {
         agent.isStopped = !toSetBool;
+        monsterAnimator.SetBool("isWalk", toSetBool);
         
     }
-
+    public void StopMove() //애니메이션 이벤트용 이동정지 메서드
+    {
+        SetMoveBool(false);
+    }
+    public void StartMove() //애니메이션 이벤트용 이동 시작 메서드
+    {
+        SetMoveBool(true);
+    }
 
     /// <summary>
     /// 감지를 위한 코루틴 함수
@@ -182,11 +197,11 @@ public class BigBear : Monster
     protected override IEnumerator DetectTarget()
     {
         bool foundTarget;
-        
+
         while (true)
         {
-            
-            foundTarget = false;       
+
+            foundTarget = false;
             waypoints.Clear();
             colliders = Physics.OverlapSphere(transform.position, detectDestinationRadius, detectLayer);
 
@@ -196,18 +211,18 @@ public class BigBear : Monster
                 {
                     //▼ 레이어가 player고 플레이어 감지거리 내에 있다면 
                     if (collider.gameObject.layer == playerLayer && Vector3.SqrMagnitude(collider.transform.position - transform.position) < playerDetectedRange * playerDetectedRange)
-                    {                
+                    {
                         target = collider.gameObject; //타겟 설정
                         foundTarget = true;
-                        isDetectTarget = true;                    
+                        isDetectTarget = true;
                         break;
 
                     }
                 }
-                if(!foundTarget)
-                {                    
-                    isDetectTarget = false;                   
-                }               
+                if (!foundTarget)
+                {
+                    isDetectTarget = false;
+                }
             }
             else
             {
@@ -216,26 +231,11 @@ public class BigBear : Monster
             yield return detectDelay;
         }
     }
-
+    
     /// <summary>
-    /// 애니메이션 종료 대기 코루틴
+    /// 공격 딜레이 넣어주는 메서드 
     /// </summary>
-    /// <param name="animName">애니메이션 이름 </param>
     /// <returns></returns>
-    private IEnumerator WaitAnimationEnd(string animName)
-    {
-        while (!monsterAnimator.GetCurrentAnimatorStateInfo(0).IsName(animName))
-        {
-            yield return null;
-        }
-        while (monsterAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
-        {
-            agent.isStopped = true; //애니메이션 재생되는 동안 멈춤
-            yield return null;
-        }
-        agent.isStopped = false; //애니메이션 재생 끝나면 다시 이동 가능
-        yield return CoroutineManager.waitForSeconds(animeDelay);
-    }
     private IEnumerator AttackDelay()
     {
         isAttackCooltime = true;
