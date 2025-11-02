@@ -1087,6 +1087,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2196224073123689397, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
+      propertyPath: m_FillAmount
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2529850668057408164, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -1167,9 +1171,49 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2666933282554460499, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2666933282554460499, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2962397500577077777, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3000800734909081916, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
       propertyPath: m_Name
       value: UIManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 6655924981393570808, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6655924981393570808, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: f51787da7231e434c9f318683e9d5011, type: 3}
+    - target: {fileID: 6655924981393570808, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6655924981393570808, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6655924981393570808, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
+      propertyPath: m_Color.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8471740691594124663, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8471740691594124663, guid: 1d3728ef6812607449112ae74dfa0554, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1225,10 +1269,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2221373778831208721, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
-      propertyPath: dodgeForce
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 2221373778831208721, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
       propertyPath: mainCamera
       value: 
       objectReference: {fileID: 1405820079}
@@ -1236,25 +1276,14 @@ PrefabInstance:
       propertyPath: fovQuad
       value: 
       objectReference: {fileID: 859550262}
-    - target: {fileID: 4926076781645048277, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5048565078041827740, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 8428292921748122077, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
-      propertyPath: m_Drag
-      value: 0.5
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5048565078041827740, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1422839127}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

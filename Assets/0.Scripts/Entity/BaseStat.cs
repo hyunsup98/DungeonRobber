@@ -1,30 +1,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-#region ½ºÅÈÀÇ Å¸ÀÔ
-//½ºÅÈÀÇ Å¸ÀÔ
+#region ìŠ¤íƒ¯ì˜ íƒ€ì…
+//ìŠ¤íƒ¯ì˜ íƒ€ì…
 public enum StatType
 {
-    HP,             //Ã¼·Â, baseStats¿¡¼± maxHP¿ªÇÒ / stats¿¡¼± currentHP ¿ªÇÒ
-    MoveSpeed,      //ÀÌµ¿ ¼Óµµ
-    AttackDamage,   //°ø°İ·Â
-    AttackRange,    //°ø°İ »ç°Å¸®
-    AttackDelay     //°ø°İ ¼Óµµ
+    HP,             //ì²´ë ¥, baseStatsì—ì„  maxHPì—­í•  / statsì—ì„  currentHP ì—­í• 
+    MoveSpeed,      //ì´ë™ ì†ë„
+    AttackDamage,   //ê³µê²©ë ¥
+    AttackRange,    //ê³µê²© ì‚¬ê±°ë¦¬
+    AttackDelay     //ê³µê²© ì†ë„
 }
 #endregion
 
-#region °¢ ½ºÅÈµéÀÌ °¡Áú ½ºÅÈ Á¤º¸ Å¬·¡½º
+#region ê° ìŠ¤íƒ¯ë“¤ì´ ê°€ì§ˆ ìŠ¤íƒ¯ ì •ë³´ í´ë˜ìŠ¤
 /// <summary>
-/// °¢°¢ÀÇ ½ºÅÈµéÀÌ °¡Áú ½ºÅÈÀÇ Å¸ÀÔ°ú ¼öÄ¡ Á¤º¸
-/// ÀæÀº ¼öÁ¤À» °í·ÁÇØ strcut°¡ ¾Æ´Ñ class·Î ÀÛ¼º
-/// structÀÇ °æ¿ì ±íÀº º¹»ç·Î ¼öÁ¤µÉ ¶§ ¸¶´Ù º¹»çº»ÀÇ °ªÀ» ¹Ş¾Æ¿Í¾ß ÇÔ
+/// ê°ê°ì˜ ìŠ¤íƒ¯ë“¤ì´ ê°€ì§ˆ ìŠ¤íƒ¯ì˜ íƒ€ì…ê³¼ ìˆ˜ì¹˜ ì •ë³´
+/// ì¦ì€ ìˆ˜ì •ì„ ê³ ë ¤í•´ strcutê°€ ì•„ë‹Œ classë¡œ ì‘ì„±
+/// structì˜ ê²½ìš° ê¹Šì€ ë³µì‚¬ë¡œ ìˆ˜ì •ë  ë•Œ ë§ˆë‹¤ ë³µì‚¬ë³¸ì˜ ê°’ì„ ë°›ì•„ì™€ì•¼ í•¨
 /// </summary>
 [System.Serializable]
 public class Stat
 {
-    [SerializeField] private StatType type;                             //½ºÅÈ Å¸ÀÔ
+    [SerializeField] private StatType type;                             //ìŠ¤íƒ¯ íƒ€ì…
     public StatType Type => type;
-    [field : SerializeField] public float Value { get; private set; }   //½ºÅÈ ¼öÄ¡
+    [field : SerializeField] public float Value { get; private set; }   //ìŠ¤íƒ¯ ìˆ˜ì¹˜
 
     public Stat(StatType type, float value)
     {
@@ -32,7 +32,7 @@ public class Stat
         Value = value;
     }
 
-    //¼öÄ¡¸¦ Á¶Á¤ÇÏ´Â ¸Ş¼­µå
+    //ìˆ˜ì¹˜ë¥¼ ì¡°ì •í•˜ëŠ” ë©”ì„œë“œ
     public void AddValue(float amount)
     {
         if (Value + amount < 0)
@@ -41,7 +41,7 @@ public class Stat
             Value += amount;
     }
 
-    //¼öÄ¡¸¦ ¼¼ÆÃÇÏ´Â ¸Ş¼­µå
+    //ìˆ˜ì¹˜ë¥¼ ì„¸íŒ…í•˜ëŠ” ë©”ì„œë“œ
     public void SetValue(float value)
     {
         if (value < 0)
@@ -55,17 +55,17 @@ public class Stat
 [System.Serializable]
 public class BaseStat
 {
-    #region ½ºÅÈ ÃÊ±âÈ­ ½Ã ÂüÁ¶ÇÒ ½ºÅÈ ¸®½ºÆ®
-    [Header("ÃÊ±â ½ºÅÈ °ª, ¹öÇÁ µîÀÇ È¿°ú°¡ ³¡³ª°í ÃÊ±â ¼öÄ¡·Î µÇµ¹¸®±â À§ÇØ ÂüÁ¶ÇÒ ÃÊ±â °ª")]
-    //ÃÊ±â ½ºÅÈ
+    #region ìŠ¤íƒ¯ ì´ˆê¸°í™” ì‹œ ì°¸ì¡°í•  ìŠ¤íƒ¯ ë¦¬ìŠ¤íŠ¸
+    [Header("ì´ˆê¸° ìŠ¤íƒ¯ ê°’, ë²„í”„ ë“±ì˜ íš¨ê³¼ê°€ ëë‚˜ê³  ì´ˆê¸° ìˆ˜ì¹˜ë¡œ ë˜ëŒë¦¬ê¸° ìœ„í•´ ì°¸ì¡°í•  ì´ˆê¸° ê°’")]
+    //ì´ˆê¸° ìŠ¤íƒ¯
     [SerializeField] private List<Stat> baseStats = new List<Stat>();
     #endregion
 
-    [Header("°ÔÀÓ ÇÃ·¹ÀÌ µµÁß ½Ç½Ã°£À¸·Î º¯ÇÒ ½ºÅÈ °ª")]
-    //°ÔÀÓ ÇÃ·¹ÀÌ Áß ½Ç½Ã°£À¸·Î º¯ÇÒ ½ºÅÈ
-    private List<Stat> stats = new List<Stat>();
+    [Header("ê²Œì„ í”Œë ˆì´ ë„ì¤‘ ì‹¤ì‹œê°„ìœ¼ë¡œ ë³€í•  ìŠ¤íƒ¯ ê°’")]
+    //ê²Œì„ í”Œë ˆì´ ì¤‘ ì‹¤ì‹œê°„ìœ¼ë¡œ ë³€í•  ìŠ¤íƒ¯
+    [SerializeField] private List<Stat> stats = new List<Stat>();
 
-    //¿£Æ¼Æ¼ »ı¼º ½Ã ÃÊ±â ¼¼ÆÃ ¸Ş¼­µå
+    //ì—”í‹°í‹° ìƒì„± ì‹œ ì´ˆê¸° ì„¸íŒ… ë©”ì„œë“œ
     public void Init()
     {
         if (baseStats == null) return;
@@ -77,13 +77,13 @@ public class BaseStat
         }
     }
 
-    //Æ¯Á¤ Å¸ÀÔÀÇ ´É·ÂÄ¡¸¦ base °ªÀ¸·Î ÃÊ±âÈ­
+    //íŠ¹ì • íƒ€ì…ì˜ ëŠ¥ë ¥ì¹˜ë¥¼ base ê°’ìœ¼ë¡œ ì´ˆê¸°í™”
     public void InitStat(StatType type)
     {
         ModifyStat(type, GetBaseStat(type));
     }
 
-    #region BaseStats °ª °ü·Ã ¸Ş¼­µå
+    #region BaseStats ê°’ ê´€ë ¨ ë©”ì„œë“œ
     public float GetBaseStat(StatType type)
     {
         return baseStats.Find(stat => stat.Type == type).Value;
@@ -94,15 +94,15 @@ public class BaseStat
         baseStats.Find(stat => stat.Type == type).SetValue(value);
     }
 
-    //·¹º§¾÷ µîÀÇ ÀÌÀ¯·Î baseStatsÀ» ¼öÁ¤
+    //ë ˆë²¨ì—… ë“±ì˜ ì´ìœ ë¡œ baseStatsì„ ìˆ˜ì •
     public void ModifyBaseStat(StatType type, float amount)
     {
         baseStats.Find(stat => stat.Type == type).AddValue(amount);
     }
     #endregion
 
-    #region stats °ª °ü·Ã ¸Ş¼­µå
-    //¿£Æ¼Æ¼ ½ºÅÈÀÇ Æ¯Á¤ Å¸ÀÔ °ª ¹İÈ¯
+    #region stats ê°’ ê´€ë ¨ ë©”ì„œë“œ
+    //ì—”í‹°í‹° ìŠ¤íƒ¯ì˜ íŠ¹ì • íƒ€ì… ê°’ ë°˜í™˜
     public float GetStat(StatType type)
     {
         return stats.Find(stat => stat.Type == type).Value;
@@ -113,7 +113,7 @@ public class BaseStat
         stats.Find(stat => stat.Type == type).SetValue(value);
     }
 
-    //µµÆ®µô, ÀÌ¼Ó °¨¼Ò µîÀÇ È¿°ú·Î ¿£Æ¼Æ¼ ½ºÅÈ ¼öÁ¤
+    //ë„íŠ¸ë”œ, ì´ì† ê°ì†Œ ë“±ì˜ íš¨ê³¼ë¡œ ì—”í‹°í‹° ìŠ¤íƒ¯ ìˆ˜ì •
     public void ModifyStat(StatType type, float amount)
     {
         stats.Find(stat => stat.Type == type).AddValue(amount);

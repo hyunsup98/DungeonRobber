@@ -11,7 +11,7 @@ public class Presenter_PlayerStat
         this.uiPlayerStat = uiPlayerStat;
 
         player.onPlayerStatChanged += OnTakeDamage;
-        player.onPlayerStatChanged += OnShowStat;
+        player.onStaminaChanged += UpdateStamina;
     }
 
     private void OnTakeDamage()
@@ -21,10 +21,10 @@ public class Presenter_PlayerStat
         uiPlayerStat.SetHpBar(player.GetPlayerStat().GetStat(StatType.HP), player.GetPlayerStat().GetBaseStat(StatType.HP));
     }
 
-    private void OnShowStat()
+    private void UpdateStamina()
     {
         if (player == null || uiPlayerStat == null) return;
 
-        uiPlayerStat.SetStatUI(player.GetPlayerStat());
+        uiPlayerStat.SetStaminaBar(player.Stamina, player.MaxStamina);
     }
 }

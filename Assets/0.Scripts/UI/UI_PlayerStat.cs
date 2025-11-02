@@ -4,25 +4,24 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ÇÃ·¹ÀÌ¾îÀÇ hp, ½ºÅÈ °ü·Ã UI¸¦ º¸¿©ÁÖ´Â Å¬·¡½º
+/// í”Œë ˆì´ì–´ì˜ hp, ìŠ¤íƒ¯ ê´€ë ¨ UIë¥¼ ë³´ì—¬ì£¼ëŠ” í´ë˜ìŠ¤
 /// </summary>
 public class UI_PlayerStat : MonoBehaviour
 {
-    [Header("hpBar °ü·Ã º¯¼öµé")]
-    //hpBar °ü·Ã º¯¼ö
-    [SerializeField] private Image imageHp;                 //hpBar ÀÌ¹ÌÁö
-    [SerializeField] private TMP_Text textHp;               //hpBar ÅØ½ºÆ® - "ÇöÀçÃ¼·Â / ÃÖ´ëÃ¼·Â"
-    [SerializeField] private float fadeTime = 0.3f;         //Ã¼·ÂÀÌ ±ğÀÏ ¶§ ±ğÀÌ´Â ¸ğ¼ÇÀÌ °É¸®´Â ½Ã°£
+    [Header("hpBar ê´€ë ¨ ë³€ìˆ˜ë“¤")]
+    //hpBar ê´€ë ¨ ë³€ìˆ˜
+    [SerializeField] private Image imageHp;                     //hpBar ì´ë¯¸ì§€
+    [SerializeField] private TMP_Text textHp;                   //hpBar í…ìŠ¤íŠ¸ - "í˜„ì¬ì²´ë ¥ / ìµœëŒ€ì²´ë ¥"
+    [SerializeField] private float hpLerpTime = 0.3f;           //ì²´ë ¥ì´ ê¹ì¼ ë•Œ ê¹ì´ëŠ” ëª¨ì…˜ì´ ê±¸ë¦¬ëŠ” ì‹œê°„
     private Coroutine hpCoroutine;
 
-    [Header("½ºÅÈ °ü·Ã º¯¼öµé")]
-    [SerializeField] private TMP_Text text_StatHp;          //½ºÅÈÃ¢ÀÇ Ã¼·Â ÅØ½ºÆ®
-    [SerializeField] private TMP_Text text_StatAtk;         //½ºÅÈÃ¢ÀÇ °ø°İ·Â ÅØ½ºÆ®
-    [SerializeField] private TMP_Text text_StatAtkRange;    //½ºÅÈÃ¢ÀÇ »ç°Å¸® ÅØ½ºÆ®
-    [SerializeField] private TMP_Text text_StatAtkDelay;    //½ºÅÈÃ¢ÀÇ °ø°İ¼Óµµ ÅØ½ºÆ®
+    [Header("stamina ê´€ë ¨ ë³€ìˆ˜ë“¤")]
+    [SerializeField] private Image imageStamina;                //ìŠ¤íƒœë¯¸ë„ˆë°” ì´ë¯¸ì§€
+    [SerializeField] private float staminaLerpTime = 0.15f;     //ìŠ¤íƒœë¯¸ë„ˆ ëŸ¬í”„ ì‹œê°„
+    private Coroutine staminaCoroutine;
 
-    #region hpBar °ü·Ã ¸Ş¼­µå
-    //hp¸¦ °»½ÅÇÏ¿© Bar·Î º¸¿©ÁÖ´Â ¸Ş¼­µå
+    #region hpBar ê´€ë ¨ ë©”ì„œë“œ
+    //hpë¥¼ ê°±ì‹ í•˜ì—¬ Barë¡œ ë³´ì—¬ì£¼ëŠ” ë©”ì„œë“œ
     public void SetHpBar(float currentHp, float maxHp)
     {
         if(hpCoroutine != null)
@@ -30,43 +29,34 @@ public class UI_PlayerStat : MonoBehaviour
             StopCoroutine(hpCoroutine);
         }
 
-        hpCoroutine = StartCoroutine(FadeEffectHpBar(currentHp, maxHp));
+        hpCoroutine = StartCoroutine(FadeEffectBar(imageHp, currentHp, maxHp, hpLerpTime));
         textHp.text = $"{currentHp} / {maxHp}";
     }
 
-    //Ã¼·Â¹Ù°¡ ³»·Á°¡´Â ¸ğ¼Ç ÀÌÆåÆ®
-    private IEnumerator FadeEffectHpBar(float currentHp, float maxHp)
+    public void SetStaminaBar(float stamina, float maxStamina)
+    {
+        if(staminaCoroutine != null)
+        {
+            StopCoroutine(staminaCoroutine);
+        }
+
+        staminaCoroutine = StartCoroutine(FadeEffectBar(imageStamina, stamina, maxStamina, staminaLerpTime));
+    }
+
+    //ì´ë¯¸ì§€ ë°”ê°€ ì›€ì§ì´ëŠ” ëª¨ì…˜ ì´í™íŠ¸
+    private IEnumerator FadeEffectBar(Image bar, float currentValue, float maxValue, float time)
     {
         float timer = 0f;
-        Debug.Log(currentHp);
-        Debug.Log(maxHp);
 
-        float beforeAmount = imageHp.fillAmount;
-        float afterAmount = currentHp / maxHp;
+        float beforeAmount = bar.fillAmount;
+        float afterAmount = currentValue / maxValue;
 
-        while(timer < fadeTime)
+        while(timer < time)
         {
             timer += Time.deltaTime;
-            imageHp.fillAmount = Mathf.Lerp(beforeAmount, afterAmount, timer / fadeTime);
+            bar.fillAmount = Mathf.Lerp(beforeAmount, afterAmount, timer / time);
             yield return null;
         }
-    }
-    #endregion
-
-    #region ½ºÅÈÃ¢ °ü·Ã ¸Ş¼­µå
-    public void SetStatUI(BaseStat stat)
-    {
-        if (text_StatHp != null)
-            text_StatHp.text = $"HP : {stat.GetStat(StatType.HP)}";
-
-        if (text_StatAtk != null)
-            text_StatAtk.text = $"Atk : {stat.GetStat(StatType.AttackDamage)}";
-
-        if (text_StatAtkRange != null)
-            text_StatAtkRange.text = $"AtkRange : {stat.GetStat(StatType.AttackRange)}";
-
-        if (text_StatAtkDelay != null)
-            text_StatAtkDelay.text = $"AtkDelay : {stat.GetStat(StatType.AttackDelay)}";
     }
     #endregion
 
@@ -75,6 +65,11 @@ public class UI_PlayerStat : MonoBehaviour
         if (hpCoroutine != null)
         {
             StopCoroutine(hpCoroutine);
+        }
+
+        if(staminaCoroutine != null)
+        {
+            StopCoroutine(staminaCoroutine);
         }
     }
 }

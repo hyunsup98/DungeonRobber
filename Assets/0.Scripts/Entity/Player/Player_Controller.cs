@@ -4,14 +4,15 @@ using UnityEngine;
 [System.Flags]
 public enum PlayerBehaviorState : int
 {
-    None        = 0,
-    Alive       = 1 << 0,       //플레이어가 살아있는 상태 = 체력이 0보다 큼
-    Dead        = 1 << 1,       //플레이어가 죽은 상태 = 체력이 0 이하
-    IsCanMove   = 1 << 2,       //플레이어가 움직일 수 있는 상태
-    IsWalk      = 1 << 3,       //플레이어가 걷고 있는 상태
-    IsSprint    = 1 << 4,       //플레이어가 달리고 있는 상태
-    IsAttack    = 1 << 5,       //플레이어가 공격하고 있는 상태
-    IsDodge      = 1 << 6,      //플레이어가 다이빙(구르기) 하는 상태
+    None            = 0,
+    Alive           = 1 << 0,       //플레이어가 살아있는 상태 = 체력이 0보다 큼
+    Dead            = 1 << 1,       //플레이어가 죽은 상태 = 체력이 0 이하
+    IsCanMove       = 1 << 2,       //플레이어가 움직일 수 있는 상태
+    IsWalk          = 1 << 3,       //플레이어가 걷고 있는 상태
+    IsSprint        = 1 << 4,       //플레이어가 달리고 있는 상태
+    IsAttack        = 1 << 5,       //플레이어가 공격하고 있는 상태
+    IsDodge         = 1 << 6,       //플레이어가 다이빙(구르기) 하는 상태
+    IsUsingStamina  = 1 << 7,       //스태미너를 사용 중인지
 }
 
 /// <summary>
@@ -25,30 +26,36 @@ public sealed partial class Player_Controller : Entity
     public event Action onPlayerStatChanged;
 
     [Header("컴포넌트 변수")]
-    [SerializeField] private Camera mainCamera;         //메인 카메라
-    [SerializeField] private Rigidbody playerRigid;     //플레이어 Rigidbody
-    [SerializeField] private Animator playerAnimator;   //플레이어 애니메이터
-    [SerializeField] private Transform attackPos;       //플레이어가 공격할 때 공격 탐지를 시작할 위치
+    [SerializeField] private Camera mainCamera;             //메인 카메라
+    [SerializeField] private Rigidbody playerRigid;         //플레이어 Rigidbody
+    [SerializeField] private Animator playerAnimator;       //플레이어 애니메이터
+    [SerializeField] private Transform attackPos;           //플레이어가 공격할 때 공격 탐지를 시작할 위치
 
     [Header("이동 관련 변수")]
-    [SerializeField] private float runSpeed;            //플레이어 달리기 속도
-    [SerializeField] private float dodgeForce;          //구르기 힘
+    [SerializeField] private float runSpeed;                //플레이어 달리기 속도
+    [SerializeField] private float dodgeForce;              //구르기 힘
 
     [Header("공격 관련 변수")]
-    [SerializeField] private LayerMask attackMask;      //공격할 대상 레이어
-    public event Action playerDeadAction;               //플레이어가 죽었을 때 발생할 이벤트
+    [SerializeField] private LayerMask attackMask;          //공격할 대상 레이어
+    public event Action playerDeadAction;                   //플레이어가 죽었을 때 발생할 이벤트
 
     [Header("스태미너 관련 변수")]
-    [SerializeField] private float maxStamina = 100f;
+    [SerializeField] private float runStamina;              //달리기할 때 소모할 스태미너
+    [SerializeField] private float dodgeStamina;            //구르기할 때 소모할 스태미너
+    [SerializeField] private float staminaRecoveryDelay;    //몇 초 동안 스태미너를 사용안하면 회복할지
+    [SerializeField] private float staminaRecoverySpeed;    //스태미너 회복되는 속도
+    [field: SerializeField] public float MaxStamina { get; private set; } = 100f;   //최대 스태미너
+    public event Action onStaminaChanged;                   //스태미너 값이 변할 때 실행할 액션 이벤트
+    private float staminaRecoveryTimer = 0f;
     private float stamina;
     public float Stamina
     {
         get { return stamina; }
         set
         {
-            if(value > maxStamina)
+            if(value > MaxStamina)
             {
-                value = maxStamina;
+                value = MaxStamina;
             }
             else if(value < 0)
             {
@@ -56,6 +63,7 @@ public sealed partial class Player_Controller : Entity
             }
 
             stamina = value;
+            onStaminaChanged?.Invoke();
         }
     }
 
@@ -110,6 +118,14 @@ public sealed partial class Player_Controller : Entity
         {
             LookAtMousePoint();
         }
+
+        //스태미너 회복
+        RecoveryStamina();
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            GetDamage(5f);
+        }
     }
 
     private void FixedUpdate()
@@ -131,7 +147,7 @@ public sealed partial class Player_Controller : Entity
         if (runSpeed < stats.GetStat(StatType.MoveSpeed))
             runSpeed = stats.GetStat(StatType.MoveSpeed) * 1.5f;
 
-        stamina = maxStamina;
+        stamina = MaxStamina;
 
         playerBehaviorState = PlayerBehaviorState.Alive | PlayerBehaviorState.IsCanMove;
     }
