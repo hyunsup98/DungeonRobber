@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Á¸ »óÅÂ¸¦ °ü¸®ÇÏ´Â ¸Å´ÏÀú
+//ì¡´ ìƒíƒœë¥¼ ê´€ë¦¬í•˜ëŠ” ë§¤ë‹ˆì €
 public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
 {
-    //Á¸ »óÅÂ
+    //ì¡´ ìƒíƒœ
     public enum ZoneState
     {
         Normal,
@@ -14,78 +14,79 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
         Locked
     }
 
-    //°³º° Á¸ µ¥ÀÌÅÍ
+    //ê°œë³„ ì¡´ ë°ì´í„°
     [Serializable]
     public class Zone
     {
-        //Á¸ ÀÌ¸§
+        //ì¡´ ì´ë¦„
         public string zoneName;
 
-        //¾À¿¡ ¹èÄ¡µÈ Æ®·£½ºÆû
+        //ì”¬ì— ë°°ì¹˜ëœ íŠ¸ëœìŠ¤í¼
         public Transform areaRootObject;
 
-        //°æ°è·Î ÀÚµ¿ Å©±â °è»ê
+        //ê²½ê³„ë¡œ ìë™ í¬ê¸° ê³„ì‚°
         public bool autoSizeFromBounds = true;
 
-        //Á¸ Å©±â(XZ)
+        //ì¡´ í¬ê¸°(XZ)
         public Vector2 areaSizeXZ = new Vector2(10f, 10f);
 
-        //ÀÌÆåÆ® Å©±â(XZ)
+        //ì´í™íŠ¸ í¬ê¸°(XZ)
         public Vector2 effectSizeXZ = new Vector2(10f, 10f);
 
-        //ÀÌÆåÆ® ³ôÀÌ ¿ÀÇÁ¼Â
+        //ì´í™íŠ¸ ë†’ì´ ì˜¤í”„ì…‹
         public float effectHeightOffset = 0f;
 
-        //ÀÌÆåÆ® µÎ²²(Y)
+        //ì´í™íŠ¸ ë‘ê»˜(Y)
         [Min(0.01f)]
         public float effectThicknessY = 1.0f;
 
-        //»óÅÂ¿Í ÀÌÆåÆ® ÀÎ½ºÅÏ½º
+        //ìƒíƒœì™€ ì´í™íŠ¸ ì¸ìŠ¤í„´ìŠ¤
         [HideInInspector] public ZoneState state = ZoneState.Normal;
         [HideInInspector] public GameObject lockedEffectInstance;
     }
 
-    //°ÔÀÓ ½Ã°£ °ü¸® Å¬·¡½º
+    //ê²Œì„ ì‹œê°„ ê´€ë¦¬ í´ë˜ìŠ¤
     [SerializeField] private TimerFunc timerFunc;
 
-    //Á¸ ¸®½ºÆ®
+    //ì¡´ ë¦¬ìŠ¤íŠ¸
     [Header("Zone Settings")]
     [SerializeField] private List<Zone> zones = new List<Zone>();
 
-    //½Ã°£ °ü·Ã
+    //ì‹œê°„ ê´€ë ¨
     [Header("Timing")]
-    [SerializeField] private float timeBetweenLocks = 30f;
     [SerializeField] private float warningDuration = 60f;
 
-    //Àá±İ ÀÌÆåÆ® ÇÁ¸®ÆÕ
+    //ì ê¸ˆ ì´í™íŠ¸ í”„ë¦¬íŒ¹
     [Header("Locked Effect")]
     [SerializeField] private GameObject lockedEffectPrefab;
 
-    //¹Ù´Ú °¨Áö¿ë ¸¶½ºÅ©
+    //ë°”ë‹¥ ê°ì§€ìš© ë§ˆìŠ¤í¬
     [Header("Floor Raycast")]
     [SerializeField] private LayerMask floorMask = ~0;
 
-    //¸Ş½ÃÁö »ö»ó
+    //ë©”ì‹œì§€ ìƒ‰ìƒ
     [Header("Message Colors")]
     [SerializeField] private Color warningColor = Color.yellow;
     [SerializeField] private Color lockedColor = new Color(1f, 0.35f, 0.35f, 1f);
     [SerializeField] private Color infoColor = Color.white;
 
-    //ÀÌº¥Æ®
+    //ì´ë²¤íŠ¸
     public event Action OnZonesUpdated;
     public event Action<string, Color, float> OnMessageRequested;
 
-    //·±Å¸ÀÓ º¯¼ö
+    //ëŸ°íƒ€ì„ ë³€ìˆ˜
     private Coroutine warningCoroutine;
     private Zone currentWarningTarget;
 
-    //ÀĞ±â Àü¿ë ¸®½ºÆ®
+    private bool isDoingLock = false;       //íŠ¹ì • ì¡´ì´ ì ê¸°ê³  ìˆëŠ”ì§€ - true => ì ê¸°ê³  ìˆëŠ” ì¤‘ / false => ì ê¸°ê³  ìˆëŠ” ì¡´ì´ ì—†ìŒ
+
+    //ì½ê¸° ì „ìš© ë¦¬ìŠ¤íŠ¸
     public IReadOnlyList<Zone> Zones
     {
         get { return zones; }
     }
 
-    //ÃÊ±âÈ­
+    //ì´ˆê¸°í™”
     private void Awake()
     {
         for (int i = 0; i < zones.Count; i++)
@@ -98,7 +99,7 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
 
             if (z.areaRootObject == null)
             {
-                Debug.LogWarning("//ZoneManager areaRootObject°¡ ºñ¾î ÀÖÀ½: " + z.zoneName);
+                Debug.LogWarning("//ZoneManager areaRootObjectê°€ ë¹„ì–´ ìˆìŒ: " + z.zoneName);
                 continue;
             }
 
@@ -115,7 +116,7 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
         }
     }
 
-    //½ÃÀÛ ½Ã ½ºÄÉÁÙ ½ÃÀÛ
+    //ì‹œì‘ ì‹œ ìŠ¤ì¼€ì¤„ ì‹œì‘
     private void Start()
     {
         if(timerFunc != null)
@@ -125,7 +126,7 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
         NotifyZonesUpdated();
     }
 
-    //ºñÈ°¼ºÈ­ ½Ã ÄÚ·çÆ¾ Á¤Áö
+    //ë¹„í™œì„±í™” ì‹œ ì½”ë£¨í‹´ ì •ì§€
     private void OnDisable()
     {
         if (warningCoroutine != null)
@@ -135,18 +136,18 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
         }
     }
 
-    //ÀÏÁ¤ ½Ã°£¸¶´Ù Àá±İ ½ºÄÉÁÙ ½ÇÇà
+    //ì¼ì • ì‹œê°„ë§ˆë‹¤ ì ê¸ˆ ìŠ¤ì¼€ì¤„ ì‹¤í–‰
     private IEnumerator LockSchedulerLoop()
     {
         while (true)
         {
             if (AllLocked() == true)
             {
-                RequestMessage("¸ğµç Á¸ÀÌ Àá°å½À´Ï´Ù.", infoColor, 3f);
+                RequestMessage("ëª¨ë“  ì¡´ì´ ì ê²¼ìŠµë‹ˆë‹¤.", infoColor, 3f);
                 yield break;
             }
 
-            yield return CoroutineManager.waitForSeconds(timeBetweenLocks);
+            yield return new WaitUntil(() => !isDoingLock);
 
             Zone target = GetRandomNormalZone();
             if (target == null)
@@ -156,34 +157,33 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
 
             currentWarningTarget = target;
             SetZoneState(target, ZoneState.Warning);
-            RequestMessage(target.zoneName + " Á¸ÀÌ °ğ Àá±é´Ï´Ù.", warningColor, 10f);
-
-            if (warningCoroutine != null)
-            {
-                StopCoroutine(warningCoroutine);
-            }
+            RequestMessage(target.zoneName + " ì¡´ì´ ê³§ ì ê¹ë‹ˆë‹¤.", warningColor, 10f);
 
             warningCoroutine = StartCoroutine(WarningThenLock(target));
         }
     }
 
-    //°æ°í ÈÄ Àá±İ
+    //ê²½ê³  í›„ ì ê¸ˆ
     private IEnumerator WarningThenLock(Zone z)
     {
+        isDoingLock = true;
+
         yield return CoroutineManager.waitForSeconds(warningDuration);
 
         if (z.state == ZoneState.Warning)
         {
             SetZoneState(z, ZoneState.Locked);
             SpawnLockedEffect(z);
-            RequestMessage(z.zoneName + " Á¸ÀÌ Àá°å½À´Ï´Ù.", lockedColor, 10f);
+            RequestMessage(z.zoneName + " ì¡´ì´ ì ê²¼ìŠµë‹ˆë‹¤.", lockedColor, 10f);
 
             currentWarningTarget = null;
             warningCoroutine = null;
         }
+
+        isDoingLock = false;
     }
 
-    //Àá±İ ÀÌÆåÆ® »ı¼º
+    //ì ê¸ˆ ì´í™íŠ¸ ìƒì„±
     private void SpawnLockedEffect(Zone z)
     {
         if (lockedEffectPrefab == null)
@@ -218,7 +218,7 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
         z.lockedEffectInstance = go;
     }
 
-    //ÀÌÆåÆ® Å©±â Á¦ÇÑ
+    //ì´í™íŠ¸ í¬ê¸° ì œí•œ
     private Vector2 ClampSizeToRect(Vector2 desired, Vector2 rectSize)
     {
         float w = Mathf.Clamp(desired.x, 0.1f, rectSize.x);
@@ -226,7 +226,7 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
         return new Vector2(w, h);
     }
 
-    //ÀÌÆåÆ® Áß½É Á¦ÇÑ
+    //ì´í™íŠ¸ ì¤‘ì‹¬ ì œí•œ
     private Vector3 ClampCenterToRect(Vector3 spawnBase, Vector3 rectCenter, Vector2 effSize, Vector2 rectSize)
     {
         float halfRectX = rectSize.x * 0.5f;
@@ -245,7 +245,7 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
         return new Vector3(cx, spawnBase.y, cz);
     }
 
-    //¾À ¿ÀºêÁ§Æ® Å©±â °è»ê
+    //ì”¬ ì˜¤ë¸Œì íŠ¸ í¬ê¸° ê³„ì‚°
     private Vector2 GetXZSizeFromObject(GameObject go)
     {
         if (go == null)
@@ -270,7 +270,7 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
         return Vector2.zero;
     }
 
-    //»óÅÂ º¯°æ ¹× °»½Å ÀÌº¥Æ®
+    //ìƒíƒœ ë³€ê²½ ë° ê°±ì‹  ì´ë²¤íŠ¸
     private void SetZoneState(Zone z, ZoneState next)
     {
         if (z.state == next)
@@ -282,7 +282,7 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
         NotifyZonesUpdated();
     }
 
-    //¸ğµÎ Àá±İ »óÅÂÀÎÁö È®ÀÎ
+    //ëª¨ë‘ ì ê¸ˆ ìƒíƒœì¸ì§€ í™•ì¸
     private bool AllLocked()
     {
         for (int i = 0; i < zones.Count; i++)
@@ -299,7 +299,7 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
         return true;
     }
 
-    //·£´ı ³ë¸Ö Á¸ ¼±ÅÃ
+    //ëœë¤ ë…¸ë©€ ì¡´ ì„ íƒ
     private Zone GetRandomNormalZone()
     {
         List<Zone> list = new List<Zone>();
@@ -325,7 +325,7 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
         return list[idx];
     }
 
-    //¸Ş½ÃÁö ¿äÃ»
+    //ë©”ì‹œì§€ ìš”ì²­
     private void RequestMessage(string msg, Color color, float time)
     {
         if (OnMessageRequested != null)
@@ -334,7 +334,7 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
         }
     }
 
-    //Á¸ °»½Å ¾Ë¸²
+    //ì¡´ ê°±ì‹  ì•Œë¦¼
     private void NotifyZonesUpdated()
     {
         if (OnZonesUpdated != null)
@@ -346,5 +346,13 @@ public class ZoneManager : MonoBehaviour, IDangerousTimeObserver
     public void OnDangerousTimeReached()
     {
         StartCoroutine(LockSchedulerLoop());
+    }
+
+    private void OnDestroy()
+    {
+        if(warningCoroutine != null)
+        {
+            StopCoroutine(warningCoroutine);
+        }
     }
 }

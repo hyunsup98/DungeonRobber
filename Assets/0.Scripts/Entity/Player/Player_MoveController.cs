@@ -1,23 +1,27 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public sealed partial class Player_Controller
 {
+    public float GetPlayerCurrentSpeed()
+    {
+        return CheckPlayerBehaviorState(PlayerBehaviorState.IsSprint) ? runSpeed : stats.GetStat(StatType.MoveSpeed);
+    }
+
     /// <summary>
-    /// RigidbodyÀÇ velocity¸¦ ÀÌ¿ëÇÑ ÀÌµ¿ ¸Ş¼­µå
-    /// W, A, S, D Å°¸¦ ÀÌ¿ëÇØ ÀÌµ¿ ±¸Çö, Left Shift¸¦ ÀÌ¿ëÇØ ´Ş¸®±â ±¸Çö
+    /// Rigidbodyì˜ velocityë¥¼ ì´ìš©í•œ ì´ë™ ë©”ì„œë“œ
+    /// W, A, S, D í‚¤ë¥¼ ì´ìš©í•´ ì´ë™ êµ¬í˜„, Left Shiftë¥¼ ì´ìš©í•´ ë‹¬ë¦¬ê¸° êµ¬í˜„
     /// </summary>
     private void Move()
     {
-        //ÀÌµ¿ÀÌ °¡´ÉÇÑ »óÅÂ¶ó¸é
+        //ì´ë™ì´ ê°€ëŠ¥í•œ ìƒíƒœë¼ë©´
         if(CheckPlayerBehaviorState(PlayerBehaviorState.IsCanMove))
         {
             float horizontal = Input.GetAxisRaw("Horizontal");
             float vertical = Input.GetAxisRaw("Vertical");
             Vector3 moveDir = new Vector3(horizontal, 0, vertical).normalized;
 
-            //ÀÔ·Â Å° º¤ÅÍ°ª¿¡ µû¶ó¼­ °È°í ÀÖ´Â »óÅÂÀÎÁö ¾Æ´ÑÁö ¼¼ÆÃ
+            //ì…ë ¥ í‚¤ ë²¡í„°ê°’ì— ë”°ë¼ì„œ ê±·ê³  ìˆëŠ” ìƒíƒœì¸ì§€ ì•„ë‹Œì§€ ì„¸íŒ…
             if (moveDir.sqrMagnitude < 0.005f)
             {
                 RemovePlayerBehaviorState(PlayerBehaviorState.IsWalk);
@@ -27,7 +31,7 @@ public sealed partial class Player_Controller
                 AddPlayerBehaviorState(PlayerBehaviorState.IsWalk);
             }
 
-            //±¸¸£±â
+            //êµ¬ë¥´ê¸°
             if (Input.GetKey(KeyCode.Space))
             {
                 if (!CheckPlayerBehaviorState(PlayerBehaviorState.IsDodge))
@@ -41,18 +45,18 @@ public sealed partial class Player_Controller
             {
                 if (Input.GetKey(KeyCode.LeftShift))
                 {
-                    //¿ŞÂÊ ½¬ÇÁÆ®¸¦ ´­·¶À» ¶§ - ´Ş¸®±â
+                    //ì™¼ìª½ ì‰¬í”„íŠ¸ë¥¼ ëˆŒë €ì„ ë•Œ - ë‹¬ë¦¬ê¸°
                     AddPlayerBehaviorState(PlayerBehaviorState.IsSprint);
                     transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(moveDir), 10 * Time.deltaTime);
                 }
                 else
                 {
-                    //¿ŞÂÊ ½¬ÇÁÆ®¸¦ ´©¸£Áö ¾Ê¾ÒÀ» ¶§ - °È±â
+                    //ì™¼ìª½ ì‰¬í”„íŠ¸ë¥¼ ëˆ„ë¥´ì§€ ì•Šì•˜ì„ ë•Œ - ê±·ê¸°
                     RemovePlayerBehaviorState(PlayerBehaviorState.IsSprint);
                 }
             }
 
-            //ÀÔ·Â¹ŞÀº moveDir(¿ùµåÁÂÇ¥ ±âÁØ)À» ·ÎÄÃÁÂÇ¥ ±âÁØ ¹æÇâ º¤ÅÍ·Î º¯È¯
+            //ì…ë ¥ë°›ì€ moveDir(ì›”ë“œì¢Œí‘œ ê¸°ì¤€)ì„ ë¡œì»¬ì¢Œí‘œ ê¸°ì¤€ ë°©í–¥ ë²¡í„°ë¡œ ë³€í™˜
             Vector3 localMoveDir = transform.InverseTransformDirection(moveDir).normalized;
             SetMoveAnimationBlend(localMoveDir);
 
@@ -61,7 +65,7 @@ public sealed partial class Player_Controller
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î°¡ ¸¶¿ì½º Æ÷ÀÎÅÍ¸¦ ¹Ù¶óº¸´Â ¸Ş¼­µå
+    /// í”Œë ˆì´ì–´ê°€ ë§ˆìš°ìŠ¤ í¬ì¸í„°ë¥¼ ë°”ë¼ë³´ëŠ” ë©”ì„œë“œ
     /// </summary>
     private void LookAtMousePoint()
     {
@@ -78,9 +82,9 @@ public sealed partial class Player_Controller
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾îÀÇ ÀÌµ¿ ¾Ö´Ï¸ŞÀÌ¼Ç ºí·»µùÀ» º¸°£ Ã³¸®ÇÏ´Â ¸Ş¼­µå
+    /// í”Œë ˆì´ì–´ì˜ ì´ë™ ì• ë‹ˆë©”ì´ì…˜ ë¸”ë Œë”©ì„ ë³´ê°„ ì²˜ë¦¬í•˜ëŠ” ë©”ì„œë“œ
     /// </summary>
-    /// <param name="dir"> ÇÃ·¹ÀÌ¾îÀÇ forward ±âÁØ ÀÌµ¿ÇÏ´Â ¹æÇâ º¤ÅÍ </param>
+    /// <param name="dir"> í”Œë ˆì´ì–´ì˜ forward ê¸°ì¤€ ì´ë™í•˜ëŠ” ë°©í–¥ ë²¡í„° </param>
     private void SetMoveAnimationBlend(Vector3 dir)
     {
         float smoothX = 0;
@@ -98,12 +102,12 @@ public sealed partial class Player_Controller
 
     private IEnumerator Dive(Vector3 moveDir)
     {
-        //»óÅÂ ÇÃ·¡±× º¯°æ ¹× ±¸¸£±â ¾Ö´Ï¸ŞÀÌ¼Ç Àû¿ë
+        //ìƒíƒœ í”Œë˜ê·¸ ë³€ê²½ ë° êµ¬ë¥´ê¸° ì• ë‹ˆë©”ì´ì…˜ ì ìš©
         AddPlayerBehaviorState(PlayerBehaviorState.IsDodge);
         RemovePlayerBehaviorState(PlayerBehaviorState.IsCanMove);
         playerAnimator.SetTrigger("dodge");
 
-        //ÇÃ·¹ÀÌ¾î ±¸¸£±â ¹°¸® Àû¿ë
+        //í”Œë ˆì´ì–´ êµ¬ë¥´ê¸° ë¬¼ë¦¬ ì ìš©
         if(moveDir.sqrMagnitude <= 0.0005f)
         {
             playerRigid.AddForce(transform.forward * dodgeForce, ForceMode.Impulse);

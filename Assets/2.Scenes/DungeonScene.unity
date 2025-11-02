@@ -20,13 +20,13 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientSkyColor: {r: 0.5900676, g: 0.60550016, b: 0.6415094, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 0
-  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_AmbientMode: 3
+  m_SubtractiveShadowColor: {r: 0.49019608, g: 0.52156866, b: 0.59607846, a: 1}
+  m_SkyboxMaterial: {fileID: 2100000, guid: a814ebd62b1a1aa42a44fe8554fe6144, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -35,7 +35,7 @@ RenderSettings:
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
   m_ReflectionBounces: 1
-  m_ReflectionIntensity: 1
+  m_ReflectionIntensity: 0
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
   m_UseRadianceAmbientProbe: 0
@@ -7167,6 +7167,22 @@ PrefabInstance:
     m_TransformParent: {fileID: 822793480}
     m_Modifications:
     - target: {fileID: 3044377558356368519, guid: b808f8ad5681d8e4aabd9282616a4081, type: 3}
+      propertyPath: worldMax.x
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3044377558356368519, guid: b808f8ad5681d8e4aabd9282616a4081, type: 3}
+      propertyPath: worldMax.y
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 3044377558356368519, guid: b808f8ad5681d8e4aabd9282616a4081, type: 3}
+      propertyPath: worldMin.x
+      value: -20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3044377558356368519, guid: b808f8ad5681d8e4aabd9282616a4081, type: 3}
+      propertyPath: worldMin.y
+      value: -22
+      objectReference: {fileID: 0}
+    - target: {fileID: 3044377558356368519, guid: b808f8ad5681d8e4aabd9282616a4081, type: 3}
       propertyPath: _zoneManager
       value: 
       objectReference: {fileID: 1511092416}
@@ -7313,12 +7329,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2221373778831208721, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
+      propertyPath: dodgeForce
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2221373778831208721, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
       propertyPath: mainCamera
       value: 
       objectReference: {fileID: 1317024956}
     - target: {fileID: 2221373778831208721, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
       propertyPath: stats.baseStats.Array.data[1].<Value>k__BackingField
-      value: 15
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 2221373778831208721, guid: e41637c66e558b7488c4e9ec4761d67b, type: 3}
       propertyPath: stats.baseStats.Array.data[2].<Value>k__BackingField
@@ -9099,7 +9119,7 @@ PrefabInstance:
       objectReference: {fileID: 2054301081}
     - target: {fileID: 7625713682982165177, guid: 9d447a9c4769fe34ea59e363907aa9b7, type: 3}
       propertyPath: warningDuration
-      value: 20
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 7625713682982165177, guid: 9d447a9c4769fe34ea59e363907aa9b7, type: 3}
       propertyPath: timeBetweenLocks
@@ -11223,7 +11243,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &2106481842
 Light:
   m_ObjectHideFlags: 0

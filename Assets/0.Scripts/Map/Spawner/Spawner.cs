@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-//½ºÆùÇÒ µ¥ÀÌÅÍ ±âº» ±¸Á¶ (ÇÁ¸®ÆÕ + È®·ü)
+//ìŠ¤í°í•  ë°ì´í„° ê¸°ë³¸ êµ¬ì¡° (í”„ë¦¬íŒ¹ + í™•ë¥ )
 [System.Serializable]
 public class SpawnData
 {
@@ -11,7 +11,7 @@ public class SpawnData
     [Range(0f, 1f)] public float _spawnProbability = 1f;
 }
 
-//»ç¿ëÇÒ ÅÂ±× ¿­°ÅÇü
+//ì‚¬ìš©í•  íƒœê·¸ ì—´ê±°í˜•
 public enum TagType
 {
     Monster,
@@ -19,7 +19,7 @@ public enum TagType
     ItemBox
 }
 
-//ÅÂ±×º° ½ºÆù ¼³Á¤ ±¸Á¶Ã¼
+//íƒœê·¸ë³„ ìŠ¤í° ì„¤ì • êµ¬ì¡°ì²´
 [System.Serializable]
 public class TagSpawnSetting
 {
@@ -29,34 +29,34 @@ public class TagSpawnSetting
     public int createCount;
     public float minSpawnDistance;
 
-    public float spawnHeight = 0f;  // Ãß°¡: ½ºÆù ³ôÀÌ
+    public float spawnHeight = 0f;  // ì¶”ê°€: ìŠ¤í° ë†’ì´
 }
 
 
-//ÅëÇÕ ½ºÆ÷³Ê
+//í†µí•© ìŠ¤í¬ë„ˆ
 public class Spawner : MonoBehaviour, IRespawnNotifier
 {
 
-    [Header("½ºÆù ¼³Á¤")]
+    [Header("ìŠ¤í° ì„¤ì •")]
     [SerializeField] private LayerMask _groundLayer;
     [SerializeField] private Vector2 _mapSpawnSize;
     [Range(0f, 1f)][SerializeField] private float _spawnCountChance = 1f;
 
 
-    [Header("¸®½ºÆù ¼³Á¤")]
+    [Header("ë¦¬ìŠ¤í° ì„¤ì •")]
     [SerializeField] private bool enableRespawn;
     [SerializeField] private float respawnDelay;
 
 
-    [Header("ÅÂ±×º° ½ºÆù ¼³Á¤")]
+    [Header("íƒœê·¸ë³„ ìŠ¤í° ì„¤ì •")]
     [SerializeField] private List<TagSpawnSetting> _tagGroups = new List<TagSpawnSetting>();
 
     private float _raycastHeight = 100;
 
-    //½ºÆù À§Ä¡ °ãÄ§ ¹æÁö¿ë
+    //ìŠ¤í° ìœ„ì¹˜ ê²¹ì¹¨ ë°©ì§€ìš©
     private List<Vector3> _spawnedPositions = new List<Vector3>();
 
-    //»ı¼ºµÈ ¿ÀºêÁ§Æ®¿Í °ü·Ã µ¥ÀÌÅÍ ÀúÀå
+    //ìƒì„±ëœ ì˜¤ë¸Œì íŠ¸ì™€ ê´€ë ¨ ë°ì´í„° ì €ì¥
     private Dictionary<GameObject, TagSpawnSetting> _spawnedObjects = new Dictionary<GameObject, TagSpawnSetting>();
 
     private void Start()
@@ -64,7 +64,7 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
         SpawnAllTags();
     }
 
-    //¸ğµç ÅÂ±× ±×·ì ½ºÆù
+    //ëª¨ë“  íƒœê·¸ ê·¸ë£¹ ìŠ¤í°
     private void SpawnAllTags()
     {
         foreach (var tagGroup in _tagGroups)
@@ -76,7 +76,7 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
         }
     }
 
-    //ÅÂ±× ±×·ìº° ½ºÆù
+    //íƒœê·¸ ê·¸ë£¹ë³„ ìŠ¤í°
     private void SpawnTagGroup(TagSpawnSetting group)
     {
         if (group.spawnPrefabs.Count == 0)
@@ -86,7 +86,7 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
 
         int spawnCount = group.createCount;
 
-        //ÀÏºÎ¸¸ »ı¼ºµÉ È®·ü Àû¿ë
+        //ì¼ë¶€ë§Œ ìƒì„±ë  í™•ë¥  ì ìš©
         if (Random.value > _spawnCountChance)
         {
             spawnCount = Random.Range((int)(group.createCount * 0.5f), group.createCount);
@@ -99,7 +99,7 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
     }
 
 
-    //È®·ü¿¡ µû¶ó ½ºÆù µ¥ÀÌÅÍ ¼±ÅÃ
+    //í™•ë¥ ì— ë”°ë¼ ìŠ¤í° ë°ì´í„° ì„ íƒ
     private SpawnData GetRandomData(List<SpawnData> list)
     {
         float totalWeight = 0f;
@@ -124,12 +124,12 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
 
     private void SpawnObjectByTag(TagSpawnSetting group, bool useTag = true)
     {
-        // À¯È¿ÇÑ ½ºÆù À§Ä¡ ÈÄº¸ ¸®½ºÆ®
+        // ìœ íš¨í•œ ìŠ¤í° ìœ„ì¹˜ í›„ë³´ ë¦¬ìŠ¤íŠ¸
         List<Vector3> candidatePositions = new List<Vector3>();
         int maxAttempts = 100;
 
 
-        // ·£´ı À§Ä¡ ÈÄº¸ Å½»ö
+        // ëœë¤ ìœ„ì¹˜ í›„ë³´ íƒìƒ‰
         for (int i = 0; i < maxAttempts; i++)
         {
             float offsetX = transform.position.x;
@@ -140,14 +140,14 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
             Vector3 spawnPos = new Vector3(x, _raycastHeight, z);
 
 
-            // Áö¸é Å½Áö
+            // ì§€ë©´ íƒì§€
             if (Physics.Raycast(spawnPos, Vector3.down, out RaycastHit hit, _raycastHeight * 2f, _groundLayer))
             {
                 Vector3 groundPos = hit.point;
                 bool tooClose = false;
 
 
-                // ±âÁ¸ ½ºÆù À§Ä¡¿Í ÃÖ¼Ò °Å¸® Ã¼Å©
+                // ê¸°ì¡´ ìŠ¤í° ìœ„ì¹˜ì™€ ìµœì†Œ ê±°ë¦¬ ì²´í¬
                 foreach (var pos in _spawnedPositions)
                 {
                     if (Vector3.Distance(groundPos, pos) < group.minSpawnDistance)
@@ -165,22 +165,22 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
         }
 
 
-        // À¯È¿ À§Ä¡°¡ ¾øÀ¸¸é ½ºÆù ½ÇÆĞ
+        // ìœ íš¨ ìœ„ì¹˜ê°€ ì—†ìœ¼ë©´ ìŠ¤í° ì‹¤íŒ¨
         if (candidatePositions.Count == 0)
         {
             return;
         }
 
 
-        // ÃÖÁ¾ ½ºÆù À§Ä¡ ·£´ı ¼±ÅÃ
+        // ìµœì¢… ìŠ¤í° ìœ„ì¹˜ ëœë¤ ì„ íƒ
         Vector3 finalPos = candidatePositions[Random.Range(0, candidatePositions.Count)];
 
 
-        // ½ºÆù ³ôÀÌ Àû¿ë
+        // ìŠ¤í° ë†’ì´ ì ìš©
         finalPos.y = group.spawnHeight;
 
 
-        // È®·ü ±â¹İÀ¸·Î ½ºÆù µ¥ÀÌÅÍ ¼±ÅÃ
+        // í™•ë¥  ê¸°ë°˜ìœ¼ë¡œ ìŠ¤í° ë°ì´í„° ì„ íƒ
         var spawnData = GetRandomData(group.spawnPrefabs);
         if (spawnData == null || spawnData.mapPrefab == null)
         {
@@ -188,16 +188,16 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
         }
 
 
-        // ¿ÀºêÁ§Æ® »ı¼º
+        // ì˜¤ë¸Œì íŠ¸ ìƒì„±
         GameObject instance = Instantiate(spawnData.mapPrefab, finalPos, Quaternion.identity);
 
 
-        // À§Ä¡¿Í °´Ã¼ µ¥ÀÌÅÍ ÀúÀå
+        // ìœ„ì¹˜ì™€ ê°ì²´ ë°ì´í„° ì €ì¥
         _spawnedPositions.Add(finalPos);
         _spawnedObjects.Add(instance, group);
 
 
-        // ÆÄ±« °¨½Ã Æ®·¡Ä¿ Ãß°¡ (¸®½ºÆù ±â´É¿ë)
+        // íŒŒê´´ ê°ì‹œ íŠ¸ë˜ì»¤ ì¶”ê°€ (ë¦¬ìŠ¤í° ê¸°ëŠ¥ìš©)
         if (enableRespawn == true)
         {
             var tracker = instance.AddComponent<DestructionTracker>();
@@ -207,7 +207,7 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
 
 
 
-    //¿ÀºêÁ§Æ®¿Í ÀÚ½Äµé±îÁö ÅÂ±× ÁöÁ¤
+    //ì˜¤ë¸Œì íŠ¸ì™€ ìì‹ë“¤ê¹Œì§€ íƒœê·¸ ì§€ì •
     private void SetTagRecursively(GameObject obj, string tag)
     {
         obj.tag = tag;
@@ -219,7 +219,7 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
 
 
 
-    //¿ÀºêÁ§Æ® ÆÄ±« ½Ã ¸®½ºÆù Ã³¸®
+    //ì˜¤ë¸Œì íŠ¸ íŒŒê´´ ì‹œ ë¦¬ìŠ¤í° ì²˜ë¦¬
     public void NotifyObjectDestroyed(GameObject obj)
     {
         if (enableRespawn == false || _spawnedObjects.ContainsKey(obj) == false)
@@ -235,7 +235,7 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
 
 
 
-    //µô·¹ÀÌ ÈÄ ¸®½ºÆù
+    //ë”œë ˆì´ í›„ ë¦¬ìŠ¤í°
     private IEnumerator RespawnAfterDelay(TagSpawnSetting group, float delay)
     {
         yield return new WaitForSeconds(delay);
