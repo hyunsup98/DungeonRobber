@@ -5,7 +5,7 @@ using UnityEngine;
 public class BigBear : Monster
 {
     [SerializeField] private float detectDelay = 1f;//감지 딜레이 
-    [SerializeField] private float animeDelay = 0.5f;//애니메이션 딜레이 
+
     Vector3 homePosition;
     bool isHome;//집인지 확인하는 변수
     int playerLayer;

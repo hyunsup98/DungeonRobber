@@ -26,7 +26,7 @@ public class SkeletonWarrior : Monster
     }
     private void FixedUpdate()
     {
-        if (!isAlive) return;
+        if (!isAlive) return; //죽었다면 종료
 
         agent.speed = stats.GetStat(StatType.MoveSpeed);
 
@@ -132,7 +132,7 @@ public class SkeletonWarrior : Monster
     {
         monsterAnimator.SetTrigger("GetDamage");
         stats.ModifyStat(StatType.HP, -damage);
-        Debug.Log($"적 hp: {stats.GetStat(StatType.HP)}");
+        
 
         if (stats.GetStat(StatType.HP) <= 0)
         {
@@ -201,6 +201,7 @@ public class SkeletonWarrior : Monster
         while (true)
         {
             waypoints.Clear();
+            //detectLayer내에 있고 detactDestinationRadius반경 내에 있는 collider감지 
             colliders = Physics.OverlapSphere(transform.position, detectDestinationRadius, detectLayer);
             foundTarget = false;
 
@@ -221,7 +222,7 @@ public class SkeletonWarrior : Monster
                         waypoints.Add(collider.transform);
                     }
                 }              
-                if (!foundTarget)
+                if (!foundTarget) //Target을 찾지 못했으면 
                 {
                     isDetectTarget = false;
                 }
@@ -254,6 +255,10 @@ public class SkeletonWarrior : Monster
         yield return CoroutineManager.waitForSeconds(animeSeconds);
     }
 
+    /// <summary>
+    /// 공격 딜레이 넣어주는 메서드 
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator AttackDelay()
     {
         isAttackCooltime = true;

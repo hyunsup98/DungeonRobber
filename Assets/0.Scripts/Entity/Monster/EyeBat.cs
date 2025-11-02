@@ -5,7 +5,6 @@ public class EyeBat : Monster
 {
     [SerializeField] BaseBuff slowbuff; //적용할 디버프  
     [SerializeField] float detectDelay = 1f;//감지 딜레이 
-    [SerializeField] float  animeDelay = 0.5f;//애니메이션 딜레이 
     
     int playerLayer;
     int WaypointLayer;
@@ -240,7 +239,7 @@ public class EyeBat : Monster
     }
 
     /// <summary>
-    /// 애니메이션 종료 대기 코루틴
+    /// 공격 딜레이 넣어주는 메서드 
     /// </summary>
     /// <param name="animName">애니메이션 이름 </param>
     /// <returns></returns>
