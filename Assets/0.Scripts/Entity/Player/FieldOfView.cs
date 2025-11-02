@@ -2,39 +2,37 @@ using UnityEngine;
 
 public class FieldOfView : MonoBehaviour
 {
-    [Header("½Ã¾ß°¢ Àû Å½Áö º¯¼ö")]
-    [SerializeField] private float viewAngle = 90f;         //½Ã¾ß°¢
-    [SerializeField] private float viewInnerRadius = 3f;    //ÇÃ·¹ÀÌ¾î ÁÖº¯ ½Ã¾ß ¹üÀ§
-    [SerializeField] private float viewDistance = 30f;      //ºÎÃ¤²Ã ½Ã¾ß°¢ÀÇ ÃÖ´ë ½Ã¾ß °Å¸®
-    [SerializeField] private float offsetY = 0.5f;          //·¹ÀÌÄ³½ºÆ®¸¦ ½ò ¶§ y ÁÂÇ¥ À§Ä¡(Ä³¸¯ÅÍ positionÀÌ ¹Ù´Ú¿¡ ÀÖ±â ¶§¹®¿¡ °¨Áö¸¦ ¸øÇÒ ¶§°¡ ÀÖ¾î¼­ ¿Ã·ÁÁÜ)
-    [SerializeField] private LayerMask targetMask;          //Àû(Enemy) ·¹ÀÌ¾î¸¶½ºÅ©
-    [SerializeField] private LayerMask obstacleMask;        //Àå¾Ö¹°, º® ·¹ÀÌ¾î¸¶½ºÅ©
+    [Header("ì‹œì•¼ê° ì  íƒì§€ ë³€ìˆ˜")]
+    [SerializeField] private float viewAngle = 90f;         //ì‹œì•¼ê°
+    [SerializeField] private float viewInnerRadius = 3f;    //í”Œë ˆì´ì–´ ì£¼ë³€ ì‹œì•¼ ë²”ìœ„
+    [SerializeField] private float viewDistance = 30f;      //ë¶€ì±„ê¼´ ì‹œì•¼ê°ì˜ ìµœëŒ€ ì‹œì•¼ ê±°ë¦¬
+    [SerializeField] private float offsetY = 0.5f;          //ë ˆì´ìºìŠ¤íŠ¸ë¥¼ ì  ë•Œ y ì¢Œí‘œ ìœ„ì¹˜(ìºë¦­í„° positionì´ ë°”ë‹¥ì— ìˆê¸° ë•Œë¬¸ì— ê°ì§€ë¥¼ ëª»í•  ë•Œê°€ ìˆì–´ì„œ ì˜¬ë ¤ì¤Œ)
+    [SerializeField] private LayerMask targetMask;          //ì (Enemy) ë ˆì´ì–´ë§ˆìŠ¤í¬
+    [SerializeField] private LayerMask obstacleMask;        //ì¥ì• ë¬¼, ë²½ ë ˆì´ì–´ë§ˆìŠ¤í¬
 
-    [Header("½Ã¾ß°¢ ½¦ÀÌ´õ º¯¼ö")]
-    [SerializeField] private Transform player;              //ÇÃ·¹ÀÌ¾î À§Ä¡ Á¤º¸
-    [SerializeField] private Material maskMaterial;         //½Ã¾ß ¸ŞÅ×¸®¾ó
+    [Header("ì‹œì•¼ê° ì‰ì´ë” ë³€ìˆ˜")]
+    [SerializeField] private Transform player;              //í”Œë ˆì´ì–´ ìœ„ì¹˜ ì •ë³´
+    [SerializeField] private Material maskMaterial;         //ì‹œì•¼ ë©”í…Œë¦¬ì–¼
     [Range(1f, 15f)]
-    [SerializeField] private float fovRotateSpeed = 10f;    //¸¶¿ì½º Æ÷ÀÎÅÍ¸¦ µ¹¸± ¶§ º¸°£ ¼öÄ¡
+    [SerializeField] private float fovRotateSpeed = 10f;    //ë§ˆìš°ìŠ¤ í¬ì¸í„°ë¥¼ ëŒë¦´ ë•Œ ë³´ê°„ ìˆ˜ì¹˜
 
-    [Header("Quad(Panel Æ®·£½ºÆû)")]
-    [SerializeField] private Transform fovQuad;             //Ä«¸Ş¶ó¿¡ ºÙ¾îÀÖ´Â Äõµå(ÆÇ³Ú) À§Ä¡ Á¤º¸
+    [Header("Quad(Panel íŠ¸ëœìŠ¤í¼)")]
+    [SerializeField] private Transform fovQuad;             //ì¹´ë©”ë¼ì— ë¶™ì–´ìˆëŠ” ì¿¼ë“œ(íŒë„¬) ìœ„ì¹˜ ì •ë³´
 
-    Vector3 lookDir = Vector3.zero;                         //½Ã¾ß°¢ÀÌ ¹Ù¶óº¸°í ÀÖ´Â ¹æÇâ º¤ÅÍ
-
-    private void Start()
-    {
-        InitFOVShader();
-        SetFOVShader();
-    }
+    Vector3 lookDir = Vector3.zero;                         //ì‹œì•¼ê°ì´ ë°”ë¼ë³´ê³  ìˆëŠ” ë°©í–¥ ë²¡í„°
 
     private void Update()
     {
+        if (GameManager.Instance.CurrentGameState != GameState.Dungeon) return;
+
         InitFOVShader();
         SetFOVShader();
     }
 
     private void FixedUpdate()
     {
+        if (GameManager.Instance.CurrentGameState == GameState.Title) return;
+
         FindVisibleTargets();
     }
 
@@ -74,6 +72,8 @@ public class FieldOfView : MonoBehaviour
 
     private void InitFOVShader()
     {
+        if (fovQuad == null) return;
+
         maskMaterial.SetFloat("_InnerRadius", viewInnerRadius);
         maskMaterial.SetFloat("_OuterRadius", viewDistance);
         maskMaterial.SetFloat("_FOV", viewAngle);
@@ -93,10 +93,13 @@ public class FieldOfView : MonoBehaviour
         maskMaterial.SetVector("_PlayerForward", lookDir);
     }
 
-    private void OnDrawGizmosSelected()
+    public void SetViewAngle(float angle)
     {
-        Gizmos.color = new Color(0f, 1f, 0f, 0.25f); // ¿¬ÇÑ ÃÊ·Ï»ö ¹İÅõ¸í
-        Gizmos.DrawWireSphere(transform.position, viewDistance); // ¿Ü°û¼± ¿ø
-        Gizmos.DrawSphere(transform.position, viewInnerRadius);  // ³»ºÎ ±Ù°Å¸® °¨Áö ¿µ¿ª
+        viewAngle = angle;
+    }
+
+    public void SetFovQuad(Transform trans)
+    {
+        fovQuad = trans;
     }
 }
