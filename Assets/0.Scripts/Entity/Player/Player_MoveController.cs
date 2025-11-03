@@ -156,7 +156,7 @@ public sealed partial class Player_Controller
             playerAnimator.GetCurrentAnimatorStateInfo(0).IsName("Dodge") && 
             playerAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f
             );
-        yield return CoroutineManager.waitForSeconds(0.15f);
+        yield return CoroutineManager.waitForSeconds(0.1f);
 
         RemovePlayerBehaviorState(PlayerBehaviorState.IsDodge);
         AddPlayerBehaviorState(PlayerBehaviorState.IsCanMove);

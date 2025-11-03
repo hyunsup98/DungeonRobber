@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4297205086415685074}
   - component: {fileID: 7306967168355131109}
   - component: {fileID: 2402264559357363420}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: CrystalPiece
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -123,6 +123,10 @@ MonoBehaviour:
   pickupRange: 2
   rotationSpeed: 60
   autoRotate: 1
+  raycastLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  raycastDistance: 100
 --- !u!54 &2402264559357363420
 Rigidbody:
   m_ObjectHideFlags: 0

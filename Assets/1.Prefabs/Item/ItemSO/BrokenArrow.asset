@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cba473bc2e971f438252297b5a5b43f, type: 3}
+  m_Name: BrokenArrow
+  m_EditorClassIdentifier: 
+  itemName: "\uBD80\uB7EC\uC9C4 \uD654\uC0B4 "
+  description: "\uBD80\uB7EC\uC9C4 \uD654\uC0B4 \uBCBD\uC5D0 \uBC15\uD600\uC788\uC5C8\uB358
+    \uAE30\uAC04\uC774 \uC624\uB798\uB41C \uAC83 \uAC19\uB2E4. "
+  itemType: 3
+  buyPrice: 40
+  sellPrice: 20
+  itemImage: {fileID: 21300000, guid: ee50a49abc6ff3243ac5e6f3f068970a, type: 3}
+  itemPrefab: {fileID: 2939937718708288869, guid: e8cfd3dac6bb9f142926dd9915ac3d54, type: 3}
+  weaponType: 
+  useBuff: {fileID: 0}

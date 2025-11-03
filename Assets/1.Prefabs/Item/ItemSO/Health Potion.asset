@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cba473bc2e971f438252297b5a5b43f, type: 3}
+  m_Name: Health Potion
+  m_EditorClassIdentifier: 
+  itemName: "\uCCB4\uB825 \uD3EC\uC158"
+  description: "\uB9C8\uC2DC\uBA74 \uCCB4\uB825\uC744 \uD68C\uBCF5\uD558\uB294 \uBE68\uAC04
+    \uBB3C\uC57D."
+  itemType: 2
+  buyPrice: 100
+  sellPrice: 50
+  itemImage: {fileID: 21300000, guid: b7d19ec039fa7b141bd165aa95496c75, type: 3}
+  itemPrefab: {fileID: 7290317975778534051, guid: 1d014df1168051c46a127911467598b8, type: 3}
+  weaponType: 
+  useBuff: {fileID: -4079020208478183241, guid: 36596a7795f200c4b93fde143e7c4f4c, type: 3}

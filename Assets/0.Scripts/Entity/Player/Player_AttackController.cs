@@ -56,6 +56,18 @@ public sealed partial class Player_Controller
         }
     }
 
+    public void Revive()
+    {
+        if(CheckPlayerBehaviorState(PlayerBehaviorState.Dead))
+        {
+            playerAnimator.SetBool("alive", true);
+            AddPlayerBehaviorState(PlayerBehaviorState.Alive);
+            RemovePlayerBehaviorState(PlayerBehaviorState.Dead);
+            stats.InitStat(StatType.HP);
+            onPlayerStatChanged?.Invoke();
+        }
+    }
+
     private void Dead()
     {
         playerAnimator.SetBool("alive", false);

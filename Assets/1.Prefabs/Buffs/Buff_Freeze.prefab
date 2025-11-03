@@ -45,8 +45,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   statType: 1
-  amount: -5
-  duration: 5
+  amount: -2
+  duration: 1
   isTick: 0
   tickTime: 1
   isRestoreValue: 1

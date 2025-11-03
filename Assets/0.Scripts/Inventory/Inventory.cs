@@ -85,7 +85,9 @@ public class Inventory : MonoBehaviour
         
         InitializeSlots();
         HideInventory();
-        
+
+        GameManager.Instance.variationGoldAction += UpdateGoldText;
+
         // 초기 골드 UI 업데이트
         UpdateGoldText();
     }
@@ -334,6 +336,14 @@ public class Inventory : MonoBehaviour
         {
             int currentGold = GameManager.Instance != null ? GameManager.Instance.Gold : 0;
             goldText.text = $"Gold: {currentGold:N0}";
+        }
+    }
+
+    private void OnDisable()
+    {
+        if(GameManager.Instance != null)
+        {
+            GameManager.Instance.variationGoldAction -= UpdateGoldText;
         }
     }
 

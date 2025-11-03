@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4574614610846930250}
   - component: {fileID: -4087774402345926112}
   - component: {fileID: -381229422697491380}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Health Potion Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -124,6 +124,10 @@ MonoBehaviour:
   pickupRange: 5
   rotationSpeed: 60
   autoRotate: 1
+  raycastLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  raycastDistance: 100
 --- !u!108 &-4087774402345926112
 Light:
   m_ObjectHideFlags: 0

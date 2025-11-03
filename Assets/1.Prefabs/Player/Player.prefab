@@ -901,6 +901,7 @@ MonoBehaviour:
   runSpeed: 7.5
   dodgeForce: 15
   attackClip: {fileID: 8300000, guid: 486ca38b75e534f41855339d2ac5f4c4, type: 3}
+  hitClip: {fileID: 8300000, guid: 86e05bfa47c249c40ac15bb1a292141d, type: 3}
   attackMask:
     serializedVersion: 2
     m_Bits: 8
@@ -909,6 +910,11 @@ MonoBehaviour:
   staminaRecoveryDelay: 3
   staminaRecoverySpeed: 10
   <MaxStamina>k__BackingField: 100
+  inventory: {fileID: 0}
+  quickSlots: {fileID: 0}
+  itemController: {fileID: 0}
+  shop: {fileID: 0}
+  interactionRange: 3
 --- !u!114 &2465718992621701338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -923,7 +929,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   viewAngle: 90
   viewInnerRadius: 3
-  viewDistance: 22
+  viewDistance: 30
   offsetY: 0.5
   targetMask:
     serializedVersion: 2
@@ -942,7 +948,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5048565078041827740}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 46cb1a6fc7caef54d9bb695c6a4b3adc, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

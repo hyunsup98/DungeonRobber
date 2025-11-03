@@ -126,7 +126,7 @@ public sealed partial class Player_Controller : Entity
     private void Start()
     {
         playerDeadAction += Dead;
-        GameManager.Instance.onSceneChanged += Init;
+        GameManager.Instance.onSceneChanged += Revive;
     }
 
     private void Update()
@@ -134,6 +134,11 @@ public sealed partial class Player_Controller : Entity
         if (GameManager.Instance.CurrentGameState == GameState.Title) return;
         if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead)) return;
 
+
+        if(Input.GetKeyDown(KeyCode.F8))
+        {
+            GetDamage(5f);
+        }
 
         //공격
         if (Input.GetMouseButtonDown(0))
@@ -240,6 +245,11 @@ public sealed partial class Player_Controller : Entity
     protected override void Init()
     {
         base.Init();
+
+        if (CheckPlayerBehaviorState(PlayerBehaviorState.Dead))
+        {
+            Revive();
+        }
 
         if (runSpeed < stats.GetStat(StatType.MoveSpeed))
             runSpeed = stats.GetStat(StatType.MoveSpeed) * 1.5f;

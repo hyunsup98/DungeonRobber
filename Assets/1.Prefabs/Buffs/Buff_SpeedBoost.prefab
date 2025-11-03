@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   statType: 1
-  amount: 10
+  amount: 3
   duration: 10
   isTick: 0
   tickTime: 0

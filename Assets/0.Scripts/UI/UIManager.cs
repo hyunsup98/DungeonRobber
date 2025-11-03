@@ -36,6 +36,18 @@ public class UIManager : Singleton<UIManager>
         //플레이어 스탯과 스탯 UI를 이어주는 Presenter 클래스 생성, 플레이어가 생길 때 만들기
         presenter_PlayerStat = new Presenter_PlayerStat(Player_Controller.Instance, playerStat);
         presenter_Settings = new Presenter_Settings(SoundManager.Instance, settings);
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.onGameStateTitle += UpdateUIByTitleScene;
+            GameManager.Instance.onGameStateBase += UpdateUIByBaseScene;
+            GameManager.Instance.onGameStateDungeon += UpdateUIByDungeonScene;
+        }
+
+        if (Player_Controller.Instance != null)
+        {
+            Player_Controller.Instance.playerDeadAction += OnDeadMenu;
+        }
     }
 
     private void Update()
@@ -77,6 +89,7 @@ public class UIManager : Singleton<UIManager>
     {
         OnOffUI(playerStat.gameObject, false);
         OnOffUI(quickSlot.gameObject, false);
+        OnOffUI(deadMenu.gameObject, false);
     }
 
     //베이스 씬으로 이동할 때 키고 꺼줄 UI
@@ -84,6 +97,7 @@ public class UIManager : Singleton<UIManager>
     {
         OnOffUI(playerStat.gameObject, true);
         OnOffUI(quickSlot.gameObject, true);
+        OnOffUI(deadMenu.gameObject, false);
     }
 
     //던전 씬으로 이동할 때 키고 꺼줄 UI
@@ -93,30 +107,8 @@ public class UIManager : Singleton<UIManager>
         OnOffUI(quickSlot.gameObject, true);
     }
 
-    private void OnEnable()
-    {
-        if(GameManager.Instance != null)
-        {
-            GameManager.Instance.onGameStateTitle += UpdateUIByTitleScene;
-            GameManager.Instance.onGameStateBase += UpdateUIByBaseScene;
-            GameManager.Instance.onGameStateDungeon += UpdateUIByDungeonScene;
-        }
-
-        if (Player_Controller.Instance != null)
-        {
-            Player_Controller.Instance.playerDeadAction += OnDeadMenu;
-        }
-    }
-
     private void OnDisable()
     {
-        if(GameManager.Instance != null)
-        {
-            GameManager.Instance.onGameStateTitle -= UpdateUIByTitleScene;
-            GameManager.Instance.onGameStateBase -= UpdateUIByBaseScene;
-            GameManager.Instance.onGameStateDungeon -= UpdateUIByDungeonScene;
-        }
-
         if (Player_Controller.Instance != null)
         {
             Player_Controller.Instance.playerDeadAction -= OnDeadMenu;

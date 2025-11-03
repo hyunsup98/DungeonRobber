@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 6548439433233231288}
   - component: {fileID: -7076957047800646647}
   - component: {fileID: 2813559390118610817}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Book_Evil_Open
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -196,3 +196,7 @@ MonoBehaviour:
   pickupRange: 1
   rotationSpeed: 60
   autoRotate: 1
+  raycastLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  raycastDistance: 100

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5801145817949712890}
   - component: {fileID: 3151398428567427587}
   - component: {fileID: 773410106139648536}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Pot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -151,3 +151,7 @@ MonoBehaviour:
   pickupRange: 2
   rotationSpeed: 60
   autoRotate: 1
+  raycastLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  raycastDistance: 100

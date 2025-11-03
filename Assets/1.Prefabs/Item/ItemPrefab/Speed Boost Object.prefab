@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 483762712068268313}
   - component: {fileID: 5540015935281676611}
   - component: {fileID: -104822006584065396}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Speed Boost Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,6 +101,10 @@ MonoBehaviour:
   pickupRange: 5
   rotationSpeed: 60
   autoRotate: 1
+  raycastLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  raycastDistance: 100
 --- !u!65 &-104822006584065396
 BoxCollider:
   m_ObjectHideFlags: 0

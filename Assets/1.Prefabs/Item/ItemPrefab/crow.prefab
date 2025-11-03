@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7204393675580121419}
   - component: {fileID: 4032827422124242408}
   - component: {fileID: 8835485597897232799}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: crow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -151,3 +151,7 @@ MonoBehaviour:
   pickupRange: 2
   rotationSpeed: 60
   autoRotate: 1
+  raycastLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  raycastDistance: 100

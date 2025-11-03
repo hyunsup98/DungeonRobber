@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7925643808815538524}
   - component: {fileID: 928173667279391797}
   - component: {fileID: 8488408155874705839}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -99,6 +99,10 @@ MonoBehaviour:
   pickupRange: 2
   rotationSpeed: 60
   autoRotate: 1
+  raycastLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  raycastDistance: 100
 --- !u!1001 &8146824695263205803
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -150,6 +154,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 118337ea94081934a8908bbc42ad35c3, type: 3}
       propertyPath: m_Name
       value: Skeleton_Arrow
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 118337ea94081934a8908bbc42ad35c3, type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

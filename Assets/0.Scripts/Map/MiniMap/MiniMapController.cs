@@ -104,6 +104,10 @@ public class MiniMapController : MonoBehaviour
         SyncMarkersToZones();
         RefreshAllStates();
         ToggleOpen(false);
+        if(Player_Controller.Instance != null)
+        {
+            _playerTransform = Player_Controller.Instance.transform;
+        }
     }
 
 

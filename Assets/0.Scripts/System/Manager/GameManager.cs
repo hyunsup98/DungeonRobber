@@ -41,6 +41,7 @@ public class GameManager : Singleton<GameManager>
                 onGameStateDungeon?.Invoke();
             }
 
+            onSceneChanged?.Invoke();
             currentGameState = value;
         }
     }
@@ -55,6 +56,7 @@ public class GameManager : Singleton<GameManager>
     public int ViewAngleLevel { get; private set; } = 0;
     #endregion
 
+    public event Action variationGoldAction;        //골드가 변했을 때 할 이벤트 액션
     private int gold = 0;       //플레이어 소지 골드
     public int Gold
     {
@@ -67,6 +69,7 @@ public class GameManager : Singleton<GameManager>
             }
 
             gold = value;
+            variationGoldAction?.Invoke();
         }
     }
 
