@@ -289,6 +289,14 @@ public class InventoryContextMenu : MonoBehaviour
     {
         if (item == null || shopRef == null) return;
         
+        // Shop의 playerInventory가 없으면 전달받은 Inventory를 설정
+        if (invRef != null)
+        {
+            // Shop 클래스에 직접 접근할 수 없으므로, Shop의 SellItem이 자동으로 찾도록 함
+            // 또는 Inventory를 매개변수로 받는 SellItem 오버로드를 만들 수도 있지만,
+            // 현재는 SellItem이 FindObjectOfType으로 찾도록 수정했으므로 괜찮음
+        }
+        
         shopRef.SellItem(item, quantity);
         Debug.Log($"'{item.itemName}' {quantity}개 판매 완료!");
     }

@@ -14,11 +14,14 @@ public class TreasureChest : MonoBehaviour
     [Tooltip("아이템이 튀어나가는 간격 (초)")]
     [SerializeField] private float spawnInterval = 0.5f;
     
-    [Tooltip("아이템이 튀어나가는 힘")]
-    [SerializeField] private float ejectForce = 5f;
+    [Tooltip("아이템이 튀어나가는 힘 (작을수록 조용히 떨어짐)")]
+    [SerializeField] private float ejectForce = 1.5f;
     
-    [Tooltip("아이템이 튀어나가는 높이")]
-    [SerializeField] private float ejectHeight = 2f;
+    [Tooltip("아이템이 튀어나가는 높이 (작을수록 조용히 떨어짐)")]
+    [SerializeField] private float ejectHeight = 0.5f;
+    
+    [Tooltip("아이템이 상자 주변에 떨어지는 최대 반경")]
+    [SerializeField] private float ejectRadius = 1.5f;
     
     [Tooltip("상호작용 가능 거리")]
     [SerializeField] private float interactionRange = 3f;
@@ -86,11 +89,11 @@ public class TreasureChest : MonoBehaviour
         mesh.transform.localPosition = Vector3.zero;
         mesh.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         
-        // 콜라이더는 유지 (레이캐스트로 줍기 위해 필요)
+        // 콜라이더 설정
         Collider collider = mesh.GetComponent<Collider>();
         if (collider != null)
         {
-            collider.isTrigger = false; // 물리 상호작용을 위해 false
+            collider.isTrigger = false; // 물리 충돌 허용
         }
         
         // 빛나는 Material 설정
@@ -138,8 +141,8 @@ public class TreasureChest : MonoBehaviour
         Light light = itemObj.AddComponent<Light>();
         light.type = LightType.Point;
         light.color = new Color(1f, 0.8f, 0.3f, 1f); // 황금색
-        light.range = 3f; // 작은 범위
-        light.intensity = 1.5f;
+        light.range = 5f; // 더 넓은 범위로 퍼지게
+        light.intensity = 0.8f; // 덜 밝게
         light.shadows = LightShadows.None; // 성능을 위해 그림자 없음
     }
     
@@ -179,18 +182,32 @@ public class TreasureChest : MonoBehaviour
             
             // GroundItem 생성 (상자 위치의 약간 위에서)
             Vector3 spawnPosition = transform.position + Vector3.up * 2f;
-            GameObject groundItemObj = Instantiate(groundItemPrefab, spawnPosition, Quaternion.identity);
-            groundItemObj.SetActive(true);
+            GameObject groundItemObj = CreateGroundItemFromItem(item, spawnPosition);
+            
+            if (groundItemObj == null)
+            {
+                Debug.LogError($"TreasureChest: '{item.itemName}' 아이템의 GroundItem을 생성할 수 없습니다.");
+                continue;
+            }
             
             // GroundItem 컴포넌트 설정
             GroundItem groundItem = groundItemObj.GetComponent<GroundItem>();
+            if (groundItem == null)
+            {
+                // GroundItem 컴포넌트가 없으면 추가
+                groundItem = groundItemObj.AddComponent<GroundItem>();
+                Debug.Log("TreasureChest: GroundItem 컴포넌트를 추가했습니다.");
+            }
+            
+            // 아이템 데이터 설정
             if (groundItem != null)
             {
                 groundItem.item = item;
+                Debug.Log($"TreasureChest: GroundItem에 아이템 '{item.itemName}' 설정 완료");
             }
             else
             {
-                Debug.LogWarning("TreasureChest: GroundItem 컴포넌트를 찾을 수 없습니다.");
+                Debug.LogError("TreasureChest: GroundItem 컴포넌트를 추가할 수 없습니다!");
             }
             
             // 빛나는 효과 확인 및 추가 (프리팹에 없을 경우)
@@ -236,6 +253,75 @@ public class TreasureChest : MonoBehaviour
         }
         
         return selected;
+    }
+    
+    /// <summary>
+    /// 아이템 정보를 사용해서 GroundItem 오브젝트를 생성합니다.
+    /// </summary>
+    /// <param name="item">아이템 데이터</param>
+    /// <param name="spawnPosition">스폰 위치</param>
+    /// <returns>생성된 GroundItem GameObject</returns>
+    private GameObject CreateGroundItemFromItem(Item item, Vector3 spawnPosition)
+    {
+        GameObject groundItemObj = null;
+        
+        // 1순위: itemPrefab이 있으면 그것을 사용
+        if (item.itemPrefab != null)
+        {
+            groundItemObj = Instantiate(item.itemPrefab, spawnPosition, Quaternion.identity);
+            groundItemObj.name = $"GroundItem_{item.itemName}";
+            Debug.Log($"TreasureChest: '{item.itemName}' - itemPrefab 사용");
+        }
+        // 2순위: itemImage가 있으면 Quad에 이미지 적용
+        else if (item.itemImage != null)
+        {
+            groundItemObj = new GameObject($"GroundItem_{item.itemName}");
+            groundItemObj.transform.position = spawnPosition;
+            
+            // Quad 생성 (이미지를 표시하기 위해)
+            GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            quad.transform.SetParent(groundItemObj.transform);
+            quad.transform.localPosition = Vector3.zero;
+            quad.transform.localRotation = Quaternion.Euler(90, 0, 0); // 바닥에 누워있게
+            quad.transform.localScale = Vector3.one * 0.5f; // 적당한 크기
+            
+            // Collider 설정
+            Collider collider = quad.GetComponent<Collider>();
+            if (collider != null)
+            {
+                collider.isTrigger = false; // 물리 충돌 허용
+            }
+            
+            // Material 설정 (아이템 이미지 적용)
+            Renderer renderer = quad.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                Material mat = new Material(Shader.Find("Standard"));
+                mat.mainTexture = item.itemImage.texture;
+                mat.SetTexture("_MainTex", item.itemImage.texture);
+                renderer.material = mat;
+            }
+            
+            Debug.Log($"TreasureChest: '{item.itemName}' - itemImage를 Quad에 적용");
+        }
+        // 3순위: 기본 프리팹 사용 (둘 다 없을 경우)
+        else
+        {
+            if (groundItemPrefab != null)
+            {
+                groundItemObj = Instantiate(groundItemPrefab, spawnPosition, Quaternion.identity);
+                groundItemObj.name = $"GroundItem_{item.itemName}";
+                Debug.Log($"TreasureChest: '{item.itemName}' - 기본 프리팹 사용 (아이템 이미지/프리팹 없음)");
+            }
+            else
+            {
+                Debug.LogWarning($"TreasureChest: '{item.itemName}' - 아이템 프리팹과 이미지가 모두 없습니다. 기본 프리팹도 없습니다.");
+                return null;
+            }
+        }
+        
+        groundItemObj.SetActive(true);
+        return groundItemObj;
     }
     
     /// <summary>
@@ -286,6 +372,8 @@ public class TreasureChest : MonoBehaviour
             rb.mass = 0.1f; // 가벼운 질량
             Debug.Log("TreasureChest: GroundItem에 Rigidbody를 추가했습니다.");
         }
+        
+        // Collider는 물리 충돌 허용 (Trigger 설정하지 않음)
     }
     
     /// <summary>
@@ -300,18 +388,35 @@ public class TreasureChest : MonoBehaviour
             return;
         }
         
-        // 랜덤 방향 계산 (수평면 기준)
-        Vector2 randomDir2D = Random.insideUnitCircle.normalized;
-        Vector3 randomDirection = new Vector3(randomDir2D.x, ejectHeight, randomDir2D.y);
+        // 상자 중심에서 랜덤 위치 계산 (수평면 원 내부, 더 가깝게)
+        Vector2 randomOffset2D = Random.insideUnitCircle * ejectRadius;
+        Vector3 targetPosition = transform.position + new Vector3(randomOffset2D.x, 0, randomOffset2D.y);
+        
+        // 상자에서 목표 위치까지의 거리 계산
+        float distanceToTarget = Vector3.Distance(transform.position, targetPosition);
+        
+        // 거리가 너무 멀면 조정 (최대 반경을 넘지 않도록)
+        if (distanceToTarget > ejectRadius)
+        {
+            targetPosition = transform.position + (targetPosition - transform.position).normalized * ejectRadius;
+        }
+        
+        // 상자에서 목표 위치까지의 방향 (약간 위로, 거리에 비례하여 힘 조정)
+        Vector3 direction = (targetPosition - transform.position);
+        direction.y = ejectHeight; // 위쪽 힘은 일정하게
+        
+        // 거리가 가까울수록 힘을 줄여서 더 가깝게 떨어지도록
+        float distanceFactor = Mathf.Clamp01(distanceToTarget / ejectRadius);
+        float adjustedForce = ejectForce * (0.7f + 0.3f * distanceFactor); // 최소 70% ~ 최대 100%
         
         // 힘 적용
-        rb.AddForce(randomDirection * ejectForce, ForceMode.Impulse);
+        rb.AddForce(direction.normalized * adjustedForce, ForceMode.Impulse);
         
-        // 랜덤 회전 추가
+        // 약간의 랜덤 회전 추가 (너무 많이 회전하지 않도록)
         Vector3 randomTorque = new Vector3(
-            Random.Range(-10f, 10f),
-            Random.Range(-10f, 10f),
-            Random.Range(-10f, 10f)
+            Random.Range(-5f, 5f),
+            Random.Range(-5f, 5f),
+            Random.Range(-5f, 5f)
         );
         rb.AddTorque(randomTorque, ForceMode.Impulse);
     }

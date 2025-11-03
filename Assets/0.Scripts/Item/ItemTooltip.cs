@@ -19,6 +19,7 @@ public class ItemTooltip : MonoBehaviour
 
     private Canvas parentCanvas;
     private RectTransform canvasRect;
+    private bool isShowing = false;
 
     void Awake()
     {
@@ -47,6 +48,15 @@ public class ItemTooltip : MonoBehaviour
         
         if (itemNameText == null)
             itemNameText = GetComponentInChildren<TextMeshProUGUI>();
+    }
+    
+    void Update()
+    {
+        // 툴팁이 표시 중일 때 마우스 위치로 계속 업데이트
+        if (isShowing && tooltipRoot != null && tooltipRoot.gameObject.activeSelf)
+        {
+            UpdatePosition(Input.mousePosition);
+        }
     }
 
     /// <summary>
@@ -119,6 +129,7 @@ public class ItemTooltip : MonoBehaviour
 
         // 툴팁 표시
         tooltipRoot.gameObject.SetActive(true);
+        isShowing = true;
     }
 
     /// <summary>
@@ -128,37 +139,78 @@ public class ItemTooltip : MonoBehaviour
     {
         if (tooltipRoot != null)
             tooltipRoot.gameObject.SetActive(false);
+        isShowing = false;
+    }
+    
+    /// <summary>
+    /// 툴팁 위치만 업데이트합니다.
+    /// </summary>
+    /// <param name="screenPosition">마우스 위치</param>
+    public void UpdatePosition(Vector2 screenPosition)
+    {
+        if (tooltipRoot != null && tooltipRoot.gameObject.activeSelf)
+        {
+            SetTooltipPosition(screenPosition);
+        }
     }
 
     /// <summary>
-    /// 툴팁 위치를 설정합니다. (스크린 좌표를 RectTransform 로컬 좌표로 변환)
+    /// 툴팁 위치를 설정합니다.
     /// </summary>
     private void SetTooltipPosition(Vector2 screenPosition)
     {
-        if (tooltipRoot == null || canvasRect == null || parentCanvas == null)
-            return;
+        if (tooltipRoot == null)
+        {
+            tooltipRoot = GetComponent<RectTransform>();
+            if (tooltipRoot == null)
+                return;
+        }
+
+        if (canvasRect == null || parentCanvas == null)
+        {
+            parentCanvas = GetComponentInParent<Canvas>();
+            if (parentCanvas != null)
+                canvasRect = parentCanvas.GetComponent<RectTransform>();
+            
+            if (canvasRect == null || parentCanvas == null)
+                return;
+        }
 
         Vector2 localPoint;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+        Camera cam = parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : 
+                     (parentCanvas.renderMode == RenderMode.ScreenSpaceCamera ? parentCanvas.worldCamera : null);
+        
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvasRect,
             screenPosition,
-            parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : parentCanvas.worldCamera,
-            out localPoint
-        );
+            cam,
+            out localPoint))
+        {
+            // 좌표 변환 실패 시 스킵
+            return;
+        }
 
         // 마우스 위치에 표시하되, 화면 밖으로 나가지 않도록 조정
-        Vector2 offset = new Vector2(10, -10); // 마우스에서 약간 오프셋
+        Vector2 offset = new Vector2(15, -15); // 마우스에서 약간 오프셋
         localPoint += offset;
 
         // 화면 경계 체크 및 조정
+        // 레이아웃 업데이트로 정확한 크기 계산
+        Canvas.ForceUpdateCanvases();
+        UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRoot);
+        
         Rect tooltipRect = tooltipRoot.rect;
         Rect canvasRectBounds = canvasRect.rect;
 
-        if (localPoint.x + tooltipRect.width > canvasRectBounds.xMax)
-            localPoint.x = canvasRectBounds.xMax - tooltipRect.width;
-        
-        if (localPoint.y - tooltipRect.height < canvasRectBounds.yMin)
-            localPoint.y = canvasRectBounds.yMin + tooltipRect.height;
+        // Canvas 크기 기준으로 경계 계산
+        float maxX = canvasRectBounds.xMax - tooltipRect.width;
+        float minX = canvasRectBounds.xMin;
+        float maxY = canvasRectBounds.yMax;
+        float minY = canvasRectBounds.yMin + tooltipRect.height;
+
+        // 경계 제한
+        localPoint.x = Mathf.Clamp(localPoint.x, minX, maxX);
+        localPoint.y = Mathf.Clamp(localPoint.y, minY, maxY);
 
         tooltipRoot.anchoredPosition = localPoint;
     }

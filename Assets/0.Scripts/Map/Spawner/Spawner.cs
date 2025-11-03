@@ -82,34 +82,71 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
     //모든 태그 그룹 스폰
     private void SpawnAllTags()
     {
-        foreach (var tagGroup in _tagGroups)
+        Debug.Log($"Spawner: SpawnAllTags 시작 - 총 태그 그룹 수: {_tagGroups.Count}");
+        
+        for (int i = 0; i < _tagGroups.Count; i++)
         {
-            if (tagGroup != null)
+            var tagGroup = _tagGroups[i];
+            if (tagGroup == null)
             {
-                if (tagGroup.enable == true)
-                {
-                    SpawnTagGroup(tagGroup);
-                }
+                Debug.LogWarning($"Spawner: 태그 그룹 [{i}]이 null입니다!");
+                continue;
+            }
+            
+            Debug.Log($"Spawner: 태그 그룹 [{i}] 확인 - Tag: {tagGroup.tag}, Enable: {tagGroup.enable}, CreateCount: {tagGroup.createCount}");
+            
+            if (tagGroup.enable == true)
+            {
+                Debug.Log($"Spawner: [{tagGroup.tag}] 그룹 스폰 시작!");
+                SpawnTagGroup(tagGroup);
+            }
+            else
+            {
+                Debug.Log($"Spawner: [{tagGroup.tag}] 그룹이 비활성화되어 있습니다.");
             }
         }
+        
+        Debug.Log($"Spawner: SpawnAllTags 완료");
     }
 
 
     //태그 그룹별 스폰
     private void SpawnTagGroup(TagSpawnSetting group)
     {
+        Debug.Log($"Spawner: [{group.tag}] SpawnTagGroup 호출됨");
+        
         if (group.spawnPrefabs == null)
         {
+            Debug.LogError($"Spawner: [{group.tag}] spawnPrefabs 리스트가 null입니다!");
             return;
         }
 
         if (group.spawnPrefabs.Count == 0)
         {
+            Debug.LogError($"Spawner: [{group.tag}] spawnPrefabs 리스트가 비어있습니다!");
+            return;
+        }
+
+        Debug.Log($"Spawner: [{group.tag}] 프리팹 후보 수: {group.spawnPrefabs.Count}");
+        
+        // 프리팹 null 체크
+        int validPrefabs = 0;
+        foreach (var spawnData in group.spawnPrefabs)
+        {
+            if (spawnData != null && spawnData.mapPrefab != null)
+            {
+                validPrefabs++;
+            }
+        }
+        Debug.Log($"Spawner: [{group.tag}] 유효한 프리팹 수: {validPrefabs}/{group.spawnPrefabs.Count}");
+        
+        if (validPrefabs == 0)
+        {
+            Debug.LogError($"Spawner: [{group.tag}] 유효한 프리팹이 없습니다!");
             return;
         }
 
         int spawnCount = group.createCount;
-
 
         //일부만 생성될 확률 적용
         if (Random.value > _spawnCountChance)
@@ -117,6 +154,18 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
             spawnCount = Random.Range((int)(group.createCount * 0.5f), group.createCount);
         }
 
+        Debug.Log($"Spawner: [{group.tag}] 최종 생성 개수: {spawnCount}, usePreplacedPoints: {group.usePreplacedPoints}");
+        
+        // 랜덤 스폰인지 확인
+        if (group.usePreplacedPoints == false)
+        {
+            Debug.Log($"Spawner: [{group.tag}] 랜덤 영역 스폰 모드 (몬스터와 동일한 방식) - {spawnCount}번 반복");
+            Debug.Log($"Spawner: [{group.tag}] 스폰 설정 - mapSize: {_mapSpawnSize}, minDistance: {group.minSpawnDistance}, spawnHeight: {group.spawnHeight}");
+        }
+        else
+        {
+            Debug.LogWarning($"Spawner: [{group.tag}] 설치된 스폰 포인트 사용 모드 (랜덤 스폰이 아님!) - 포인트 수: {group.installedSpawnPoints?.Count ?? 0}");
+        }
 
         //포인트 스폰 분기
         if (group.usePreplacedPoints == true)
@@ -127,6 +176,7 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
         {
             for (int i = 0; i < spawnCount; i++)
             {
+                Debug.Log($"Spawner: [{group.tag}] 스폰 시도 {i + 1}/{spawnCount}");
                 SpawnObjectByTag(group);
             }
         }
@@ -201,8 +251,22 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
 
 
             //생성
-            GameObject instance = Instantiate(spawnData.mapPrefab, pos, Quaternion.identity);
+            GameObject instance = null;
+            try
+            {
+                instance = Instantiate(spawnData.mapPrefab, pos, Quaternion.identity);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Spawner: {group.tag} - 프리팹 인스턴스화 실패: {e.Message}\n프리팹: {spawnData.mapPrefab.name}");
+                continue;
+            }
 
+            if (instance == null)
+            {
+                Debug.LogError($"Spawner: {group.tag} - 프리팹 인스턴스화 결과가 null입니다. 프리팹: {spawnData.mapPrefab.name}");
+                continue;
+            }
 
             //기록
             _spawnedPositions.Add(pos);
@@ -268,9 +332,12 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
     //랜덤 영역 스폰
     private void SpawnObjectByTag(TagSpawnSetting group, bool useTag = true)
     {
+        Debug.Log($"Spawner: [{group.tag}] SpawnObjectByTag 시작 - groundLayer: {_groundLayer.value}, mapSize: {_mapSpawnSize}, minDistance: {group.minSpawnDistance}, spawnHeight: {group.spawnHeight}");
 
         List<Vector3> candidatePositions = new List<Vector3>();
         int maxAttempts = 100;
+        int raycastHits = 0;
+        int tooCloseCount = 0;
 
 
         //랜덤 후보 수집
@@ -287,6 +354,7 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
             //지면 히트
             if (Physics.Raycast(spawnPos, Vector3.down, out RaycastHit hit, _raycastHeight * 2f, _groundLayer))
             {
+                raycastHits++;
                 Vector3 groundPos = hit.point;
                 bool tooClose = false;
 
@@ -297,6 +365,7 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
                     if (Vector3.Distance(groundPos, pos) < group.minSpawnDistance)
                     {
                         tooClose = true;
+                        tooCloseCount++;
                         break;
                     }
                 }
@@ -308,10 +377,12 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
             }
         }
 
+        Debug.Log($"Spawner: [{group.tag}] 후보 탐색 완료 - 레이캐스트 성공: {raycastHits}/{maxAttempts}, 너무 가까움: {tooCloseCount}, 유효 후보: {candidatePositions.Count}");
 
         //후보 없음
         if (candidatePositions.Count == 0)
         {
+            Debug.LogWarning($"Spawner: [{group.tag}] 적절한 스폰 위치를 찾을 수 없습니다! (현재 스폰된 위치: {_spawnedPositions.Count}개)");
             return;
         }
 
@@ -326,18 +397,37 @@ public class Spawner : MonoBehaviour, IRespawnNotifier
 
         if (spawnData == null)
         {
+            Debug.LogError($"Spawner: [{group.tag}] 프리팹 선택 실패 - spawnData가 null");
             return;
         }
 
         if (spawnData.mapPrefab == null)
         {
+            Debug.LogError($"Spawner: [{group.tag}] 프리팹이 null입니다!");
             return;
         }
 
+        Debug.Log($"Spawner: [{group.tag}] 프리팹 선택 성공 - {spawnData.mapPrefab.name}, 위치: {finalPos}");
 
         //생성
-        GameObject instance = Instantiate(spawnData.mapPrefab, finalPos, Quaternion.identity);
+        GameObject instance = null;
+        try
+        {
+            instance = Instantiate(spawnData.mapPrefab, finalPos, Quaternion.identity);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Spawner: [{group.tag}] 프리팹 인스턴스화 실패: {e.Message}\n프리팹: {spawnData.mapPrefab.name}\n스택: {e.StackTrace}");
+            return;
+        }
 
+        if (instance == null)
+        {
+            Debug.LogError($"Spawner: [{group.tag}] 프리팹 인스턴스화 결과가 null입니다! 프리팹: {spawnData.mapPrefab.name}");
+            return;
+        }
+
+        Debug.Log($"Spawner: [{group.tag}] 스폰 성공! - {spawnData.mapPrefab.name} at {finalPos}");
 
         //기록
         _spawnedPositions.Add(finalPos);

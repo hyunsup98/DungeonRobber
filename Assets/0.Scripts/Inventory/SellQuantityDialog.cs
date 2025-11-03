@@ -65,6 +65,15 @@ public class SellQuantityDialog : MonoBehaviour
 
         if (dialogRoot != null)
         {
+            // 최상단에 표시하기 위해 Transform 순서를 마지막으로 이동
+            dialogRoot.SetAsLastSibling();
+            
+            // Canvas의 sorting order를 높여서 최상단에 표시
+            if (parentCanvas != null)
+            {
+                parentCanvas.sortingOrder = 1000; // 높은 값으로 설정하여 최상단에 표시
+            }
+            
             dialogRoot.gameObject.SetActive(true);
             SetPosition(screenPosition);
         }

@@ -9,7 +9,7 @@ public class GroundItem : MonoBehaviour
     public Item item;
 
     [Header("설정")]
-    [SerializeField] private float pickupRange = 2f;
+    [SerializeField] private float pickupRange = 5f; // 줍기 가능 거리
     public float PickupRange => pickupRange; // 외부 접근을 위해 프로퍼티 추가
     [SerializeField] private float rotationSpeed = 60f;
     [SerializeField] private bool autoRotate = true;
@@ -79,7 +79,7 @@ public class GroundItem : MonoBehaviour
             }
         }
 
-        // 상태가 변경되었을 때만 툴팁 업데이트
+        // 상태가 변경되었을 때만 툴팁 표시/숨김
         if (currentlyMouseOver != isMouseOver)
         {
             isMouseOver = currentlyMouseOver;
@@ -89,14 +89,24 @@ public class GroundItem : MonoBehaviour
             {
                 if (isMouseOver)
                 {
-                    // 3D 위치를 스크린 좌표로 변환
-                    Vector3 screenPos = mainCamera.WorldToScreenPoint(transform.position);
-                    tooltip.Show(item, screenPos);
+                    // 마우스 위치로 툴팁 표시
+                    tooltip.Show(item, Input.mousePosition);
                 }
                 else
                 {
                     tooltip.Hide();
                 }
+            }
+        }
+        
+        // 마우스 오버 중일 때는 마우스 위치로 툴팁을 계속 업데이트
+        if (isMouseOver)
+        {
+            ItemTooltip tooltip = ItemTooltip.GetOrFind();
+            if (tooltip != null)
+            {
+                // 마우스 위치를 실시간으로 업데이트
+                tooltip.UpdatePosition(Input.mousePosition);
             }
         }
     }

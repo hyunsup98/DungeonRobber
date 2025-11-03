@@ -289,8 +289,8 @@ public class TestPlayer : Entity
         // 소비형 아이템 처리
         if (item.itemType == Item.ItemType.Consumable)
         {
-            // 빙결 수류탄 특별 처리
-            if (item.itemName == "빙결 수류탄")
+            // 아이스볼 특별 처리
+            if (item.itemName == "아이스볼")
             {
                 ThrowFreezeGrenade(item, slotIndex);
                 return;
@@ -350,7 +350,7 @@ public class TestPlayer : Entity
     }
 
     /// <summary>
-    /// 빙결 수류탄 던지기
+    /// 아이스볼 던지기
     /// </summary>
     private void ThrowFreezeGrenade(Item item, int slotIndex)
     {
@@ -376,14 +376,14 @@ public class TestPlayer : Entity
                     {
                         enemy.ApplyBuffToEntity(item.useBuff);
                         hitEnemy = true;
-                        Debug.Log($"'{enemy.name}'에게 빙결 수류탄이 맞았습니다!");
+                        Debug.Log($"'{enemy.name}'에게 아이스볼이 맞았습니다!");
                     }
                 }
             }
 
             if (!hitEnemy)
             {
-                Debug.Log("빙결 수류탄이 적에게 맞지 않았습니다.");
+                Debug.Log("아이스볼이 적에게 맞지 않았습니다.");
             }
 
             // 인벤토리 수량 감소

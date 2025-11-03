@@ -64,8 +64,8 @@ public class Item_Controller : MonoBehaviour
         // 소비형 아이템 처리
         if (item.itemType == Item.ItemType.Consumable)
         {
-            // 빙결 수류탄 특별 처리
-            if (item.itemName == "빙결 수류탄")
+            // 아이스볼 특별 처리
+            if (item.itemName == "아이스볼")
             {
                 ThrowFreezeGrenade(item, slotIndex);
                 return;
@@ -122,7 +122,7 @@ public class Item_Controller : MonoBehaviour
     }
 
     /// <summary>
-    /// 빙결 수류탄 던지기
+    /// 아이스볼 던지기
     /// </summary>
     private void ThrowFreezeGrenade(Item item, int slotIndex)
     {
@@ -148,14 +148,14 @@ public class Item_Controller : MonoBehaviour
                     {
                         enemy.ApplyBuffToEntity(item.useBuff);
                         hitEnemy = true;
-                        Debug.Log($"'{enemy.name}'에게 빙결 수류탄이 맞았습니다!");
+                        Debug.Log($"'{enemy.name}'에게 아이스볼맞았습니다!");
                     }
                 }
             }
 
             if (!hitEnemy)
             {
-                Debug.Log("빙결 수류탄이 적에게 맞지 않았습니다.");
+                Debug.Log("아이스볼이 적에게 맞지 않았습니다.");
             }
 
             // 인벤토리 수량 감소
@@ -207,32 +207,42 @@ public class Item_Controller : MonoBehaviour
         // UI 위에 마우스가 있는지 확인 (UI 클릭은 무시)
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
         {
-            // UI 위에 마우스가 있으면 아이템 줍기 무시
             return;
         }
         
-        // 카메라에서 마우스 위치로 레이캐스트 (모든 오브젝트 검사)
-        Ray ray = mainCamera != null ? mainCamera.ScreenPointToRay(Input.mousePosition) : Camera.main.ScreenPointToRay(Input.mousePosition);
+        Camera cam = mainCamera != null ? mainCamera : Camera.main;
+        if (cam == null)
+        {
+            Debug.LogWarning("Item_Controller: 카메라를 찾을 수 없습니다.");
+            return;
+        }
+        
+        // 카메라에서 마우스 위치로 레이 생성
+        Ray cameraRay = cam.ScreenPointToRay(Input.mousePosition);
+        
+        // 플레이어 위치에서 마우스가 가리키는 방향으로 레이캐스트
+        // 카메라 레이의 방향을 사용하되, 시작점은 플레이어 위치
+        Vector3 rayDirection = cameraRay.direction;
+        Vector3 rayOrigin = playerPosition + Vector3.up * 0.5f; // 플레이어 위치에서 약간 위에서 시작 (눈 높이)
+        
+        Ray ray = new Ray(rayOrigin, rayDirection);
         UnityEngine.RaycastHit[] hits = Physics.RaycastAll(ray, pickupRaycastDistance, itemLayerMask);
 
         // 모든 레이캐스트 결과 중 GroundItem 찾기
         foreach (var hit in hits)
         {
-            // GroundItem 찾기 (자식 오브젝트의 Collider에서 부모로 올라가며 찾기)
             GroundItem groundItem = hit.collider.GetComponent<GroundItem>();
             
-            // 부모 오브젝트에서 찾기 (자식 mesh의 Collider를 맞췄을 경우)
             if (groundItem == null)
             {
                 groundItem = hit.collider.GetComponentInParent<GroundItem>();
             }
             
-            // GroundItem을 찾았으면 처리하고 종료
             if (groundItem != null)
             {
-                // 줍기 가능한 거리인지 확인
                 float distance = Vector3.Distance(groundItem.transform.position, playerPosition);
-                if (groundItem.CanPickup(playerPosition))
+                
+                if (groundItem.CanPickup(playerPosition) || distance <= pickupRaycastDistance)
                 {
                     Item pickedItem = groundItem.Pickup();
                     
@@ -240,26 +250,77 @@ public class Item_Controller : MonoBehaviour
                     {
                         if (inventory.AddItem(pickedItem))
                         {
-                            Debug.Log($"'{pickedItem.itemName}' 아이템을 획득했습니다! (거리: {distance:F2}m)");
+                            Debug.Log($"'{pickedItem.itemName}' 아이템을 획득했습니다!");
                         }
                         else
                         {
                             Debug.LogWarning("인벤토리가 가득 찼습니다.");
-                            // 아이템 다시 활성화
                             groundItem.gameObject.SetActive(true);
                         }
                     }
-                    else if (pickedItem == null)
-                    {
-                        Debug.LogWarning("아이템 데이터가 없습니다.");
-                    }
                 }
-                // GroundItem을 찾았으면 (거리가 멀어도) 다른 오브젝트는 검사하지 않고 종료
                 return;
             }
-            // GroundItem이 아니면 다음 오브젝트 검사 계속
+        }
+    }
+    
+    /// <summary>
+    /// 플레이어 주변의 아이템을 찾아서 줍기 시도
+    /// </summary>
+    /// <param name="playerPosition">플레이어 위치</param>
+    /// <param name="pickupRange">줍기 가능 거리</param>
+    /// <returns>아이템을 줍았는지 여부</returns>
+    public bool TryPickupNearbyItem(Vector3 playerPosition, float pickupRange = 5f)
+    {
+        if (inventory == null)
+        {
+            Debug.LogWarning("Item_Controller: 인벤토리가 설정되지 않았습니다.");
+            return false;
         }
         
-        // GroundItem을 찾지 못했으면 조용히 무시 (Quad 등 다른 오브젝트는 무시)
+        // 주변의 모든 GroundItem 찾기
+        GroundItem[] allGroundItems = FindObjectsOfType<GroundItem>();
+        
+        GroundItem closestItem = null;
+        float closestDistance = float.MaxValue;
+        
+        // 가장 가까운 아이템 찾기
+        foreach (GroundItem groundItem in allGroundItems)
+        {
+            if (groundItem == null || groundItem.item == null || !groundItem.gameObject.activeInHierarchy)
+                continue;
+            
+            float distance = Vector3.Distance(groundItem.transform.position, playerPosition);
+            
+            if (distance <= pickupRange && distance < closestDistance)
+            {
+                closestItem = groundItem;
+                closestDistance = distance;
+            }
+        }
+        
+        // 가장 가까운 아이템 줍기 시도
+        if (closestItem != null)
+        {
+            Item pickedItem = closestItem.Pickup();
+            
+            if (pickedItem != null)
+            {
+                if (inventory.AddItem(pickedItem))
+                {
+                    Debug.Log($"'{pickedItem.itemName}' 아이템을 획득했습니다!");
+                    return true;
+                }
+                else
+                {
+                    Debug.LogWarning("인벤토리가 가득 찼습니다.");
+                    // 아이템 다시 활성화
+                    closestItem.gameObject.SetActive(true);
+                    return false;
+                }
+            }
+        }
+        
+        return false;
     }
 }

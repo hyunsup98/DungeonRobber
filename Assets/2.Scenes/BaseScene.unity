@@ -22203,7 +22203,13 @@ MonoBehaviour:
   shopRoot: {fileID: 1212292930}
   slotParent: {fileID: 383480862}
   availableItems:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: c35c6d529da40554cb4711e8aa08e5be, type: 2}
+  - {fileID: 11400000, guid: 45def54236c27564591ab379dd49f37a, type: 2}
+  - {fileID: 11400000, guid: 765f4aeda92a6c4438ee3bec464a6282, type: 2}
+  - {fileID: 11400000, guid: 3f29d4d9a2f1bf642b2682a3b6635c67, type: 2}
+  - {fileID: 11400000, guid: d38cec41e12294e41b374618006cfb2e, type: 2}
+  - {fileID: 11400000, guid: 4a75ac14be5f28548b4e8e1e931e8126, type: 2}
+  - {fileID: 11400000, guid: 5e26a76c6d10e4f48bf06b1b052a4822, type: 2}
   autoLoadDefaultItems: 1
 --- !u!114 &1212292932
 MonoBehaviour:

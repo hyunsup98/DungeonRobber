@@ -223,11 +223,12 @@ public class Shop : MonoBehaviour
 
         // 골드 확인
         int totalCost = item.buyPrice * quantity;
-        if (playerInventory.Gold < totalCost)
+        int currentGold = GameManager.Instance != null ? GameManager.Instance.Gold : 0;
+        if (currentGold < totalCost)
         {
-            int shortage = totalCost - playerInventory.Gold;
-            Debug.LogWarning($"골드가 부족합니다. (보유: {playerInventory.Gold}G, 필요: {totalCost}G)");
-            ShowMessage($"골드가 부족합니다.\n보유: {playerInventory.Gold}G / 필요: {totalCost}G\n부족: {shortage}G");
+            int shortage = totalCost - currentGold;
+            Debug.LogWarning($"골드가 부족합니다. (보유: {currentGold}G, 필요: {totalCost}G)");
+            ShowMessage($"골드가 부족합니다.\n보유: {currentGold}G / 필요: {totalCost}G\n부족: {shortage}G");
             return false;
         }
 
@@ -264,7 +265,15 @@ public class Shop : MonoBehaviour
         if (successCount > 0)
         {
             // 골드 차감
-            playerInventory.Gold -= totalCost;
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.Gold -= totalCost;
+                // 인벤토리 UI 골드 텍스트 업데이트
+                if (playerInventory != null)
+                {
+                    playerInventory.UpdateGoldText();
+                }
+            }
             
             // 상점 슬롯 새로고침
             RefreshSlots();
@@ -320,9 +329,21 @@ public class Shop : MonoBehaviour
     /// <param name="quantity">판매 수량</param>
     public void SellItem(Item item, int quantity = 1)
     {
-        if (item == null || playerInventory == null)
+        if (item == null)
         {
-            Debug.LogWarning("Shop: 아이템 또는 인벤토리를 찾을 수 없습니다.");
+            Debug.LogWarning("Shop: 아이템이 null입니다.");
+            return;
+        }
+        
+        // playerInventory가 없으면 다시 찾기
+        if (playerInventory == null)
+        {
+            playerInventory = FindObjectOfType<Inventory>();
+        }
+        
+        if (playerInventory == null)
+        {
+            Debug.LogWarning("Shop: 인벤토리를 찾을 수 없습니다.");
             return;
         }
 
@@ -334,9 +355,20 @@ public class Shop : MonoBehaviour
 
         // 골드 지급
         int sellPrice = item.sellPrice * quantity;
-        playerInventory.Gold += sellPrice;
-
-        Debug.Log($"'{item.itemName}' 아이템을 {quantity}개 판매했습니다. (+{sellPrice}G)");
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.Gold += sellPrice;
+            
+            // 인벤토리 UI 골드 텍스트 업데이트
+            Inventory[] allInventories = FindObjectsOfType<Inventory>();
+            foreach (Inventory inv in allInventories)
+            {
+                if (inv != null)
+                {
+                    inv.UpdateGoldText();
+                }
+            }
+        }
     }
 
     /// <summary>

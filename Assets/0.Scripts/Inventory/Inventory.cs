@@ -36,17 +36,23 @@ public class Inventory : MonoBehaviour
         }
     }
     
-    // 골드 관리
-    [Header("Gold")]
-    [SerializeField] private int gold = 0;
-    
+    // 골드 관리 - GameManager.Gold를 사용 (호환성을 위한 프로퍼티)
+    [System.Obsolete("GameManager.Gold를 직접 사용하세요. 이 프로퍼티는 GameManager.Gold를 반환합니다.")]
     public int Gold
     {
-        get => gold;
+        get
+        {
+            if (GameManager.Instance != null)
+                return GameManager.Instance.Gold;
+            return 0;
+        }
         set
         {
-            gold = Mathf.Max(0, value);
-            UpdateGoldText();
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.Gold = value;
+                UpdateGoldText();
+            }
         }
     }
     
@@ -309,11 +315,25 @@ public class Inventory : MonoBehaviour
     /// <summary>
     /// 골드 텍스트를 업데이트합니다.
     /// </summary>
-    private void UpdateGoldText()
+    public void UpdateGoldText()
     {
+        if (goldText == null)
+        {
+            TMPro.TextMeshProUGUI[] allTexts = GetComponentsInChildren<TMPro.TextMeshProUGUI>(true);
+            foreach (var text in allTexts)
+            {
+                if (text.CompareTag("GoldText"))
+                {
+                    goldText = text;
+                    break;
+                }
+            }
+        }
+        
         if (goldText != null)
         {
-            goldText.text = $"Gold: {gold:N0}";
+            int currentGold = GameManager.Instance != null ? GameManager.Instance.Gold : 0;
+            goldText.text = $"Gold: {currentGold:N0}";
         }
     }
 

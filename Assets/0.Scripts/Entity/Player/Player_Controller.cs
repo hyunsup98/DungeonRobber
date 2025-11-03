@@ -206,6 +206,22 @@ public sealed partial class Player_Controller : Entity
         {
             TryInteractWithChest();
         }
+        
+        // F 키 (상자 열기 우선, 없으면 아이템 줍기)
+        // NPC 상호작용은 NPC 클래스에서 자체적으로 처리하므로, 여기서는 상자/아이템만 처리
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            // 상자 근처에 있으면 상자 열기 (우선순위)
+            if (currentNearbyChest != null && !currentNearbyChest.IsOpened)
+            {
+                TryInteractWithChest();
+            }
+            // 상자가 없으면 아이템 줍기 시도
+            else if (itemController != null)
+            {
+                itemController.TryPickupNearbyItem(transform.position);
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -351,9 +367,20 @@ public sealed partial class Player_Controller : Entity
         if (foundChest != currentNearbyChest)
         {
             currentNearbyChest = foundChest;
-            if (foundChest != null)
+            
+            // UI 텍스트 표시/숨김
+            if (UIManager.Instance != null && UIManager.Instance.textInteractive != null)
             {
-                Debug.Log("[상자] E키를 눌러 상자를 열 수 있습니다.");
+                if (foundChest != null)
+                {
+                    // 상자가 근처에 있으면 텍스트 표시
+                    UIManager.Instance.textInteractive.OnInteractiveMessage("F키를 눌러 상자를 열 수 있습니다");
+                }
+                else
+                {
+                    // 상자가 없으면 텍스트 숨김
+                    UIManager.Instance.textInteractive.OffInteractiveMessage();
+                }
             }
         }
     }
@@ -366,7 +393,12 @@ public sealed partial class Player_Controller : Entity
         if (currentNearbyChest != null)
         {
             currentNearbyChest.Open();
-            Debug.Log("상자를 열었습니다!");
+            
+            if (UIManager.Instance != null && UIManager.Instance.textInteractive != null)
+            {
+                UIManager.Instance.textInteractive.OffInteractiveMessage();
+            }
+            currentNearbyChest = null;
         }
     }
     

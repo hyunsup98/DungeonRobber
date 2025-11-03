@@ -193,6 +193,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   item: {fileID: 11400000, guid: 145ee72006a9f5b468200839eedbb03f, type: 2}
-  pickupRange: 1
+  pickupRange: 5
   rotationSpeed: 60
   autoRotate: 1
+  raycastLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  raycastDistance: 100
