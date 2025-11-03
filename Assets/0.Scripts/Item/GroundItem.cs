@@ -14,11 +14,33 @@ public class GroundItem : MonoBehaviour
     [SerializeField] private float rotationSpeed = 60f;
     [SerializeField] private bool autoRotate = true;
 
+    [Header("마우스 오버 감지")]
+    [SerializeField] private LayerMask raycastLayerMask = -1; // 모든 레이어
+    [SerializeField] private float raycastDistance = 100f;
+
+    private Camera mainCamera;
+    private Collider itemCollider;
+    private bool isMouseOver = false;
+
     private void Start()
     {
         if (item == null)
         {
             Debug.LogWarning("GroundItem: 아이템 데이터가 설정되지 않았습니다.");
+        }
+
+        // 메인 카메라 찾기
+        mainCamera = Camera.main;
+        if (mainCamera == null)
+        {
+            mainCamera = FindObjectOfType<Camera>();
+        }
+
+        // Collider 찾기
+        itemCollider = GetComponent<Collider>();
+        if (itemCollider == null)
+        {
+            itemCollider = GetComponentInChildren<Collider>();
         }
     }
 
@@ -28,6 +50,54 @@ public class GroundItem : MonoBehaviour
         if (autoRotate)
         {
             transform.Rotate(0, rotationSpeed * Time.deltaTime, 0);
+        }
+
+        // 마우스 오버 감지
+        CheckMouseOver();
+    }
+
+    /// <summary>
+    /// 마우스 오버를 감지하여 툴팁을 표시합니다.
+    /// </summary>
+    private void CheckMouseOver()
+    {
+        if (item == null || mainCamera == null || itemCollider == null)
+            return;
+
+        // 레이캐스트로 마우스가 이 아이템을 가리키는지 확인
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        bool currentlyMouseOver = false;
+
+        if (Physics.Raycast(ray, out hit, raycastDistance, raycastLayerMask))
+        {
+            // 레이캐스트가 이 오브젝트나 자식 오브젝트를 맞췄는지 확인
+            if (hit.collider == itemCollider || hit.collider.transform.IsChildOf(transform) || hit.collider.transform == transform)
+            {
+                currentlyMouseOver = true;
+            }
+        }
+
+        // 상태가 변경되었을 때만 툴팁 업데이트
+        if (currentlyMouseOver != isMouseOver)
+        {
+            isMouseOver = currentlyMouseOver;
+            
+            ItemTooltip tooltip = ItemTooltip.GetOrFind();
+            if (tooltip != null)
+            {
+                if (isMouseOver)
+                {
+                    // 3D 위치를 스크린 좌표로 변환
+                    Vector3 screenPos = mainCamera.WorldToScreenPoint(transform.position);
+                    tooltip.Show(item, screenPos);
+                }
+                else
+                {
+                    tooltip.Hide();
+                }
+            }
         }
     }
 

@@ -208,10 +208,25 @@ public abstract class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public virtual void OnPointerEnter(PointerEventData eventData)
     {
+        // 아이템이 있을 때만 툴팁 표시
+        if (_item != null)
+        {
+            ItemTooltip tooltip = ItemTooltip.GetOrFind();
+            if (tooltip != null)
+            {
+                tooltip.Show(_item, eventData.position);
+            }
+        }
     }
 
     public virtual void OnPointerExit(PointerEventData eventData)
     {
+        // 툴팁 숨기기
+        ItemTooltip tooltip = ItemTooltip.GetOrFind();
+        if (tooltip != null)
+        {
+            tooltip.Hide();
+        }
     }
 
     public abstract void OnPointerClick(PointerEventData eventData);

@@ -121,30 +121,6 @@ public class Shop : MonoBehaviour
             }
         }
 #endif
-        
-        // Resources 폴더에서 찾기 (빌드 후에도 작동)
-        Item[] resourcesItems = Resources.LoadAll<Item>("Items");
-        foreach (var item in resourcesItems)
-        {
-            if (item != null && !availableItems.Contains(item))
-            {
-                availableItems.Add(item);
-                Debug.Log($"Shop: Resources에서 아이템 로드 완료 - {item.itemName}");
-            }
-        }
-        
-        // Resources 폴더의 루트에서도 찾기
-        Item[] rootResourcesItems = Resources.LoadAll<Item>("");
-        foreach (var item in rootResourcesItems)
-        {
-            if (item != null && !availableItems.Contains(item) && 
-                (item.itemName.Contains("포션") || item.itemName.Contains("Potion") ||
-                 item.itemType == Item.ItemType.Consumable))
-            {
-                availableItems.Add(item);
-                Debug.Log($"Shop: Resources 루트에서 아이템 로드 완료 - {item.itemName}");
-            }
-        }
     }
 
     private void InitializeSlots()
