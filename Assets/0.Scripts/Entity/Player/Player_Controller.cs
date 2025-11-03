@@ -165,8 +165,8 @@ public sealed partial class Player_Controller : Entity
             }
         }
         
-        // Tab 키 (인벤토리 열기/닫기)
-        if (Input.GetKeyDown(KeyCode.Tab))
+        // E 키 (인벤토리 열기/닫기)
+        if (Input.GetKeyDown(KeyCode.E))
         {
             if (inventory != null)
                 inventory.ToggleInventory();
