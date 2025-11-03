@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class NPC_Upgrade : NPC
@@ -20,7 +18,10 @@ public class NPC_Upgrade : NPC
 
     protected override void DoInteractive()
     {
-        upgradeUI.SetActive(true);
+        if(upgradeUI != null)
+        {
+            upgradeUI.SetActive(true);
+        }
     }
 
     protected override void OnTriggerExit(Collider other)

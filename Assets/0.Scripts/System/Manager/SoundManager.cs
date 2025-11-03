@@ -34,6 +34,7 @@ public class SoundManager : Singleton<SoundManager>
         if (soundEffectAudioSource == null || clip == null) return;
 
         soundEffectAudioSource.PlayOneShot(clip);
+        transform.position = Camera.main.transform.position;
     }
 
     public void SetSoundVolume(SoundType type, float volume)
