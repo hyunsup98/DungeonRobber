@@ -206,11 +206,6 @@ public sealed partial class Player_Controller : Entity
         {
             TryInteractWithChest();
         }
-
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            GetDamage(5f);
-        }
     }
 
     private void FixedUpdate()
