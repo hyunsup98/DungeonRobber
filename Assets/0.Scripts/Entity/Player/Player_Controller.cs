@@ -47,6 +47,7 @@ public sealed partial class Player_Controller : Entity
     [SerializeField] private float dodgeStamina;            //구르기할 때 소모할 스태미너
     [SerializeField] private float staminaRecoveryDelay;    //몇 초 동안 스태미너를 사용안하면 회복할지
     [SerializeField] private float staminaRecoverySpeed;    //스태미너 회복되는 속도
+
     [field: SerializeField] public float MaxStamina { get; private set; } = 100f;   //최대 스태미너
     public event Action onStaminaChanged;                   //스태미너 값이 변할 때 실행할 액션 이벤트
     private float staminaRecoveryTimer = 0f;
@@ -174,6 +175,11 @@ public sealed partial class Player_Controller : Entity
     {
         stats.SetBaseStat(type, value);
         stats.InitStat(type);
+        if(type == StatType.MoveSpeed)
+        {
+            runSpeed = stats.GetStat(StatType.MoveSpeed) * 1.5f;
+        }
+        onPlayerStatChanged?.Invoke();
     }
 
     #region 플레이어의 행동 상태 제어

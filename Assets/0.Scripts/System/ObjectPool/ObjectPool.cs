@@ -4,17 +4,22 @@ using UnityEngine;
 
 public abstract class ObjectPool<T> : Singleton<ObjectPool<T>> where T : MonoBehaviour
 {
-    //ÇÑ °¡Áö Å¸ÀÔ¸¸ ÀÖÀ¸¸é poolQueue¸¦ ÅëÇØ °ü¸®
+    //í•œ ê°€ì§€ íƒ€ì…ë§Œ ìˆìœ¼ë©´ poolQueueë¥¼ í†µí•´ ê´€ë¦¬
     protected Queue<T> poolQueue = new Queue<T>();
 
-    //¸ó½ºÅÍ, ¾ÆÀÌÅÛ µî °°Àº »óÈ²¿¡ ½ºÆùÇÏÁö¸¸ ¿©·¯ Á¾·ù°¡ ÀÖ´Â °æ¿ì poolDicÀ» ÅëÇØ °ü¸®
+    //ëª¬ìŠ¤í„°, ì•„ì´í…œ ë“± ê°™ì€ ìƒí™©ì— ìŠ¤í°í•˜ì§€ë§Œ ì—¬ëŸ¬ ì¢…ë¥˜ê°€ ìˆëŠ” ê²½ìš° poolDicì„ í†µí•´ ê´€ë¦¬
     protected Dictionary<string, Queue<T>> poolDic = new Dictionary<string, Queue<T>>();
 
+    private void Awake()
+    {
+        SingletonInit();
+    }
+
     /// <summary>
-    /// Á¦³×¸¯ ¿ÀºêÁ§Æ® Ç® ¡æ ¿ÀºêÁ§Æ® ²¨³»¿À±â
+    /// ì œë„¤ë¦­ ì˜¤ë¸Œì íŠ¸ í’€ â†’ ì˜¤ë¸Œì íŠ¸ êº¼ë‚´ì˜¤ê¸°
     /// </summary>
-    /// <param name="type"> ¿ÀºêÁ§Æ® Å¸ÀÔ </param>
-    /// <param name="pos"> ¿ÀºêÁ§Æ®¸¦ ¹èÄ¡ÇÒ À§Ä¡(ÇÏÀÌ¾î¶óÅ° ºÎ¸ğ ¿ÀºêÁ§Æ®) </param>
+    /// <param name="type"> ì˜¤ë¸Œì íŠ¸ íƒ€ì… </param>
+    /// <param name="pos"> ì˜¤ë¸Œì íŠ¸ë¥¼ ë°°ì¹˜í•  ìœ„ì¹˜(í•˜ì´ì–´ë¼í‚¤ ë¶€ëª¨ ì˜¤ë¸Œì íŠ¸) </param>
     /// <returns></returns>
     public T GetObject(T type, Transform pos)
     {
@@ -37,10 +42,10 @@ public abstract class ObjectPool<T> : Singleton<ObjectPool<T>> where T : MonoBeh
     }
 
     /// <summary>
-    /// Á¦³×¸¯ ¿ÀºêÁ§Æ® Ç® ¡æ ¿ÀºêÁ§Æ® ²¨³»¿À±â
+    /// ì œë„¤ë¦­ ì˜¤ë¸Œì íŠ¸ í’€ â†’ ì˜¤ë¸Œì íŠ¸ êº¼ë‚´ì˜¤ê¸°
     /// </summary>
-    /// <param name="type"> ¿ÀºêÁ§Æ® Å¸ÀÔ </param>
-    /// <param name="pos"> ¿ÀºêÁ§Æ®¸¦ ¹èÄ¡ÇÒ À§Ä¡(ÇÏÀÌ¾î¶óÅ° ºÎ¸ğ ¿ÀºêÁ§Æ®) </param>
+    /// <param name="type"> ì˜¤ë¸Œì íŠ¸ íƒ€ì… </param>
+    /// <param name="pos"> ì˜¤ë¸Œì íŠ¸ë¥¼ ë°°ì¹˜í•  ìœ„ì¹˜(í•˜ì´ì–´ë¼í‚¤ ë¶€ëª¨ ì˜¤ë¸Œì íŠ¸) </param>
     /// <returns></returns>
     public T GetObjects(T type, Transform pos)
     {
@@ -68,9 +73,9 @@ public abstract class ObjectPool<T> : Singleton<ObjectPool<T>> where T : MonoBeh
     }
 
     /// <summary>
-    /// Á¦³×¸¯ ¿ÀºêÁ§Æ® Ç® ¡æ ¿ÀºêÁ§Æ® ´ã±â
+    /// ì œë„¤ë¦­ ì˜¤ë¸Œì íŠ¸ í’€ â†’ ì˜¤ë¸Œì íŠ¸ ë‹´ê¸°
     /// </summary>
-    /// <param name="value"> ¿ÀºêÁ§Æ® </param>
+    /// <param name="value"> ì˜¤ë¸Œì íŠ¸ </param>
     public void TakeObject(T value)
     {
         if (value == null) return;
@@ -80,9 +85,9 @@ public abstract class ObjectPool<T> : Singleton<ObjectPool<T>> where T : MonoBeh
     }
 
     /// <summary>
-    /// Á¦³×¸¯ ¿ÀºêÁ§Æ® Ç® ¡æ ¿ÀºêÁ§Æ® ´ã±â
+    /// ì œë„¤ë¦­ ì˜¤ë¸Œì íŠ¸ í’€ â†’ ì˜¤ë¸Œì íŠ¸ ë‹´ê¸°
     /// </summary>
-    /// <param name="value"> ¿ÀºêÁ§Æ® </param>
+    /// <param name="value"> ì˜¤ë¸Œì íŠ¸ </param>
     public void TakeObjects(T value)
     {
         if (value == null) return;
