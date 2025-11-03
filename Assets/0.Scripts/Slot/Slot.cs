@@ -214,7 +214,8 @@ public abstract class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             ItemTooltip tooltip = ItemTooltip.GetOrFind();
             if (tooltip != null)
             {
-                tooltip.Show(_item, eventData.position);
+                // eventData.position 대신 Input.mousePosition 사용 (일관성 및 업데이트 문제 해결)
+                tooltip.Show(_item, Input.mousePosition);
             }
         }
     }

@@ -99,16 +99,7 @@ public class GroundItem : MonoBehaviour
             }
         }
         
-        // 마우스 오버 중일 때는 마우스 위치로 툴팁을 계속 업데이트
-        if (isMouseOver)
-        {
-            ItemTooltip tooltip = ItemTooltip.GetOrFind();
-            if (tooltip != null)
-            {
-                // 마우스 위치를 실시간으로 업데이트
-                tooltip.UpdatePosition(Input.mousePosition);
-            }
-        }
+        // 툴팁 위치는 고정되어 있으므로 업데이트 불필요
     }
 
     /// <summary>

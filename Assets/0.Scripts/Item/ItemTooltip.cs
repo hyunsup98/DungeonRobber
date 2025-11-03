@@ -33,12 +33,10 @@ public class ItemTooltip : MonoBehaviour
         if (Instance == null)
             Instance = this;
 
-        // 초기 상태는 비활성화
-        if (tooltipRoot != null)
-            tooltipRoot.gameObject.SetActive(false);
-        
-        // Canvas 찾기
+        // Canvas 찾기 (먼저 찾아야 EnsureCanvasParent에서 사용 가능)
         parentCanvas = GetComponentInParent<Canvas>();
+        if (parentCanvas == null)
+            parentCanvas = FindObjectOfType<Canvas>();
         if (parentCanvas != null)
             canvasRect = parentCanvas.GetComponent<RectTransform>();
         
@@ -46,18 +44,71 @@ public class ItemTooltip : MonoBehaviour
         if (tooltipRoot == null)
             tooltipRoot = GetComponent<RectTransform>();
         
+        // RectTransform 설정 확인 및 보정 (Canvas를 부모로 설정)
+        if (tooltipRoot != null)
+        {
+            ConfigureRectTransform(tooltipRoot);
+        }
+        
+        // 초기 상태는 비활성화
+        if (tooltipRoot != null)
+            tooltipRoot.gameObject.SetActive(false);
+        
         if (itemNameText == null)
             itemNameText = GetComponentInChildren<TextMeshProUGUI>();
     }
     
-    void Update()
+    /// <summary>
+    /// 툴팁 RectTransform을 올바르게 설정합니다.
+    /// 추천 설정: Anchor (0, 1), Pivot (0, 1) - 왼쪽 상단 기준
+    /// </summary>
+    private void ConfigureRectTransform(RectTransform rectTransform)
     {
-        // 툴팁이 표시 중일 때 마우스 위치로 계속 업데이트
-        if (isShowing && tooltipRoot != null && tooltipRoot.gameObject.activeSelf)
+        if (rectTransform == null) return;
+        
+        // Canvas를 부모로 설정하여 레이아웃 클램핑 방지
+        EnsureCanvasParent(rectTransform);
+        
+        // 레이아웃 컴포넌트가 부모에 있어도 영향을 받지 않도록 설정
+        CanvasGroup canvasGroup = rectTransform.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
         {
-            UpdatePosition(Input.mousePosition);
+            canvasGroup = rectTransform.gameObject.AddComponent<CanvasGroup>();
+        }
+        canvasGroup.ignoreParentGroups = true;
+    }
+    
+    /// <summary>
+    /// 툴팁이 Canvas의 직접 자식인지 확인하고, 아니면 이동시킵니다.
+    /// 이렇게 하면 인벤토리나 다른 UI 요소의 레이아웃에 클램핑되지 않습니다.
+    /// </summary>
+    private void EnsureCanvasParent(RectTransform rectTransform)
+    {
+        if (rectTransform == null) return;
+        
+        // Canvas 찾기
+        Canvas canvas = parentCanvas != null ? parentCanvas : GetComponentInParent<Canvas>();
+        if (canvas == null)
+        {
+            canvas = FindObjectOfType<Canvas>();
+        }
+        
+        if (canvas == null || rectTransform.parent == canvas.transform)
+        {
+            return; // 이미 Canvas 자식이거나 Canvas를 찾을 수 없음
+        }
+        
+        // Canvas의 RectTransform이 부모가 아니면 Canvas로 이동
+        if (rectTransform.parent != canvas.transform)
+        {
+            // 부모 레이아웃 컴포넌트의 영향을 받지 않도록 Canvas의 직접 자식으로 이동
+            rectTransform.SetParent(canvas.transform, false);
+            
+            // 가장 앞에 표시되도록 마지막 자식으로 이동
+            rectTransform.SetAsLastSibling();
         }
     }
+    
 
     /// <summary>
     /// ItemTooltip 인스턴스를 찾거나 생성합니다.
@@ -82,7 +133,7 @@ public class ItemTooltip : MonoBehaviour
     /// 아이템 정보를 표시합니다.
     /// </summary>
     /// <param name="item">표시할 아이템</param>
-    /// <param name="position">툴팁 위치 (스크린 좌표)</param>
+    /// <param name="position">사용하지 않음 (호환성을 위해 유지)</param>
     public void Show(Item item, Vector2 position)
     {
         if (item == null)
@@ -124,10 +175,10 @@ public class ItemTooltip : MonoBehaviour
             }
         }
 
-        // 툴팁 위치 설정
-        SetTooltipPosition(position);
+        // 부모 보장 (Canvas로 이동하여 레이아웃 클램핑 방지)
+        EnsureCanvasParent(tooltipRoot);
 
-        // 툴팁 표시
+        // 툴팁 표시 (위치는 고정, Unity 에디터에서 설정한 위치 사용)
         tooltipRoot.gameObject.SetActive(true);
         isShowing = true;
     }
@@ -142,78 +193,6 @@ public class ItemTooltip : MonoBehaviour
         isShowing = false;
     }
     
-    /// <summary>
-    /// 툴팁 위치만 업데이트합니다.
-    /// </summary>
-    /// <param name="screenPosition">마우스 위치</param>
-    public void UpdatePosition(Vector2 screenPosition)
-    {
-        if (tooltipRoot != null && tooltipRoot.gameObject.activeSelf)
-        {
-            SetTooltipPosition(screenPosition);
-        }
-    }
-
-    /// <summary>
-    /// 툴팁 위치를 설정합니다.
-    /// </summary>
-    private void SetTooltipPosition(Vector2 screenPosition)
-    {
-        if (tooltipRoot == null)
-        {
-            tooltipRoot = GetComponent<RectTransform>();
-            if (tooltipRoot == null)
-                return;
-        }
-
-        if (canvasRect == null || parentCanvas == null)
-        {
-            parentCanvas = GetComponentInParent<Canvas>();
-            if (parentCanvas != null)
-                canvasRect = parentCanvas.GetComponent<RectTransform>();
-            
-            if (canvasRect == null || parentCanvas == null)
-                return;
-        }
-
-        Vector2 localPoint;
-        Camera cam = parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : 
-                     (parentCanvas.renderMode == RenderMode.ScreenSpaceCamera ? parentCanvas.worldCamera : null);
-        
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRect,
-            screenPosition,
-            cam,
-            out localPoint))
-        {
-            // 좌표 변환 실패 시 스킵
-            return;
-        }
-
-        // 마우스 위치에 표시하되, 화면 밖으로 나가지 않도록 조정
-        Vector2 offset = new Vector2(15, -15); // 마우스에서 약간 오프셋
-        localPoint += offset;
-
-        // 화면 경계 체크 및 조정
-        // 레이아웃 업데이트로 정확한 크기 계산
-        Canvas.ForceUpdateCanvases();
-        UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRoot);
-        
-        Rect tooltipRect = tooltipRoot.rect;
-        Rect canvasRectBounds = canvasRect.rect;
-
-        // Canvas 크기 기준으로 경계 계산
-        float maxX = canvasRectBounds.xMax - tooltipRect.width;
-        float minX = canvasRectBounds.xMin;
-        float maxY = canvasRectBounds.yMax;
-        float minY = canvasRectBounds.yMin + tooltipRect.height;
-
-        // 경계 제한
-        localPoint.x = Mathf.Clamp(localPoint.x, minX, maxX);
-        localPoint.y = Mathf.Clamp(localPoint.y, minY, maxY);
-
-        tooltipRoot.anchoredPosition = localPoint;
-    }
 
     /// <summary>
     /// 아이템 타입을 한글 텍스트로 변환합니다.
