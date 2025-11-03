@@ -19,6 +19,8 @@ public class UIManager : Singleton<UIManager>
     [field : SerializeField] public UI_InteractiveMessage textInteractive { get; private set; } //상호작용 키 텍스트 클래스
     [field : SerializeField] public UI_PauseMenu pauseMenu { get; private set; }                //일시정지 메뉴
     [field : SerializeField] public UI_DeadMenu deadMenu { get; private set; }                  //플레이어가 죽었을 때 나오는 UI
+    [field : SerializeField] public Inventory inventory { get; private set; }                   //인벤토리
+    [field: SerializeField] public QuickSlot_Controller quickSlot { get; private set; }         //퀵슬롯
 
     #endregion
 
@@ -43,6 +45,11 @@ public class UIManager : Singleton<UIManager>
             if(Input.GetKeyDown(KeyCode.Escape))
             {
                 OnOffUI(pauseMenu.gameObject);
+            }
+
+            if(Input.GetKeyDown(KeyCode.I))
+            {
+                OnOffUI(inventory.gameObject);
             }
         }
     }
@@ -69,18 +76,21 @@ public class UIManager : Singleton<UIManager>
     private void UpdateUIByTitleScene()
     {
         OnOffUI(playerStat.gameObject, false);
+        OnOffUI(quickSlot.gameObject, false);
     }
 
     //베이스 씬으로 이동할 때 키고 꺼줄 UI
     private void UpdateUIByBaseScene()
     {
         OnOffUI(playerStat.gameObject, true);
+        OnOffUI(quickSlot.gameObject, true);
     }
 
     //던전 씬으로 이동할 때 키고 꺼줄 UI
     private void UpdateUIByDungeonScene()
     {
         OnOffUI(playerStat.gameObject, true);
+        OnOffUI(quickSlot.gameObject, true);
     }
 
     private void OnEnable()

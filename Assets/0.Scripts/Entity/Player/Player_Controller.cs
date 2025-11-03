@@ -142,6 +142,7 @@ public sealed partial class Player_Controller : Entity
 
         //스태미너 회복
         RecoveryStamina();
+
     }
 
     private void FixedUpdate()

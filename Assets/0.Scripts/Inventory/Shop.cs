@@ -176,17 +176,6 @@ public class Shop : MonoBehaviour
     public bool IsOpen => shopRoot != null && shopRoot.activeSelf;
 
     /// <summary>
-    /// 상점 열기/닫기를 토글합니다.
-    /// </summary>
-    public void ToggleShop()
-    {
-        if (IsOpen)
-            HideShop();
-        else
-            ShowShop();
-    }
-
-    /// <summary>
     /// 상점을 표시합니다.
     /// </summary>
     public void ShowShop()

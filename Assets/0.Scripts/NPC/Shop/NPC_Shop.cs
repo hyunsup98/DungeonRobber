@@ -1,14 +1,16 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class NPC_Upgrade : NPC
+public class NPC_Shop : NPC
 {
-    [SerializeField] private GameObject upgradeUI;
+    [SerializeField] private GameObject shopUI;
 
     private void Update()
     {
-        if(isCanInteractive)
+        if (isCanInteractive)
         {
-            if(Input.GetKeyDown(KeyCode.F))
+            if (Input.GetKeyDown(KeyCode.F))
             {
                 UIManager.Instance.OnOffUI(UIManager.Instance.textInteractive.gameObject, false);
                 DoInteractive();
@@ -18,9 +20,9 @@ public class NPC_Upgrade : NPC
 
     protected override void DoInteractive()
     {
-        if(upgradeUI != null)
+        if (shopUI != null)
         {
-            upgradeUI.SetActive(true);
+            shopUI.SetActive(true);
         }
     }
 
@@ -28,9 +30,9 @@ public class NPC_Upgrade : NPC
     {
         base.OnTriggerExit(other);
 
-        if (other.CompareTag("Player"))
+        if(other.CompareTag("Player") && shopUI != null)
         {
-            upgradeUI.SetActive(false);
+            shopUI.SetActive(false);
         }
     }
 }
